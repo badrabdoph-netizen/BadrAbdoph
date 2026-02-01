@@ -261,8 +261,6 @@ features: [
   "مفاجأة اليوم الكبير: عرض البرومو وجزء من الصور على شاشة القاعة أثناء الفرح",
 ],
 popular: true,
-  },
-  },
   {
     id: "media-coverage",
     name: "MEDIA COVERAGE",
