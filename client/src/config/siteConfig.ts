@@ -185,7 +185,7 @@ export const sessionPackages = [
   {
     id: "session-1",
     name: "باكدج 1",
-    price: "E1500",
+    price: "1500",
     description: "جلسة تصوير فقط ",
     features: [
       "عدد غير محدود من الصور",
@@ -197,15 +197,15 @@ export const sessionPackages = [
   {
     id: "session-2",
     name: "باكدج 2",
-    price: "E2500",
-    description: "الباقة الأكثر طلباً - تجربة متكاملة",
+    price: "اتصل للسعر",
+    description: "جلسة تصوير VIP ",
     features: [
-      "ألبوم كلاسيكي فاخر 18 صورة طباعة ليزر",
-      "تابلوه سابلميشن متوسط مقاس 40×50",
-      "كروت تذكارية صغيرة",
-      "شامل 2 REELS & TIKTOK",
       "عدد غير محدود من الصور",
-      "وقت محدد",
+      "MEDIA COVERAGE REELS & TIKTOK",
+      "تنظيم ريلز واستوريهات السوشيال ميديا",
+      "PROMO VIDEO [مصور خاص]",
+      " تصوير حفل الزفاف ",
+      " وقت مفتوح ",
     ],
     popular: true,
   },
@@ -219,8 +219,7 @@ export const sessionPackagesWithPrints = [
   {
     id: "prints-session-1",
     name: "باكدج 1",
-    price: "$3000",
-    description: "جلسة تصوير احترافية مع باقة متكاملة",
+    description: "الباقة الأكثر طلباً - تجربة متكاملة",
     features: [
       "ألبوم كلاسيكي فاخر 18 صورة طباعة ليزر",
       "تابلوه سابلميشن متوسط مقاس 40×50",
