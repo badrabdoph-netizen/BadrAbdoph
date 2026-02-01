@@ -1,8 +1,10 @@
+import { useMemo } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Check } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 import {
   sessionPackages,
   weddingPackages,
@@ -12,6 +14,58 @@ import {
 } from "@/config/siteConfig";
 
 export default function Services() {
+  const { data: dbPackages } = trpc.packages.getAll.useQuery(undefined, {
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+
+  const packagesByCategory = useMemo(() => {
+    const fromDb = (dbPackages && dbPackages.length > 0)
+      ? dbPackages.filter((p) => p.visible)
+      : null;
+
+    const sessions = fromDb
+      ? fromDb
+          .filter((p) => p.category === "session")
+          .map((p) => ({ ...p, features: p.features ?? [] }))
+      : sessionPackages.map((p) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          description: p.description,
+          features: p.features,
+          popular: p.popular,
+        }));
+
+    const wedding = fromDb
+      ? fromDb
+          .filter((p) => p.category === "wedding")
+          .map((p) => ({ ...p, features: p.features ?? [] }))
+      : weddingPackages.map((p) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          description: p.description,
+          features: p.features,
+          priceNote: (p as any).priceNote,
+        }));
+
+    const addons = fromDb
+      ? fromDb
+          .filter((p) => p.category === "addon")
+          .map((p) => ({ ...p, features: p.features ?? [] }))
+      : additionalServices.map((s) => ({
+          id: s.id,
+          name: s.name,
+          price: s.price,
+          description: s.description,
+          features: s.features,
+          emoji: s.emoji,
+        }));
+
+    return { sessions, wedding, addons };
+  }, [dbPackages]);
+
   return (
     <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: "'Cairo', sans-serif" }}>
       <Navbar />
@@ -33,7 +87,7 @@ export default function Services() {
           <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.services.sessionsTitle}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {sessionPackages.map((pkg) => (
+            {packagesByCategory.sessions.map((pkg: any) => (
               <div 
                 key={pkg.id} 
                 className={`relative bg-card border p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
@@ -87,7 +141,7 @@ export default function Services() {
           <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.services.weddingTitle}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {weddingPackages.map((pkg) => (
+            {packagesByCategory.wedding.map((pkg: any) => (
               <div key={pkg.id} className="bg-background p-6 border border-white/5 hover:border-primary/30 transition-colors">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-bold" style={{ fontFamily: "'Amiri', serif" }}>{pkg.name}</h3>
@@ -119,7 +173,7 @@ export default function Services() {
           <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.services.addonsTitle}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {additionalServices.map((service) => (
+            {packagesByCategory.addons.map((service: any) => (
               <div key={service.id} className="bg-card p-6 border border-white/5 hover:border-primary/30 transition-colors">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-bold" style={{ fontFamily: "'Amiri', serif" }}>

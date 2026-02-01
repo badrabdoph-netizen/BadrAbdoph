@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import { Phone, Mail, MapPin, Instagram, Facebook, Send } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { contactInfo, socialLinks, pageTexts, ctaTexts } from "@/config/siteConfig";
+import { useContactInfoMap } from "@/hooks/useContactInfoMap";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" }),
@@ -20,6 +21,16 @@ const formSchema = z.object({
 });
 
 export default function Contact() {
+  const { get } = useContactInfoMap();
+
+  const phone = get("phone", contactInfo.phone);
+  const whatsapp = get("whatsapp", contactInfo.whatsappNumber);
+  const email = get("email", contactInfo.email);
+  const location = get("location", contactInfo.location);
+  const instagram = get("instagram", socialLinks.instagram);
+  const facebook = get("facebook", socialLinks.facebook);
+  const tiktok = get("tiktok", socialLinks.tiktok);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -80,8 +91,8 @@ export default function Contact() {
                     </div>
                     <div>
                       <h4 className="font-bold text-lg">الهاتف / واتساب</h4>
-                      <a href={`https://wa.me/${contactInfo.whatsappNumber}`} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary transition-colors dir-ltr block text-right">
-                        {contactInfo.phone}
+                      <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary transition-colors dir-ltr block text-right">
+                        {phone}
                       </a>
                     </div>
                   </div>
@@ -92,8 +103,8 @@ export default function Contact() {
                     </div>
                     <div>
                       <h4 className="font-bold text-lg">البريد الإلكتروني</h4>
-                      <a href={`mailto:${contactInfo.email}`} className="text-muted-foreground hover:text-primary transition-colors">
-                        {contactInfo.email}
+                      <a href={`mailto:${email}`} className="text-muted-foreground hover:text-primary transition-colors">
+                        {email}
                       </a>
                     </div>
                   </div>
@@ -104,7 +115,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <h4 className="font-bold text-lg">الموقع</h4>
-                      <p className="text-muted-foreground">{contactInfo.location}</p>
+                      <p className="text-muted-foreground">{location}</p>
                     </div>
                   </div>
                 </div>
@@ -113,13 +124,13 @@ export default function Contact() {
               <div>
                 <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: "'Amiri', serif" }}>تابعنا على</h2>
                 <div className="flex space-x-4 space-x-reverse">
-                  <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="w-14 h-14 bg-card border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
+                  <a href={instagram} target="_blank" rel="noreferrer" className="w-14 h-14 bg-card border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
                     <Instagram size={24} />
                   </a>
-                  <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="w-14 h-14 bg-card border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
+                  <a href={facebook} target="_blank" rel="noreferrer" className="w-14 h-14 bg-card border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
                     <Facebook size={24} />
                   </a>
-                  <a href={socialLinks.tiktok} target="_blank" rel="noreferrer" className="w-14 h-14 bg-card border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
+                  <a href={tiktok} target="_blank" rel="noreferrer" className="w-14 h-14 bg-card border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
                   </a>
                 </div>
@@ -208,7 +219,7 @@ export default function Contact() {
 
       {/* WhatsApp Floating Button */}
       <a 
-        href={`https://wa.me/${contactInfo.whatsappNumber}`}
+        href={`https://wa.me/${whatsapp}`}
         target="_blank" 
         rel="noreferrer"
         className="fixed bottom-8 right-8 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center"

@@ -1,14 +1,25 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Instagram, Facebook } from "lucide-react";
+import { Menu, X, Instagram, Facebook, LayoutDashboard, PencilLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { navLinks, socialLinks, photographerInfo, ctaTexts } from "@/config/siteConfig";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { useEditMode } from "@/contexts/EditModeContext";
+import { useContactInfoMap } from "@/hooks/useContactInfoMap";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
+
+  const { user, isAuthenticated } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const { editMode, toggleEditMode, setEditMode } = useEditMode();
+
+  const { get: getContact } = useContactInfoMap();
+  const instagramUrl = getContact("instagram", socialLinks.instagram);
+  const facebookUrl = getContact("facebook", socialLinks.facebook);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,6 +28,13 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // If user is not admin (or logged out), always disable edit mode.
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin) {
+      setEditMode(false);
+    }
+  }, [isAuthenticated, isAdmin, setEditMode]);
 
   return (
     <nav
@@ -57,10 +75,40 @@ export default function Navbar() {
 
         {/* Social & CTA */}
         <div className="hidden md:flex items-center space-x-4 space-x-reverse">
-          <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="text-foreground/70 hover:text-primary transition-colors">
+          {isAdmin && (
+            <>
+              <Link href="/admin">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-foreground/80 hover:text-primary"
+                  title="لوحة التحكم"
+                >
+                  <LayoutDashboard size={18} className="ml-2" />
+                  لوحة التحكم
+                </Button>
+              </Link>
+              <Button
+                variant={editMode ? "default" : "outline"}
+                size="sm"
+                className={cn(
+                  "rounded-none",
+                  editMode
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                )}
+                onClick={toggleEditMode}
+                title="تفعيل/إيقاف وضع التعديل المباشر"
+              >
+                <PencilLine size={18} className="ml-2" />
+                {editMode ? "وضع التعديل: ON" : "وضع التعديل"}
+              </Button>
+            </>
+          )}
+          <a href={instagramUrl} target="_blank" rel="noreferrer" className="text-foreground/70 hover:text-primary transition-colors">
             <Instagram size={20} />
           </a>
-          <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="text-foreground/70 hover:text-primary transition-colors">
+          <a href={facebookUrl} target="_blank" rel="noreferrer" className="text-foreground/70 hover:text-primary transition-colors">
             <Facebook size={20} />
           </a>
           <Link href="/contact">
@@ -99,10 +147,10 @@ export default function Navbar() {
             </Link>
           ))}
           <div className="flex items-center space-x-6 space-x-reverse mt-8">
-            <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="text-foreground/70 hover:text-primary transition-colors">
+            <a href={instagramUrl} target="_blank" rel="noreferrer" className="text-foreground/70 hover:text-primary transition-colors">
               <Instagram size={24} />
             </a>
-            <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="text-foreground/70 hover:text-primary transition-colors">
+            <a href={facebookUrl} target="_blank" rel="noreferrer" className="text-foreground/70 hover:text-primary transition-colors">
               <Facebook size={24} />
             </a>
           </div>

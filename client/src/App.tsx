@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { EditModeProvider } from "./contexts/EditModeContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -29,12 +30,14 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
-        <div dir="rtl">
-          <TooltipProvider>
-            <Toaster position="top-center" />
-            <Router />
-          </TooltipProvider>
-        </div>
+        <EditModeProvider>
+          <div dir="rtl">
+            <TooltipProvider>
+              <Toaster position="top-center" />
+              <Router />
+            </TooltipProvider>
+          </div>
+        </EditModeProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

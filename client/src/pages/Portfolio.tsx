@@ -1,16 +1,35 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { X, ZoomIn } from "lucide-react";
 import { siteImages, pageTexts } from "@/config/siteConfig";
+import { trpc } from "@/lib/trpc";
 
 export default function Portfolio() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState("all");
 
-  const filteredImages = activeCategory === "all" 
-    ? siteImages.portfolioGallery 
-    : siteImages.portfolioGallery.filter(img => img.category === activeCategory);
+  const { data: dbPortfolio } = trpc.portfolio.getAll.useQuery(undefined, {
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+
+  const gallery = useMemo(() => {
+    if (dbPortfolio && dbPortfolio.length > 0) {
+      return dbPortfolio
+        .filter((img) => img.visible)
+        .map((img) => ({
+          src: img.url,
+          category: img.category,
+          title: img.title,
+        }));
+    }
+    return siteImages.portfolioGallery;
+  }, [dbPortfolio]);
+
+  const filteredImages = activeCategory === "all"
+    ? gallery
+    : gallery.filter((img) => img.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: "'Cairo', sans-serif" }}>

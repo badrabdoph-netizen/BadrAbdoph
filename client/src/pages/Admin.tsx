@@ -1,13 +1,29 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { 
   Image, 
@@ -21,6 +37,9 @@ import {
   Plus,
   Eye,
   EyeOff,
+  ArrowUp,
+  ArrowDown,
+  Pencil,
   Save,
   Loader2,
   LayoutGrid,
@@ -29,6 +48,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { getLoginUrl } from "@/const";
+import { aboutContent, pageTexts, photographerInfo } from "@/config/siteConfig";
 
 export default function Admin() {
   const { user, loading: authLoading, isAuthenticated, logout } = useAuth();
@@ -331,14 +351,22 @@ function ContentManager() {
 
   const [editingContent, setEditingContent] = useState<Record<string, string>>({});
 
+  const fallbackByKey: Record<string, string> = {
+    hero_title: photographerInfo.taglineAr,
+    hero_subtitle: photographerInfo.title,
+    hero_description: photographerInfo.descriptionAr,
+    about_title: aboutContent.title,
+    about_description: aboutContent.description,
+    cta_title: pageTexts.home.ctaTitle,
+    cta_description: pageTexts.home.ctaDescription,
+  };
+
   useEffect(() => {
-    if (content) {
-      const contentMap: Record<string, string> = {};
-      content.forEach((item) => {
-        contentMap[item.key] = item.value;
-      });
-      setEditingContent(contentMap);
-    }
+    const contentMap: Record<string, string> = { ...fallbackByKey };
+    (content ?? []).forEach((item) => {
+      contentMap[item.key] = item.value;
+    });
+    setEditingContent(contentMap);
   }, [content]);
 
   const handleSave = async (key: string, category: string, label?: string) => {
@@ -408,7 +436,7 @@ function PackagesManager() {
     onSuccess: () => {
       toast.success("تم إضافة الباقة");
       refetch();
-      setNewPackage({ name: "", price: "", description: "", category: "session", features: "" });
+      setNewPackage({ name: "", price: "", description: "", category: "session", features: "", popular: false });
     },
     onError: (error) => toast.error(error.message),
   });
@@ -433,6 +461,7 @@ function PackagesManager() {
     description: "",
     category: "session",
     features: "",
+    popular: false,
   });
 
   const handleCreate = async () => {
@@ -446,12 +475,152 @@ function PackagesManager() {
       description: newPackage.description,
       category: newPackage.category,
       features: newPackage.features.split("\n").filter(Boolean),
+      popular: newPackage.popular,
     });
   };
 
   if (isLoading) {
     return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin" /></div>;
   }
+
+  const PackageEditDialog = ({ pkg }: { pkg: any }) => {
+    const [open, setOpen] = useState(false);
+    const [draft, setDraft] = useState(() => ({
+      name: pkg.name ?? "",
+      price: pkg.price ?? "",
+      description: pkg.description ?? "",
+      category: pkg.category ?? "session",
+      popular: !!pkg.popular,
+      featuresText: Array.isArray(pkg.features) ? (pkg.features as string[]).join("\n") : "",
+    }));
+
+    useEffect(() => {
+      if (!open) return;
+      setDraft({
+        name: pkg.name ?? "",
+        price: pkg.price ?? "",
+        description: pkg.description ?? "",
+        category: pkg.category ?? "session",
+        popular: !!pkg.popular,
+        featuresText: Array.isArray(pkg.features) ? (pkg.features as string[]).join("\n") : "",
+      });
+    }, [open, pkg]);
+
+    const saveEdits = async () => {
+      await updateMutation.mutateAsync({
+        id: pkg.id,
+        name: draft.name,
+        price: draft.price,
+        description: draft.description,
+        category: draft.category,
+        popular: draft.popular,
+        features: draft.featuresText
+          .split("\n")
+          .map((l: string) => l.trim())
+          .filter(Boolean),
+      });
+      setOpen(false);
+    };
+
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button size="icon" variant="ghost" title="تعديل">
+            <Pencil className="w-4 h-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>تعديل الباقة</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>اسم الباقة</Label>
+                <Input
+                  value={draft.name}
+                  onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>السعر</Label>
+                <Input
+                  value={draft.price}
+                  onChange={(e) => setDraft({ ...draft, price: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>نوع الباقة</Label>
+                <Select
+                  value={draft.category}
+                  onValueChange={(value) =>
+                    setDraft({ ...draft, category: value })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="نوع الباقة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="session">جلسات تصوير</SelectItem>
+                    <SelectItem value="wedding">باقات زفاف</SelectItem>
+                    <SelectItem value="addon">خدمات إضافية</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>الأكثر طلباً</Label>
+                <div className="flex items-center justify-between rounded-md border border-white/10 px-3 py-2">
+                  <span className="text-sm text-muted-foreground">إظهار شارة</span>
+                  <Switch
+                    checked={draft.popular}
+                    onCheckedChange={(checked) =>
+                      setDraft({ ...draft, popular: checked })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>وصف الباقة</Label>
+              <Textarea
+                value={draft.description}
+                onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>المميزات (كل ميزة في سطر)</Label>
+              <Textarea
+                value={draft.featuresText}
+                onChange={(e) => setDraft({ ...draft, featuresText: e.target.value })}
+                rows={6}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="ghost">إلغاء</Button>
+            </DialogClose>
+            <Button onClick={saveEdits} disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin ml-2" />
+              ) : (
+                <Save className="w-4 h-4 ml-2" />
+              )}
+              حفظ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -474,6 +643,39 @@ function PackagesManager() {
               value={newPackage.price}
               onChange={(e) => setNewPackage({ ...newPackage, price: e.target.value })}
             />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              value={newPackage.category}
+              onValueChange={(value) =>
+                setNewPackage({ ...newPackage, category: value })
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="نوع الباقة" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="session">جلسات تصوير</SelectItem>
+                <SelectItem value="wedding">باقات زفاف</SelectItem>
+                <SelectItem value="addon">خدمات إضافية</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center justify-between gap-4 rounded-md border border-white/10 px-3 py-2">
+              <div className="text-right">
+                <Label className="text-sm">تمييز كـ "الأكثر طلباً"</Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  يظهر شارة على الباقة في صفحة الخدمات
+                </p>
+              </div>
+              <Switch
+                checked={newPackage.popular}
+                onCheckedChange={(checked) =>
+                  setNewPackage({ ...newPackage, popular: checked })
+                }
+              />
+            </div>
           </div>
           <Textarea
             placeholder="وصف الباقة"
@@ -503,6 +705,7 @@ function PackagesManager() {
                   <p className="text-2xl font-bold text-primary mt-2">{pkg.price}</p>
                 </div>
                 <div className="flex gap-1">
+                  <PackageEditDialog pkg={pkg} />
                   <Button
                     size="icon"
                     variant="ghost"
@@ -763,17 +966,56 @@ function SectionsManager() {
   }
 
   const defaultSections = [
-    { key: "hero", name: "القسم الرئيسي (Hero)", page: "home" },
-    { key: "about_preview", name: "قسم من أنا", page: "home" },
-    { key: "portfolio_preview", name: "معرض الأعمال", page: "home" },
-    { key: "services_preview", name: "الخدمات", page: "home" },
-    { key: "testimonials", name: "آراء العملاء", page: "home" },
-    { key: "cta", name: "قسم الدعوة للتواصل", page: "home" },
+    { key: "hero", name: "القسم الرئيسي (Hero)", page: "home", sortOrder: 1 },
+    { key: "about_preview", name: "قسم من أنا", page: "home", sortOrder: 2 },
+    { key: "portfolio_preview", name: "معرض الأعمال", page: "home", sortOrder: 3 },
+    { key: "services_preview", name: "الخدمات", page: "home", sortOrder: 4 },
+    { key: "testimonials", name: "آراء العملاء", page: "home", sortOrder: 5 },
+    { key: "cta", name: "قسم الدعوة للتواصل", page: "home", sortOrder: 6 },
   ];
 
+  const orderedSections = useMemo(() => {
+    const merged = defaultSections.map((section) => {
+      const db = sections?.find((s) => s.key === section.key);
+      return {
+        ...section,
+        sortOrder: db?.sortOrder ?? section.sortOrder,
+        visible: db?.visible ?? true,
+      };
+    });
+    merged.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    return merged;
+  }, [sections]);
+
   const getSectionVisibility = (key: string) => {
-    const section = sections?.find((s) => s.key === key);
+    const section = orderedSections.find((s) => s.key === key);
     return section?.visible ?? true;
+  };
+
+  const moveSection = (key: string, direction: -1 | 1) => {
+    const currentIndex = orderedSections.findIndex((s) => s.key === key);
+    const swapIndex = currentIndex + direction;
+    if (currentIndex === -1) return;
+    if (swapIndex < 0 || swapIndex >= orderedSections.length) return;
+
+    const a = orderedSections[currentIndex];
+    const b = orderedSections[swapIndex];
+
+    // Swap sortOrder values
+    upsertMutation.mutate({
+      key: a.key,
+      name: a.name,
+      page: a.page,
+      sortOrder: b.sortOrder,
+      visible: a.visible,
+    });
+    upsertMutation.mutate({
+      key: b.key,
+      name: b.name,
+      page: b.page,
+      sortOrder: a.sortOrder,
+      visible: b.visible,
+    });
   };
 
   return (
@@ -784,13 +1026,36 @@ function SectionsManager() {
           <CardDescription>تحكم في إظهار أو إخفاء أقسام الموقع</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {defaultSections.map((section) => (
+          {orderedSections.map((section, index) => (
             <div key={section.key} className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <p className="font-medium">{section.name}</p>
-                <p className="text-sm text-muted-foreground">الصفحة: {section.page === "home" ? "الرئيسية" : section.page}</p>
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold">
+                  {index + 1}
+                </div>
+                <div>
+                  <p className="font-medium">{section.name}</p>
+                  <p className="text-sm text-muted-foreground">الصفحة: {section.page === "home" ? "الرئيسية" : section.page}</p>
+                </div>
               </div>
               <div className="flex items-center gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  disabled={index === 0}
+                  onClick={() => moveSection(section.key, -1)}
+                  title="تحريك لأعلى"
+                >
+                  <ArrowUp className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  disabled={index === orderedSections.length - 1}
+                  onClick={() => moveSection(section.key, 1)}
+                  title="تحريك لأسفل"
+                >
+                  <ArrowDown className="w-4 h-4" />
+                </Button>
                 <Label htmlFor={section.key} className="text-sm">
                   {getSectionVisibility(section.key) ? "ظاهر" : "مخفي"}
                 </Label>

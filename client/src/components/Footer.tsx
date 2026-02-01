@@ -1,8 +1,18 @@
 import { Link } from "wouter";
 import { Instagram, Facebook, Phone, Mail, MapPin } from "lucide-react";
 import { photographerInfo, contactInfo, socialLinks, navLinks } from "@/config/siteConfig";
+import { useContactInfoMap } from "@/hooks/useContactInfoMap";
 
 export default function Footer() {
+  const { get } = useContactInfoMap();
+
+  const phone = get("phone", contactInfo.phone);
+  const email = get("email", contactInfo.email);
+  const location = get("location", contactInfo.location);
+  const instagram = get("instagram", socialLinks.instagram);
+  const facebook = get("facebook", socialLinks.facebook);
+  const tiktok = get("tiktok", socialLinks.tiktok);
+
   return (
     <footer className="bg-card border-t border-white/5 pt-16 pb-8">
       <div className="container mx-auto px-4">
@@ -20,13 +30,13 @@ export default function Footer() {
               {photographerInfo.descriptionAr}
             </p>
             <div className="flex space-x-4 space-x-reverse">
-              <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
+              <a href={instagram} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
                 <Instagram size={18} />
               </a>
-              <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
+              <a href={facebook} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
                 <Facebook size={18} />
               </a>
-              <a href={socialLinks.tiktok} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
+              <a href={tiktok} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
               </a>
             </div>
@@ -52,15 +62,15 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-center space-x-3 space-x-reverse justify-center md:justify-start">
                 <Phone size={18} className="text-primary" />
-                <span className="text-muted-foreground" dir="ltr">{contactInfo.phone}</span>
+                <span className="text-muted-foreground" dir="ltr">{phone}</span>
               </li>
               <li className="flex items-center space-x-3 space-x-reverse justify-center md:justify-start">
                 <Mail size={18} className="text-primary" />
-                <span className="text-muted-foreground">{contactInfo.email}</span>
+                <span className="text-muted-foreground">{email}</span>
               </li>
               <li className="flex items-center space-x-3 space-x-reverse justify-center md:justify-start">
                 <MapPin size={18} className="text-primary" />
-                <span className="text-muted-foreground">{contactInfo.location}</span>
+                <span className="text-muted-foreground">{location}</span>
               </li>
             </ul>
           </div>
