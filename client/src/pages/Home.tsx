@@ -71,13 +71,15 @@ export default function Home() {
                 {ctaTexts.bookSession}
               </Button>
             </Link>
-            <Link href="/portfolio">
+
+            {/* بدل "شاهد أعمالي" -> "عرض التفاصيل والاسعار" */}
+            <Link href="/services">
               <Button
                 variant="outline"
                 size="lg"
                 className="border-white text-white hover:bg-white hover:text-black px-8 py-6 text-lg rounded-none min-w-[180px]"
               >
-                {ctaTexts.viewPortfolio}
+                عرض التفاصيل والاسعار
               </Button>
             </Link>
           </div>
@@ -255,12 +257,14 @@ export default function Home() {
               لقطات مختارة
             </h2>
           </div>
+
+          {/* هنا زر "شاهد أعمالي" (Desktop) */}
           <Link href="/portfolio">
             <Button
               variant="outline"
               className="hidden md:flex border-white/20 hover:bg-white hover:text-black rounded-none"
             >
-              عرض المعرض الكامل
+              شاهد أعمالي
             </Button>
           </Link>
         </div>
@@ -288,13 +292,14 @@ export default function Home() {
           ))}
         </div>
 
+        {/* هنا زر "شاهد أعمالي" (Mobile) */}
         <div className="container mx-auto px-4 mt-8 md:hidden text-center">
           <Link href="/portfolio">
             <Button
               variant="outline"
               className="w-full border-white/20 hover:bg-white hover:text-black rounded-none"
             >
-              عرض المعرض الكامل
+              شاهد أعمالي
             </Button>
           </Link>
         </div>
