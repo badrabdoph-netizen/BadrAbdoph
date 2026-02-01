@@ -67,7 +67,7 @@ export default function Home() {
             <Link href="/contact">
               <Button
                 size="lg"
-                className="bg-primary rounded-none px-10 py-6 text-lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-6 text-lg"
               >
                 {ctaTexts.bookSession}
               </Button>
@@ -75,9 +75,8 @@ export default function Home() {
 
             <Link href="/services">
               <Button
-                variant="outline"
                 size="lg"
-                className="border-white text-white rounded-none px-10 py-6 text-lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-6 text-lg"
               >
                 عرض التفاصيل والاسعار
               </Button>
@@ -90,12 +89,12 @@ export default function Home() {
       <section className="py-28 relative">
         <div className="container mx-auto px-4">
 
-          {/* 🔥 الزر الجديد الكبير فوق الباقات */}
+          {/* ✅ زر كبير ملون فوق الباقات */}
           <div className="text-center mb-16">
             <Link href="/services">
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-16 py-8 text-2xl"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-20 py-8 text-2xl"
               >
                 عرض التفاصيل والاسعار
               </Button>
@@ -161,7 +160,10 @@ export default function Home() {
         <div className="container mx-auto px-4 text-center mb-12">
           <h2 className="text-4xl mb-6">معرض الأعمال</h2>
           <Link href="/portfolio">
-            <Button variant="outline" className="rounded-none px-10">
+            <Button
+              size="lg"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10"
+            >
               شاهد أعمالي
             </Button>
           </Link>
