@@ -1,4 +1,4 @@
-import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, adminProcedure } from "./_core/trpc";
@@ -7,9 +7,6 @@ import { z } from "zod";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import * as db from "./db";
-import { sdk } from "./_core/sdk";
-import { ENV } from "./_core/env";
-import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
   system: systemRouter,
@@ -22,41 +19,6 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
-
-admin: router({
-  login: publicProcedure
-    .input(z.object({ password: z.string().min(1, "يرجى إدخال كلمة المرور") }))
-    .mutation(async ({ ctx, input }) => {
-      const expected = ENV.adminPassword;
-      if (!expected) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "ADMIN_PASSWORD غير مضبوط على السيرفر",
-        });
-      }
-      if (input.password !== expected) {
-        throw new TRPCError({ code: "UNAUTHORIZED", message: "كلمة المرور غير صحيحة" });
-      }
-
-      const openId = "local-admin";
-      await db.upsertUser({
-        openId,
-        name: "Admin",
-        loginMethod: "local",
-        role: "admin",
-        lastSignedIn: new Date(),
-      });
-
-      const token = await sdk.createSessionToken(openId, { expiresInMs: ONE_YEAR_MS, name: "Admin" });
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.cookie(COOKIE_NAME, token, {
-        ...cookieOptions,
-        maxAge: ONE_YEAR_MS,
-      });
-
-      return { success: true } as const;
-    }),
-}),
   }),
 
   // Contact form submission with owner notification

@@ -1,16 +1,28 @@
-# Badr Photography (Clean + Admin)
+# تشغيل ونشر المشروع على Railway (بالعربي)
 
-## تشغيل على Railway (الأبسط)
-1) ارفع هذا المشروع على GitHub.
-2) اربط GitHub بـ Railway واعمل Deploy.
-3) بعد أول Deploy (حتى لو فشل/اشتغل)، ادخل Railway > Variables واضف:
-- DATABASE_URL = Reference إلى MYSQL_URL (أو انسخ رابط MySQL)
-- JWT_SECRET = أي نص طويل (32 حرف+)
-- ADMIN_PASSWORD = كلمة سر لوحة التحكم
+## 1) ارفع المشروع على GitHub
+- فك الضغط
+- ارفع الملفات للريبو
+- اعمل Commit
 
-## لوحة التحكم
-- افتح: /admin
-- اكتب كلمة السر (ADMIN_PASSWORD)
+## 2) على Railway: اربط الريبو واعمل Deploy
+النسخة دي فيها `nixpacks.toml` عشان تتفادى مشاكل pnpm في البناء.
 
-## ملاحظة
-هذا الإصدار يستبدل الصور الثقيلة بصور placeholder خفيفة لتناسب الخطة المجانية.
+## 3) متغيرات البيئة (Variables) المطلوبة
+في Railway -> Service -> Variables أضف:
+
+- `DATABASE_URL` = `${{MySQL.MYSQL_URL}}` (أو ربطها Reference من خدمة MySQL)
+- `JWT_SECRET` = أي نص طويل (32 حرف أو أكثر)
+- `ADMIN_PASSWORD` = كلمة سر لوحة التحكم
+
+> ملاحظة: لو عندك خدمة MySQL على Railway هتلاقي `MYSQL_URL` ضمن المتغيرات، اعمل `DATABASE_URL` Reference لها.
+
+## 4) تهيئة قاعدة البيانات (مرة واحدة فقط)
+بعد أول Deploy ناجح:
+- افتح Shell/Console (إن متاح) وشغل:
+`pnpm db:push`
+
+## 5) لوحة التحكم
+افتح:
+`/admin`
+وادخل كلمة السر من `ADMIN_PASSWORD`.

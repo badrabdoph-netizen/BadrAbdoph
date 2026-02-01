@@ -1,6 +1,6 @@
-# Railway / Nixpacks config
-# This forces pnpm to install without frozen-lockfile so deploys don't fail
-# when pnpm-lock.yaml differs slightly.
+[phases.setup]
+nixPkgs = ["nodejs_20", "pnpm-9_x"]
+
 [phases.install]
 cmds = ["pnpm install --no-frozen-lockfile"]
 
