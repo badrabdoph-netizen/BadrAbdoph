@@ -153,7 +153,7 @@ export const aboutContent = {
 ‏My goal is for every photo to tell a story and become a beautiful memory that lasts for years, especially during important occasions and VIP events‏  philosophy.`,
 
   philosophy:
-    "أؤمن أن أجمل الصور هي تلك التي تُلتقط دون تكلف، حين تكون المشاعر صادقة والابتسامات حقيقية.",
+    "أجمل صورة هي اللي بتطلع لوحدها، من غير تصنّع، لما الإحساس يكون صادق والضحكة حقيقية .",
 
   stats: [
     { number: "+500", label: "عميل سعيد" },
