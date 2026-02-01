@@ -220,22 +220,28 @@ export default function Home() {
       <section className="py-24 md:py-32 relative">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            {/* ✅ الصورة: ألوان دايمًا + تأثير يبان على الموبايل كمان */}
+            {/* ✅ ألوان دايمًا + تأثير قوي يشتغل على الموبايل */}
             <div className="relative order-2 md:order-1 group overflow-hidden">
               <div className="absolute -top-4 -left-4 w-full h-full border border-primary/30 z-0 hidden md:block"></div>
 
-              {/* Glow overlay بسيط (دايمًا خفيف + يزيد على الديسكتوب مع hover) */}
-              <div className="absolute inset-0 z-10 bg-gradient-to-tr from-primary/10 via-transparent to-primary/10 opacity-40 md:opacity-0 md:group-hover:opacity-40 transition-opacity duration-700 pointer-events-none" />
+              {/* Vignette لعمق الصورة */}
+              <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-black/45 via-transparent to-black/10" />
+
+              {/* Shine متحرك دايمًا (موبايل وديسكتوب) */}
+              <div className="about-shine absolute inset-0 z-20 pointer-events-none opacity-45 md:opacity-0 md:group-hover:opacity-55 transition-opacity duration-500" />
 
               <img
                 src={siteImages.aboutImage}
                 alt="Badr Photography Style"
+                style={{ filter: "none" }} // ✅ كسر أي grayscale مفروض من CSS
                 className="
                   relative z-0 w-full h-[600px] object-cover
-                  transition-transform duration-700 ease-in-out
-                  scale-[1.02] md:scale-100
-                  md:group-hover:scale-[1.05]
-                  shadow-[0_25px_80px_rgba(0,0,0,0.55)]
+                  grayscale-0 filter-none
+                  saturate-[1.35] contrast-[1.12] brightness-[1.05]
+                  transition-transform duration-[1100ms] ease-out
+                  scale-[1.06] md:scale-100
+                  md:group-hover:scale-[1.12]
+                  shadow-[0_30px_120px_rgba(0,0,0,0.65)]
                 "
               />
             </div>
@@ -267,7 +273,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Portfolio Preview (Horizontal Scroll) */}
+      {/* Portfolio Preview */}
       <section className="py-24 bg-card overflow-hidden">
         <div className="container mx-auto px-4 mb-12 flex justify-between items-end">
           <div>
@@ -395,6 +401,30 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      {/* CSS للتأثير القوي */}
+      <style>{`
+        @keyframes aboutShine {
+          0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
+          15% { opacity: 0.35; }
+          40% { opacity: 0.6; }
+          70% { opacity: 0.25; }
+          100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
+        }
+        .about-shine {
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255,255,255,0.10) 35%,
+            rgba(255,255,255,0.55) 50%,
+            rgba(255,255,255,0.10) 65%,
+            transparent 100%
+          );
+          transform: translateX(-140%) skewX(-18deg);
+          animation: aboutShine 3.2s ease-in-out infinite;
+          mix-blend-mode: overlay;
+        }
+      `}</style>
 
       <Footer />
     </div>
