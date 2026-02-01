@@ -73,7 +73,6 @@ export default function Home() {
               </Button>
             </Link>
 
-            {/* سيبناه زي ما هو عندك */}
             <Link href="/services">
               <Button
                 variant="outline"
@@ -95,7 +94,7 @@ export default function Home() {
       {/* Services Preview */}
       <section className="py-24 relative">
         <div className="container mx-auto px-4">
-          {/* ✅ الزر الجديد (ملون وواضح زي احجز جلستك بالظبط) */}
+          {/* الزر الكبير فوق الباقات */}
           <div className="text-center mb-12">
             <Link href="/services">
               <Button
@@ -221,14 +220,26 @@ export default function Home() {
       <section className="py-24 md:py-32 relative">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div className="relative order-2 md:order-1">
+            {/* ✅ الصورة: ألوان دايمًا + تأثير يبان على الموبايل كمان */}
+            <div className="relative order-2 md:order-1 group overflow-hidden">
               <div className="absolute -top-4 -left-4 w-full h-full border border-primary/30 z-0 hidden md:block"></div>
+
+              {/* Glow overlay بسيط (دايمًا خفيف + يزيد على الديسكتوب مع hover) */}
+              <div className="absolute inset-0 z-10 bg-gradient-to-tr from-primary/10 via-transparent to-primary/10 opacity-40 md:opacity-0 md:group-hover:opacity-40 transition-opacity duration-700 pointer-events-none" />
+
               <img
                 src={siteImages.aboutImage}
                 alt="Badr Photography Style"
-                className="relative z-10 w-full h-[600px] object-cover grayscale hover:grayscale-0 transition-all duration-700 ease-in-out"
+                className="
+                  relative z-0 w-full h-[600px] object-cover
+                  transition-transform duration-700 ease-in-out
+                  scale-[1.02] md:scale-100
+                  md:group-hover:scale-[1.05]
+                  shadow-[0_25px_80px_rgba(0,0,0,0.55)]
+                "
               />
             </div>
+
             <div className="order-1 md:order-2 text-right">
               <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
                 {aboutContent.subtitle}
