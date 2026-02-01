@@ -1,274 +1,165 @@
-/**
- * =====================================================
- * ملف إعدادات الموقع المركزي
- * Site Configuration File
- * =====================================================
- * 
- * يمكنك تعديل جميع محتويات الموقع من هذا الملف:
- * - معلومات المصور والتواصل
- * - الصور (Hero, Portfolio, About)
- * - النصوص والعناوين
- * - القوائم والروابط
- * - الباقات والأسعار
- * - آراء العملاء
- * - روابط السوشيال ميديا
- * 
- * =====================================================
- */
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Check } from "lucide-react";
+import {
+  sessionPackages,
+  weddingPackages,
+  additionalServices,
+  pageTexts,
+  ctaTexts,
+} from "@/config/siteConfig";
 
-// =====================================================
-// معلومات المصور الأساسية
-// =====================================================
-export const photographerInfo = {
-  name: "Badr Bado",
-  brandName: "BADR.PH",
-  title: "Wedding Photography",
-  taglineAr: "توثيق المشاعر واللحظات الحقيقية",
-  descriptionAr: "أسلوب سينمائي فاخر يخلد ذكرياتكم للأبد. نروي قصة حبكم من خلال عدسة فنية تلتقط أدق التفاصيل.",
-};
+export default function Services() {
+  return (
+    <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: "'Cairo', sans-serif" }}>
+      <Navbar />
 
-// =====================================================
-// معلومات التواصل
-// =====================================================
-export const contactInfo = {
-  phone: "+20 101 151 1561",
-  whatsappNumber: "201011511561", // بدون + أو مسافات للرابط
-  email: "contact@badr-ph.com",
-  location: "مصر (متاح للسفر للمحافظات)",
-};
+      {/* Header */}
+      <header className="pt-40 pb-20 bg-card relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('/images/wedding-1.jpg')] bg-cover bg-center opacity-10"></div>
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.services.title}</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+            {pageTexts.services.subtitle}
+          </p>
+        </div>
+      </header>
 
-// =====================================================
-// روابط السوشيال ميديا
-// =====================================================
-export const socialLinks = {
-  instagram: "https://www.instagram.com/badr_abdo_ph",
-  facebook: "https://www.facebook.com/badrabdophoto",
-  tiktok: "https://www.tiktok.com/@badr_abdo_ph?_r=1&_t=ZS-93VLFDPD2cH",
-};
+      {/* Session Packages */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.services.sessionsTitle}</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {sessionPackages.map((pkg) => (
+              <div 
+                key={pkg.id} 
+                className={`relative bg-card border p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
+                  pkg.popular 
+                    ? "border-primary shadow-lg shadow-primary/10 scale-105 z-10" 
+                    : "border-white/10 hover:border-primary/50"
+                }`}
+              >
+                {pkg.popular && (
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground px-4 py-1 text-sm font-bold rounded-full">
+                    الأكثر طلباً
+                  </div>
+                )}
+                <h3 className="text-2xl font-bold mb-2 text-center" style={{ fontFamily: "'Amiri', serif" }}>{pkg.name}</h3>
+                <div className="text-center mb-6">
+                  <span className="text-4xl font-bold text-primary">{pkg.price}</span>
+                </div>
+                <p className="text-muted-foreground text-center mb-8 text-sm">{pkg.description}</p>
+                
+                <ul className="space-y-4 mb-8">
+                  {pkg.features.map((feature, i) => (
+                    <li key={i} className="flex items-start text-sm">
+                      <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
+                      <span className="text-gray-300">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                <div className="text-center mt-auto">
+                  <Link href="/contact">
+                    <Button 
+                      className={`w-full rounded-none ${
+                        pkg.popular 
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                          : "bg-transparent border border-white/20 hover:bg-white hover:text-black"
+                      }`}
+                    >
+                      {ctaTexts.bookNow}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-// =====================================================
-// قائمة التنقل (Navbar)
-// =====================================================
-export const navLinks = [
-  { label: "الرئيسية", href: "/" },
-  { label: "من أنا", href: "/about" },
-  { label: "أعمالي", href: "/portfolio" },
-  { label: "الخدمات", href: "/services" },
-  { label: "تواصل معي", href: "/contact" },
-];
+      {/* Wedding Packages */}
+      <section className="py-20 bg-card border-t border-white/5">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.services.weddingTitle}</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {weddingPackages.map((pkg) => (
+              <div key={pkg.id} className="bg-background p-6 border border-white/5 hover:border-primary/30 transition-colors">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-bold" style={{ fontFamily: "'Amiri', serif" }}>{pkg.name}</h3>
+                  <span className="text-primary font-bold">{pkg.price}</span>
+                </div>
+                {pkg.priceNote && (
+                  <p className="text-xs text-muted-foreground mb-2">{pkg.priceNote}</p>
+                )}
+                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                  {pkg.description}
+                </p>
+                <ul className="space-y-2">
+                  {pkg.features.map((feature, i) => (
+                    <li key={i} className="flex items-start text-sm">
+                      <Check size={14} className="text-primary ml-2 mt-1 flex-shrink-0" />
+                      <span className="text-gray-400">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-// =====================================================
-// صور الموقع
-// =====================================================
-export const siteImages = {
-  // صورة Hero الرئيسية
-  heroImage: "/images/hero-1.jpg",
-  heroImage2: "/images/hero-2.webp",
-  
-  // صورة صفحة من أنا
-  aboutImage: "/images/portrait-1.jpg",
-  
-  // صور معرض الأعمال في الصفحة الرئيسية
-  portfolioPreview: [
-    { src: "/images/wedding-1.jpg", title: "لحظات الزفاف" },
-    { src: "/images/outdoor-1.jpg", title: "جلسات خارجية" },
-    { src: "/images/bw-1.jpg", title: "بورتريه كلاسيكي" },
-    { src: "/images/golden-1.jpg", title: "ساعة ذهبية" },
-    { src: "/images/wedding-2.jpg", title: "تفاصيل دقيقة" },
-  ],
-  
-  // صور صفحة Portfolio الكاملة
-  portfolioGallery: [
-    { src: "/images/wedding-1.jpg", category: "wedding", title: "لحظة الزفاف" },
-    { src: "/images/wedding-2.jpg", category: "wedding", title: "تفاصيل الفرح" },
-    { src: "/images/outdoor-1.jpg", category: "outdoor", title: "جلسة خارجية" },
-    { src: "/images/bw-1.jpg", category: "portrait", title: "بورتريه أبيض وأسود" },
-    { src: "/images/golden-1.jpg", category: "outdoor", title: "الساعة الذهبية" },
-    { src: "/images/portrait-1.jpg", category: "portrait", title: "بورتريه فني" },
-    { src: "/images/hero-1.jpg", category: "wedding", title: "لحظة رومانسية" },
-    { src: "/images/hero-2.webp", category: "outdoor", title: "جلسة مميزة" },
-  ],
-};
+      {/* Additional Services */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.services.addonsTitle}</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {additionalServices.map((service) => (
+              <div key={service.id} className="bg-card p-6 border border-white/5 hover:border-primary/30 transition-colors">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-bold" style={{ fontFamily: "'Amiri', serif" }}>
+                    {service.emoji} {service.name}
+                  </h3>
+                  <span className="text-primary font-bold">{service.price}</span>
+                </div>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                  {service.description}
+                </p>
+                <ul className="space-y-2">
+                  {service.features.map((feature, i) => (
+                    <li key={i} className="flex items-start text-sm">
+                      <Check size={14} className="text-primary ml-2 mt-1 flex-shrink-0" />
+                      <span className="text-gray-400">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          
+          <p className="text-center text-muted-foreground mt-8 text-sm">
+            * الأسعار قد تختلف حسب الموقع والتفاصيل الإضافية. غير شامل رسوم اللوكيشن.
+          </p>
+        </div>
+      </section>
 
-// =====================================================
-// نصوص صفحة من أنا (About)
-// =====================================================
-export const aboutContent = {
-  title: "شغف بتصوير اللحظات العفوية",
-  subtitle: "من أنا",
-  description: `أنا بدر، مصور فوتوغرافي متخصص في تصوير الزفاف والخطوبة. لا أبحث فقط عن الصورة الجميلة، بل أبحث عن الروح والمشاعر الحقيقية في كل لقطة. أسلوبي يجمع بين الفخامة السينمائية والبساطة العفوية، لإنتاج صور تظل حية في الذاكرة لسنوات طويلة.`,
-  
-  fullStory: `بدأت رحلتي مع التصوير منذ أكثر من 10 سنوات، حين أدركت أن الصورة ليست مجرد توثيق للحظة، بل هي حكاية كاملة تُروى في إطار واحد.
+      {/* CTA */}
+      <section className="py-20 text-center bg-primary/5">
+        <h2 className="text-3xl font-bold mb-6" style={{ fontFamily: "'Amiri', serif" }}>هل لديك استفسار خاص؟</h2>
+        <p className="text-muted-foreground mb-8">تواصل معي لمناقشة تفاصيل يومك وتصميم باقة تناسبك.</p>
+        <Link href="/contact">
+          <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-6 text-lg rounded-none">
+            تواصل معي
+          </Button>
+        </Link>
+      </section>
 
-تخصصت في تصوير الزفاف والخطوبة لأنني أؤمن أن هذه اللحظات هي الأكثر صدقاً وجمالاً في حياة أي شخص. أسعى دائماً لالتقاط المشاعر الحقيقية، الابتسامات العفوية، والنظرات المليئة بالحب.
-
-أسلوبي في التصوير يجمع بين الفخامة السينمائية والبساطة الأنيقة. أستخدم الإضاءة الطبيعية قدر الإمكان، وأحرص على خلق جو مريح يسمح للعروسين بالتعبير عن مشاعرهم بحرية.`,
-  
-  philosophy: "أؤمن أن أجمل الصور هي تلك التي تُلتقط دون تكلف، حين تكون المشاعر صادقة والابتسامات حقيقية.",
-  
-  stats: [
-    { number: "+500", label: "عميل سعيد" },
-    { number: "+10", label: "سنوات خبرة" },
-    { number: "+1000", label: "جلسة تصوير" },
-  ],
-};
-
-// =====================================================
-// آراء العملاء (Testimonials)
-// =====================================================
-export const testimonials = [
-  {
-    quote: "بدر مش مجرد مصور، هو فنان حقيقي. الصور طلعت أحلى مما كنا نتخيل بكتير، وكل لحظة حلوة اتوثقت بشكل طبيعي جداً. شكراً ليك يا مبدع!",
-    name: "أحمد & سارة",
-  },
-  {
-    quote: "التجربة كانت مريحة جداً، بدر خلى السيشن ممتع ومش متوترين خالص. الصور تحفة والألبوم الكواليتي بتاعته عالية جداً.",
-    name: "محمود & نورهان",
-  },
-];
-
-// =====================================================
-// باقات جلسات التصوير (Sessions)
-// =====================================================
-export const sessionPackages = [
-  {
-    id: "session-1",
-    name: "باكدج 1",
-    price: "$3000",
-    description: "جلسة تصوير احترافية مع باقة متكاملة",
-    features: [
-      "ألبوم كلاسيكي فاخر 18 صورة طباعة ليزر",
-      "تابلوه سابلميشن متوسط مقاس 40×50",
-      "كروت تذكارية صغيرة",
-      "شامل 2 REELS & TIKTOK",
-      "عدد غير محدود من الصور",
-      "وقت محدد",
-    ],
-    popular: false,
-  },
-  {
-    id: "session-2",
-    name: "باكدج 2",
-    price: "$4500",
-    description: "الباقة الأكثر طلباً - تجربة متكاملة",
-    features: [
-      "ألبوم كبير مقاس 30×80 عدد من 20 لـ 40 صورة",
-      "تابلوه أنيميشن كبير 50×70 جودة عالية مع طبقة حماية",
-      "ألبوم آخر مصغر أنيق + كروت صغيرة لصور السيشن",
-      "ساعة حائط كبيرة مصممة بصوركم الخاصة",
-      "REELS & TIKTOK",
-      "عدد غير محدود من الصور",
-      "وقت مفتوح",
-    ],
-    popular: true,
-  },
-];
-
-// =====================================================
-// باقات الزفاف (Wedding Packages)
-// =====================================================
-export const weddingPackages = [
-  {
-    id: "wedding-party",
-    name: "بارتي القاعة",
-    price: "$800",
-    priceNote: "غير شامل رسوم اللوكيشن",
-    description: "تغطية حفل الزفاف في القاعة",
-    features: [
-      "عدد غير محدد من الصور دائماً",
-      "صور جماعية مع الأصدقاء والأقارب",
-      "توثيق كل لحظة حتى نهاية الحفل",
-      "لقطات عفوية تخلد فرحتك",
-    ],
-    popular: false,
-  },
-  {
-    id: "media-coverage",
-    name: "MEDIA COVERAGE",
-    price: "$1000",
-    description: "تغطية سوشيال ميديا متكاملة",
-    features: [
-      "توثيق كامل اليوم من كل التفاصيل بشكل سينمائي مختصر",
-      "توثيق كامل لليوم بالهاتف",
-      "تنظيم ريلز واستوريهات السوشيال ميديا",
-    ],
-    popular: false,
-  },
-];
-
-// =====================================================
-// الخدمات الإضافية (Add-ons)
-// =====================================================
-export const additionalServices = [
-  {
-    id: "vip-full-day",
-    name: "تصوير اليوم الكامل FULL DAY (VIP)",
-    price: "$1700",
-    emoji: "🚀",
-    description: "تجربة تصوير كاملة بمستوى VIP لأن اليوم ده مش هيتكرر ❤️",
-    features: [
-      "تغطية يوم كامل",
-      "فيديو برومو سينمائي",
-      "هدايا حصرية",
-    ],
-  },
-  {
-    id: "promo-video",
-    name: "PROMO VIDEO",
-    price: "اتصل للسعر",
-    emoji: "🎬",
-    description: "فيديو ترويجي سينمائي احترافي",
-    features: [
-      "مونتاج احترافي",
-      "موسيقى مرخصة",
-      "تسليم سريع",
-    ],
-  },
-];
-
-// =====================================================
-// نصوص CTA (Call to Action)
-// =====================================================
-export const ctaTexts = {
-  bookSession: "احجز جلستك",
-  viewPortfolio: "شاهد أعمالي",
-  contactNow: "تواصل معنا الآن",
-  bookNow: "احجز الآن",
-  viewDetails: "عرض التفاصيل والأسعار",
-  readMore: "اقرأ قصتي",
-  sendRequest: "إرسال الطلب",
-};
-
-// =====================================================
-// نصوص الصفحات
-// =====================================================
-export const pageTexts = {
-  home: {
-    ctaTitle: "جاهزون لتوثيق قصتكم؟",
-    ctaDescription: "دعونا نصنع ذكريات لا تنسى معاً. تواصلوا معنا الآن لحجز موعدكم.",
-  },
-  contact: {
-    title: "تواصل معي",
-    subtitle: "جاهزون لتوثيق أجمل لحظات حياتكم. املأ النموذج أو تواصل معنا مباشرة.",
-    formTitle: "احجز موعدك",
-    infoTitle: "معلومات الاتصال",
-    infoDescription: "يمكنكم التواصل معنا عبر الهاتف أو الواتساب، أو متابعتنا على منصات التواصل الاجتماعي لرؤية أحدث أعمالنا.",
-  },
-  portfolio: {
-    title: "معرض الأعمال",
-    subtitle: "مجموعة مختارة من أجمل اللحظات التي وثقناها",
-    categories: [
-      { id: "all", label: "الكل" },
-      { id: "wedding", label: "زفاف" },
-      { id: "outdoor", label: "جلسات خارجية" },
-      { id: "portrait", label: "بورتريه" },
-    ],
-  },
-  services: {
-    title: "الخدمات والباقات",
-    subtitle: "باقات تصوير متنوعة تناسب جميع المناسبات",
-    sessionsTitle: "جلسات التصوير",
-    weddingTitle: "باقات الزفاف",
-    addonsTitle: "خدمات إضافية (اختياري)",
-  },
-};
+      <Footer />
+    </div>
+  );
+}
