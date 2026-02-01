@@ -263,8 +263,6 @@ export const weddingPackages = [
   popular: true,
   featured: true,
 },
-  popular: false,
-},
 ];
 
 // =====================================================
@@ -278,7 +276,7 @@ export const additionalServices = [
     emoji: "🚀",
     description: "تجربة تصوير كاملة بمستوى VIP لأن اليوم ده مش هيتكرر ❤️",
     features: ["تغطية يوم كامل", "فيديو برومو سينمائي", "هدايا حصرية"],
-  },
+   },
   {
     id: "promo-video",
     name: "PROMO VIDEO",
