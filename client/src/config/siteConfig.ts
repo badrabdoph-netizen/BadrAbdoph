@@ -146,7 +146,7 @@ export const siteImages = {
 export const aboutContent = {
   title: "شغف بتصوير اللحظات العفوية",
   subtitle: "من أنا",
-  description: `أنا بدر، مصور فوتوغرافي متخصص في تصوير الزفاف والخطوبة. لا أبحث فقط عن الصورة الجميلة، بل أبحث عن الروح والمشاعر الحقيقية في كل لقطة. أسلوبي يجمع بين الفخامة السينمائية والبساطة العفوية، لإنتاج صور تظل حية في الذاكرة لسنوات طويلة.`,
+  description: `‏My name is Badr Abdo, I am 26 years old and I hold a bachelor’s degree from Al-Azhar University. I chose to work as a photographer because I believe in doing what I truly love.`,
 
   fullStory: `بدأت رحلتي مع التصوير منذ أكثر من 10 سنوات، حين أدركت أن الصورة ليست مجرد توثيق للحظة، بل هي حكاية كاملة تُروى في إطار واحد.
 
