@@ -47,8 +47,8 @@ export default function Home() {
         <div className="relative z-20 container mx-auto px-4 text-center flex flex-col items-center animate-in fade-in zoom-in duration-1000">
           <h2 className="text-primary text-lg md:text-xl tracking-[0.3em] uppercase mb-4 font-medium">{photographerInfo.title}</h2>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight" style={{ fontFamily: "'Amiri', serif" }}>
-            توثيق <span className="italic text-primary">المشاعر</span><br />
-            واللحظات الحقيقية
+            مش مجرد <span className="italic text-primary">صور</span><br />
+            دي ذكريات متعاشة
           </h1>
           <p className="text-lg md:text-xl text-gray-300 max-w-2xl mb-10 font-light leading-relaxed">
             {photographerInfo.descriptionAr}
