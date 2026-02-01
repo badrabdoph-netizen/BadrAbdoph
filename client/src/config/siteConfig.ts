@@ -90,10 +90,15 @@ export default function Services() {
                   ))}
                 </ul>
 
-                {/* ✅ الزر ملوّن في كل الباكدجات */}
                 <div className="text-center mt-auto">
                   <Link href="/contact">
-                    <Button className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Button
+                      className={`w-full rounded-none ${
+                        pkg.popular
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "bg-transparent border border-white/20 hover:bg-white hover:text-black"
+                      }`}
+                    >
                       {ctaTexts.bookNow}
                     </Button>
                   </Link>
@@ -103,8 +108,9 @@ export default function Services() {
           </div>
 
           {/* ================================
-              Duplicate Section
+              Duplicate Section (As requested)
               "جلسات التصوير شامل المطبوعات"
+              نفس الباكدجات مؤقتاً - هتتعدل بعدين
              ================================ */}
           <div className="mt-24">
             <h2
@@ -159,10 +165,15 @@ export default function Services() {
                     ))}
                   </ul>
 
-                  {/* ✅ الزر ملوّن في كل الباكدجات */}
                   <div className="text-center mt-auto">
                     <Link href="/contact">
-                      <Button className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button
+                        className={`w-full rounded-none ${
+                          pkg.popular
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                            : "bg-transparent border border-white/20 hover:bg-white hover:text-black"
+                        }`}
+                      >
                         {ctaTexts.bookNow}
                       </Button>
                     </Link>
