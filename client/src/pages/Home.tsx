@@ -168,6 +168,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-center">
                   <Star size={14} className="ml-2 text-primary" /> تابلوهات خشبية
+                  مطبوعة
                 </li>
                 <li className="flex items-center">
                   <Star size={14} className="ml-2 text-primary" /> تغطية فيديو
@@ -220,20 +221,17 @@ export default function Home() {
       <section className="py-24 md:py-32 relative">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            {/* ✅ ألوان دايمًا + تأثير قوي يشتغل على الموبايل */}
             <div className="relative order-2 md:order-1 group overflow-hidden">
               <div className="absolute -top-4 -left-4 w-full h-full border border-primary/30 z-0 hidden md:block"></div>
 
-              {/* Vignette لعمق الصورة */}
               <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-black/45 via-transparent to-black/10" />
 
-              {/* Shine متحرك دايمًا (موبايل وديسكتوب) */}
               <div className="about-shine absolute inset-0 z-20 pointer-events-none opacity-45 md:opacity-0 md:group-hover:opacity-55 transition-opacity duration-500" />
 
               <img
                 src={siteImages.aboutImage}
                 alt="Badr Photography Style"
-                style={{ filter: "none" }} // ✅ كسر أي grayscale مفروض من CSS
+                style={{ filter: "none" }}
                 className="
                   relative z-0 w-full h-[600px] object-cover
                   grayscale-0 filter-none
@@ -287,14 +285,21 @@ export default function Home() {
               لقطات مختارة
             </h2>
           </div>
-          <Link href="/portfolio">
+
+          {/* ✅ الوحيد اللي اتغير: زر المعرض (ديسكتوب) */}
+          <a
+            href="https://badrabdoph.pixells.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:block"
+          >
             <Button
               variant="outline"
-              className="hidden md:flex border-white/20 hover:bg-white hover:text-black rounded-none"
+              className="border-white/20 hover:bg-white hover:text-black rounded-none"
             >
               عرض المعرض الكامل
             </Button>
-          </Link>
+          </a>
         </div>
 
         <div className="flex space-x-6 space-x-reverse overflow-x-auto pb-8 px-4 md:px-0 scrollbar-hide">
@@ -321,14 +326,20 @@ export default function Home() {
         </div>
 
         <div className="container mx-auto px-4 mt-8 md:hidden text-center">
-          <Link href="/portfolio">
+          {/* ✅ الوحيد اللي اتغير: زر المعرض (موبايل) */}
+          <a
+            href="https://badrabdoph.pixells.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
             <Button
               variant="outline"
               className="w-full border-white/20 hover:bg-white hover:text-black rounded-none"
             >
               عرض المعرض الكامل
             </Button>
-          </Link>
+          </a>
         </div>
       </section>
 
@@ -402,7 +413,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CSS للتأثير القوي */}
       <style>{`
         @keyframes aboutShine {
           0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
