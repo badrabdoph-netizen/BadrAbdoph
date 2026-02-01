@@ -197,7 +197,7 @@ export const sessionPackages = [
   {
     id: "session-2",
     name: "باكدج 2",
-    price: "اتصل للسعر",
+    price: "VIP",
     description: "جلسة تصوير VIP ",
     features: [
       "عدد غير محدود من الصور",
@@ -219,7 +219,8 @@ export const sessionPackagesWithPrints = [
   {
     id: "prints-session-1",
     name: "باكدج 1",
-    description: "الباقة الأكثر طلباً - تجربة متكاملة",
+    price: "$3000",
+    description: "جلسة تصوير احترافية مع باقة متكاملة",
     features: [
       "ألبوم كلاسيكي فاخر 18 صورة طباعة ليزر",
       "تابلوه سابلميشن متوسط مقاس 40×50",
