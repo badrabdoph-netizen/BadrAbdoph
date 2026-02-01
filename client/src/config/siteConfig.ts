@@ -260,6 +260,9 @@ export const weddingPackages = [
     "مطبوعات وألبومات اختيارية حسب الطلب",
     "مفاجأة اليوم الكبير: عرض البرومو وجزء من الصور على شاشة القاعة أثناء الفرح",
   ],
+  popular: true,
+  featured: true,
+},
   popular: false,
 },
 ];
