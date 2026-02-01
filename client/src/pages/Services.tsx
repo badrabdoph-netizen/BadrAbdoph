@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { Check } from "lucide-react";
 import {
   sessionPackages,
+  sessionPackagesWithPrints,
   weddingPackages,
   additionalServices,
   pageTexts,
@@ -90,7 +91,6 @@ export default function Services() {
                   ))}
                 </ul>
 
-                {/* ✅ الزر ملوّن في كل الباكدجات */}
                 <div className="text-center mt-auto">
                   <Link href="/contact">
                     <Button className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90">
@@ -102,22 +102,21 @@ export default function Services() {
             ))}
           </div>
 
-          {/* ================================
-              Duplicate Section
-              "جلسات التصوير شامل المطبوعات"
-             ================================ */}
+          {/* ==========================================
+              ✅ Sessions With Prints (FIXED)
+             ========================================== */}
           <div className="mt-24">
             <h2
               className="text-3xl font-bold text-center mb-12"
               style={{ fontFamily: "'Amiri', serif" }}
             >
-              جلسات التصوير شامل المطبوعات
+              {pageTexts.services.sessionsWithPrintsTitle}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {sessionPackages.map((pkg) => (
+              {sessionPackagesWithPrints.map((pkg) => (
                 <div
-                  key={`prints-${pkg.id}`}
+                  key={pkg.id}
                   className={`relative bg-card border p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
                     pkg.popular
                       ? "border-primary shadow-lg shadow-primary/10 scale-105 z-10"
@@ -159,7 +158,6 @@ export default function Services() {
                     ))}
                   </ul>
 
-                  {/* ✅ الزر ملوّن في كل الباكدجات */}
                   <div className="text-center mt-auto">
                     <Link href="/contact">
                       <Button className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90">
@@ -250,9 +248,7 @@ export default function Services() {
                   >
                     {service.emoji} {service.name}
                   </h3>
-                  <span className="text-primary font-bold">
-                    {service.price}
-                  </span>
+                  <span className="text-primary font-bold">{service.price}</span>
                 </div>
 
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">
