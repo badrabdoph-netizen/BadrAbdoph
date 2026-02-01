@@ -51,9 +51,9 @@ export const socialLinks = {
 // =====================================================
 export const navLinks = [
   { label: "الرئيسية", href: "/" },
-  { label: "من أنا", href: "/about" },
-  { label: "أعمالي", href: "/portfolio" },
-  { label: "الخدمات", href: "/services" },
+      { label: "الخدمات", href: "/services" },
+    { label: "من أنا", href: "/about" },
+    { label: "أعمالي", href: "/portfolio" },
   { label: "تواصل معي", href: "/contact" },
 ];
 
