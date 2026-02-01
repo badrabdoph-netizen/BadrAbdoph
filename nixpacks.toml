@@ -1,0 +1,11 @@
+# Railway / Nixpacks config
+# This forces pnpm to install without frozen-lockfile so deploys don't fail
+# when pnpm-lock.yaml differs slightly.
+[phases.install]
+cmds = ["pnpm install --no-frozen-lockfile"]
+
+[phases.build]
+cmds = ["pnpm build"]
+
+[start]
+cmd = "pnpm start"
