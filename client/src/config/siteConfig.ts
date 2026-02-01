@@ -146,15 +146,17 @@ export const siteImages = {
 export const aboutContent = {
   title: "شغف بتصوير اللحظات العفوية",
   subtitle: "من أنا",
-  description: `My name is Badr Abdo, I am 26 years old and I hold a bachelor’s degree from Al-Azhar University. I chose to work as a photographer because I believe in doing what I truly love..`,
-  fullStory: `Photography is something I truly love, and I see it as more than just a job — it’s a real passion and something I genuinely enjoy. What I love most is portrait photography, because I enjoy capturing people’s personalities and emotions, not just their appearance.
+  description: `أنا بدر، مصور فوتوغرافي متخصص في تصوير الزفاف والخطوبة. لا أبحث فقط عن الصورة الجميلة، بل أبحث عن الروح والمشاعر الحقيقية في كل لقطة. أسلوبي يجمع بين الفخامة السينمائية والبساطة العفوية، لإنتاج صور تظل حية في الذاكرة لسنوات طويلة.`,
 
-I also really enjoy photographing parties, weddings, and spontaneous moments, as these moments are natural, honest, and full of real emotions. I always focus on capturing the small details and genuine feelings in a simple yet artistic way.
+  fullStory: `بدأت رحلتي مع التصوير منذ أكثر من 10 سنوات، حين أدركت أن الصورة ليست مجرد توثيق للحظة، بل هي حكاية كاملة تُروى في إطار واحد.
 
-My goal is for every photo to tell a story and become a beautiful memory that lasts for years, especially during important occasions and VIP events.ة.`,
+تخصصت في تصوير الزفاف والخطوبة لأنني أؤمن أن هذه اللحظات هي الأكثر صدقاً وجمالاً في حياة أي شخص. أسعى دائماً لالتقاط المشاعر الحقيقية، الابتسامات العفوية، والنظرات المليئة بالحب.
+
+أسلوبي في التصوير يجمع بين الفخامة السينمائية والبساطة الأنيقة. أستخدم الإضاءة الطبيعية قدر الإمكان، وأحرص على خلق جو مريح يسمح للعروسين بالتعبير عن مشاعرهم بحرية.`,
+
   philosophy:
-    "أجمل صورة هي اللي بتطلع لوحدها، من غير تصنّع، لما الإحساس يكون صادق والضحكة حقيقية 
-"لما تكون بتحبني 🫶".",
+    "أؤمن أن أجمل الصور هي تلك التي تُلتقط دون تكلف، حين تكون المشاعر صادقة والابتسامات حقيقية.",
+
   stats: [
     { number: "+500", label: "عميل سعيد" },
     { number: "+10", label: "سنوات خبرة" },
