@@ -13,6 +13,10 @@ import {
 } from "@/config/siteConfig";
 
 export default function Services() {
+  // ✅ Identify VIP Plus package (by id OR featured flag if you add it later)
+  const isVipPlus = (pkg: any) =>
+    pkg?.id === "full-day-vip-plus" || pkg?.featured === true;
+
   return (
     <div
       className="min-h-screen bg-background text-foreground"
@@ -102,9 +106,7 @@ export default function Services() {
             ))}
           </div>
 
-          {/* ==========================================
-              ✅ Sessions With Prints (FIXED)
-             ========================================== */}
+          {/* Sessions With Prints */}
           <div className="mt-24">
             <h2
               className="text-3xl font-bold text-center mb-12"
@@ -183,44 +185,83 @@ export default function Services() {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {weddingPackages.map((pkg) => (
-              <div
-                key={pkg.id}
-                className="bg-background p-6 border border-white/5 hover:border-primary/30 transition-colors"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <h3
-                    className="text-xl font-bold"
-                    style={{ fontFamily: "'Amiri', serif" }}
-                  >
-                    {pkg.name}
-                  </h3>
-                  <span className="text-primary font-bold">{pkg.price}</span>
+            {weddingPackages.map((pkg) => {
+              const vip = isVipPlus(pkg);
+
+              return (
+                <div
+                  key={pkg.id}
+                  className={`relative overflow-hidden p-6 border transition-all duration-300 ${
+                    vip
+                      ? "bg-background border-primary/50 ring-2 ring-primary/20 shadow-[0_0_60px_rgba(255,215,0,0.12)] hover:shadow-[0_0_90px_rgba(255,215,0,0.18)] hover:-translate-y-2"
+                      : "bg-background border-white/5 hover:border-primary/30"
+                  }`}
+                >
+                  {/* ✅ VIP Plus Glow layers */}
+                  {vip && (
+                    <>
+                      <div className="pointer-events-none absolute -inset-1 opacity-40 blur-2xl bg-gradient-to-r from-primary/0 via-primary/25 to-primary/0 animate-[shine_2.8s_linear_infinite]" />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent" />
+                      <div className="absolute top-3 right-3 z-10 bg-primary text-primary-foreground px-3 py-1 text-xs font-bold rounded-full">
+                        VIP PLUS ✨
+                      </div>
+                    </>
+                  )}
+
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3
+                        className={`text-xl font-bold ${
+                          vip ? "text-primary" : ""
+                        }`}
+                        style={{ fontFamily: "'Amiri', serif" }}
+                      >
+                        {pkg.name}
+                      </h3>
+
+                      <span className="text-primary font-bold">{pkg.price}</span>
+                    </div>
+
+                    {pkg.priceNote && (
+                      <p
+                        className={`text-xs mb-2 ${
+                          vip ? "text-primary/90" : "text-muted-foreground"
+                        }`}
+                      >
+                        {pkg.priceNote}
+                      </p>
+                    )}
+
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                      {pkg.description}
+                    </p>
+
+                    <ul className="space-y-2 mb-6">
+                      {pkg.features.map((feature, i) => (
+                        <li key={i} className="flex items-start text-sm">
+                          <Check
+                            size={14}
+                            className="text-primary ml-2 mt-1 flex-shrink-0"
+                          />
+                          <span className="text-gray-400">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* ✅ زر خاص بالـ VIP Plus */}
+                    {vip && (
+                      <div className="mt-2">
+                        <Link href="/contact">
+                          <Button className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary/90">
+                            احجز VIP Plus
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 </div>
-
-                {pkg.priceNote && (
-                  <p className="text-xs text-muted-foreground mb-2">
-                    {pkg.priceNote}
-                  </p>
-                )}
-
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  {pkg.description}
-                </p>
-
-                <ul className="space-y-2">
-                  {pkg.features.map((feature, i) => (
-                    <li key={i} className="flex items-start text-sm">
-                      <Check
-                        size={14}
-                        className="text-primary ml-2 mt-1 flex-shrink-0"
-                      />
-                      <span className="text-gray-400">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -297,6 +338,16 @@ export default function Services() {
           </Button>
         </Link>
       </section>
+
+      {/* ✅ Keyframes for VIP shine (safe inline) */}
+      <style>
+        {`
+          @keyframes shine {
+            0% { transform: translateX(-60%); }
+            100% { transform: translateX(60%); }
+          }
+        `}
+      </style>
 
       <Footer />
     </div>
