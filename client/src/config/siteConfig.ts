@@ -205,11 +205,11 @@ export const sessionPackages = [
 export const sessionPackagesWithPrints = [
   {
     id: "prints-session-1",
-    name: "باكدج 1 (مطبوعات)",
+    name: "باكدج 1 (سيشن+مطبوعات)",
     price: "3000",
     description: "جلسة تصوير + مطبوعات (باقة متكاملة)",
     features: [
-      "ألبوم كلاسيكي فاخر 18 صورة طباعة ليزر",
+      "ألبوم كلاسيكي فاخر 20 صورة طباعة ليزر",
       "تابلوه سابلميشن متوسط مقاس 40×50",
       "كروت تذكارية صغيرة",
       "شامل REELS & TIKTOK",
@@ -220,7 +220,7 @@ export const sessionPackagesWithPrints = [
   },
   {
     id: "prints-session-2",
-    name: "باكدج 2 (مطبوعات)",
+    name: "باكدج 2 (سيشن+مطبوعات)",
     price: "4500",
     description: "الباقة الأكثر طلباً - تجربة متكاملة",
     features: [
