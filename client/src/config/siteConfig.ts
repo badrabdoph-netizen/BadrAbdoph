@@ -34,7 +34,7 @@ export const photographerInfo = {
 export const contactInfo = {
   phone: "+20 101 151 1561",
   whatsappNumber: "201011511561", // بدون + أو مسافات للرابط
-  email: "contact@badr-ph.com",
+  email: "Badrabdoph@icloud.com",
   location: "مصر (متاح للسفر للمحافظات)",
 };
 
