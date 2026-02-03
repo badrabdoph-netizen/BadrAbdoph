@@ -431,6 +431,24 @@ export default function Home() {
           mix-blend-mode: overlay;
         }
 
+        /* subtle grain overlay (very light) */
+        .hero-grain {
+          background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+          background-size: 160px 160px;
+          mix-blend-mode: overlay;
+        }
+
+        /* premium border sheen */
+        .premium-border {
+          position: relative;
+        }
+        .premium-border::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border: 1px solid rgba(255,255,255,0.06);
+          pointer-events: none;
         }
         .premium-border::after {
           content: "";
