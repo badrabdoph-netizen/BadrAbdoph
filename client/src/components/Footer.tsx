@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Instagram, Facebook, Phone, Mail, MapPin, ArrowLeft, Sparkles } from "lucide-react";
+import { Instagram, Facebook, Phone, Mail, MapPin, ArrowLeft, Sparkles, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { photographerInfo, contactInfo, socialLinks, navLinks, ctaTexts, externalPortfolioUrl } from "@/config/siteConfig";
@@ -17,13 +17,21 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
   );
 }
 
+function buildWhatsAppHref(text: string) {
+  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+  if (!phone) return "";
+  return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+}
+
 export default function Footer() {
   const [location] = useLocation();
 
   const phoneClean = (contactInfo.phone ?? "").replace(/\s/g, "");
   const telHref = phoneClean ? `tel:${phoneClean}` : "";
   const mailHref = contactInfo.email ? `mailto:${contactInfo.email}` : "";
-  const waHref = contactInfo.whatsappNumber ? `https://wa.me/${contactInfo.whatsappNumber}` : "";
+
+  const waBookingHref = buildWhatsAppHref("عايز احجز اوردر ❤️");
+  const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️");
 
   return (
     <footer className="relative border-t border-white/10 bg-card/30 overflow-hidden">
@@ -47,11 +55,11 @@ export default function Footer() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-              <Link href="/contact">
+              <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full md:w-auto">
                 <Button className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-8 py-6 text-base">
                   {ctaTexts.bookNow}
                 </Button>
-              </Link>
+              </a>
 
               <a
                 href={externalPortfolioUrl}
@@ -59,10 +67,8 @@ export default function Footer() {
                 rel="noreferrer"
                 className="w-full md:w-auto border border-white/15 bg-black/15 hover:bg-white hover:text-black transition-colors rounded-none px-8 py-6 text-base inline-flex items-center justify-center gap-2"
               >
-                <span className="text-primary">
-                  <WhatsAppIcon size={18} />
-                </span>
-                المعرض الخارجي
+                <ExternalLink className="w-4 h-4 text-primary" />
+                بعض أعمالنا
               </a>
             </div>
           </div>
@@ -107,9 +113,9 @@ export default function Footer() {
                 </a>
               ) : null}
 
-              {waHref ? (
+              {waInquiryHref ? (
                 <a
-                  href={waHref}
+                  href={waInquiryHref}
                   target="_blank"
                   rel="noreferrer"
                   className="w-12 h-12 rounded-full border border-white/10 bg-black/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
@@ -173,7 +179,27 @@ export default function Footer() {
                       <Phone size={20} />
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold">مكالمة / واتساب</div>
+                      <div className="text-sm font-bold">مكالمة</div>
+                      <div className="text-xs text-muted-foreground dir-ltr">{contactInfo.phone}</div>
+                    </div>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-foreground/50" />
+                </a>
+              ) : null}
+
+              {waInquiryHref ? (
+                <a
+                  href={waInquiryHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="premium-border w-full px-4 py-4 border border-white/10 bg-black/10 hover:border-primary/35 transition-colors flex items-center justify-between tap-target"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 border border-white/10 bg-black/15 flex items-center justify-center text-primary">
+                      <WhatsAppIcon size={20} />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold">واتساب</div>
                       <div className="text-xs text-muted-foreground dir-ltr">{contactInfo.phone}</div>
                     </div>
                   </div>
@@ -216,9 +242,7 @@ export default function Footer() {
 
         <div className="mt-10 pt-6 border-t border-white/10 text-center text-xs text-muted-foreground/80">
           <div className="flex flex-col md:flex-row items-center justify-between gap-2">
-            <div>
-              © {new Date().getFullYear()} {photographerInfo.name}. All rights reserved.
-            </div>
+            <div>© {new Date().getFullYear()} {photographerInfo.name}. All rights reserved.</div>
             <div className="text-muted-foreground/70">Built with a cinematic touch ✨</div>
           </div>
         </div>
