@@ -1,20 +1,10 @@
 /**
  * =====================================================
  * ملف إعدادات الموقع المركزي
- * Site Configuration File
- * =====================================================
- *
- * عدّل كل محتوى الموقع من هنا:
- * - معلومات المصور والتواصل
- * - روابط السوشيال
- * - النصوص الأساسية (Hero / CTA / عناوين الصفحات)
- * - أقسام الهوم (الكروت والمحتوى)
- * - الباقات (جلسات / زفاف / إضافات)
- * - صور البورتفوليو
- * - آراء العملاء
- *
  * =====================================================
  */
+
+export const externalPortfolioUrl = "https://badrabdoph.pixells.co";
 
 // =====================================================
 // معلومات المصور الأساسية
@@ -33,7 +23,7 @@ export const photographerInfo = {
 // =====================================================
 export const contactInfo = {
   phone: "+20 101 151 1561",
-  whatsappNumber: "201011511561", // بدون + أو مسافات للرابط
+  whatsappNumber: "201011511561",
   email: "Badrabdoph@icloud.com",
   location: "مصر (متاح للسفر للمحافظات)",
 };
@@ -54,7 +44,7 @@ export const navLinks = [
   { label: "الرئيسية", href: "/" },
   { label: "الخدمات", href: "/services" },
   { label: "من أنا", href: "/about" },
-  { label: "أعمالي", href: "/portfolio" },
+  { label: "أعمالي", href: externalPortfolioUrl }, // ✅ خارجي
   { label: "تواصل معي", href: "/contact" },
 ];
 
@@ -109,7 +99,6 @@ export const homeServicesPreview = [
 export const siteImages = {
   heroImage: "/images/hero-1.jpg",
   heroImage2: "/images/hero-2.webp",
-
   aboutImage: "/images/portrait-1.jpg",
 
   portfolioPreview: [
@@ -133,7 +122,7 @@ export const siteImages = {
 };
 
 // =====================================================
-// نصوص صفحة من أنا (About)
+// About
 // =====================================================
 export const aboutContent = {
   title: "BADR ABDO PH",
@@ -155,7 +144,7 @@ export const aboutContent = {
 };
 
 // =====================================================
-// آراء العملاء (Testimonials)
+// Testimonials
 // =====================================================
 export const testimonials = [
   {
@@ -171,7 +160,7 @@ export const testimonials = [
 ];
 
 // =====================================================
-// باقات جلسات التصوير (Sessions) - الأساسية
+// Packages + Addons (كما هي)
 // =====================================================
 export const sessionPackages = [
   {
@@ -199,9 +188,6 @@ export const sessionPackages = [
   },
 ];
 
-// =====================================================
-// جلسات التصوير شامل المطبوعات (مستقلة تمامًا)
-// =====================================================
 export const sessionPackagesWithPrints = [
   {
     id: "prints-session-1",
@@ -236,9 +222,6 @@ export const sessionPackagesWithPrints = [
   },
 ];
 
-// =====================================================
-// باقات الزفاف (Wedding Packages)
-// =====================================================
 export const weddingPackages = [
   {
     id: "full-day-vip-plus",
@@ -265,9 +248,6 @@ export const weddingPackages = [
   },
 ];
 
-// =====================================================
-// الخدمات الإضافية (Add-ons)
-// =====================================================
 export const additionalServices = [
   {
     id: "vip-full-day",
@@ -315,9 +295,6 @@ export const additionalServices = [
   },
 ];
 
-// =====================================================
-// نصوص CTA (Call to Action)
-// =====================================================
 export const ctaTexts = {
   bookSession: "احجز جلستك",
   viewPortfolio: "شاهد أعمالي",
@@ -328,15 +305,7 @@ export const ctaTexts = {
   sendRequest: "إرسال الطلب",
 };
 
-// =====================================================
-// نصوص الصفحات
-// =====================================================
 export const pageTexts = {
-  home: {
-    ctaTitle: "جاهزين نوثق فرحتكم؟",
-    ctaDescription: "لأن كل لحظة مهمة تستاهل تتوثّق صح.",
-  },
-
   contact: {
     title: "لحظاتك تستاهل اهتمام خاص",
     subtitle: "سيب بياناتك أو تواصل معانا مباشرة، وإحنا نهتم بالباقي.",
@@ -345,7 +314,14 @@ export const pageTexts = {
     infoDescription:
       "يمكنكم التواصل معنا عبر الهاتف أو الواتساب، أو متابعتنا على منصات التواصل الاجتماعي لرؤية أحدث أعمالنا.",
   },
-
+  services: {
+    title: "الخدمات والباقات",
+    subtitle: "باقات تصوير متنوعة تناسب جميع المناسبات",
+    sessionsTitle: "جلسات التصوير",
+    sessionsWithPrintsTitle: "جلسات التصوير شامل المطبوعات",
+    weddingTitle: "باقات الزفاف",
+    addonsTitle: "خدمات إضافية (اختياري)",
+  },
   portfolio: {
     title: "معرض الأعمال",
     subtitle: "مجموعة مختارة من أجمل اللحظات التي وثقناها",
@@ -355,14 +331,5 @@ export const pageTexts = {
       { id: "outdoor", label: "جلسات خارجية" },
       { id: "portrait", label: "بورتريه" },
     ],
-  },
-
-  services: {
-    title: "الخدمات والباقات",
-    subtitle: "باقات تصوير متنوعة تناسب جميع المناسبات",
-    sessionsTitle: "جلسات التصوير",
-    sessionsWithPrintsTitle: "جلسات التصوير شامل المطبوعات",
-    weddingTitle: "باقات الزفاف",
-    addonsTitle: "خدمات إضافية (اختياري)",
   },
 };
