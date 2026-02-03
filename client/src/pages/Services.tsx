@@ -45,6 +45,18 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
   );
 }
 
+function getNavOffsetPx() {
+  const v = getComputedStyle(document.documentElement).getPropertyValue("--nav-offset").trim();
+  const n = parseInt(v.replace("px", ""), 10);
+  return Number.isFinite(n) ? n : 96; // fallback
+}
+
+// scroll margin for sections = nav + quicknav height
+function getSectionScrollMarginPx() {
+  // quicknav تقريبًا 64-72
+  return getNavOffsetPx() + 78;
+}
+
 function SectionHeader({
   title,
   subtitle,
@@ -135,7 +147,6 @@ function PackageCard({
       )}
 
       <div className="relative z-10">
-        {/* Mobile-first: price block واضح فوق */}
         <div className="flex items-start justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 border border-white/10 bg-black/15 backdrop-blur-md flex items-center justify-center">
@@ -168,7 +179,6 @@ function PackageCard({
           ))}
         </ul>
 
-        {/* Mobile-first: أزرار بعرض كامل */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <PrimaryCTA />
           <Link href="/contact">
@@ -208,7 +218,9 @@ function QuickNav({
   return (
     <div
       className="sticky z-30 bg-background/75 backdrop-blur-md border-y border-white/10"
-      style={{ top: "calc(76px + env(safe-area-inset-top))" }}
+      style={{
+        top: "var(--nav-offset, 96px)", // ✅ بدل رقم ثابت
+      }}
     >
       <div className="container mx-auto px-4 py-3">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -242,7 +254,7 @@ function MobileStickyBar({ show }: { show: boolean }) {
   return (
     <div
       className={[
-        "fixed md:hidden left-0 right-0 z-50 transition-transform duration-300",
+        "fixed md:hidden left-0 right-0 z-50 transition-transform duration-300 will-change-transform",
         show ? "translate-y-0" : "translate-y-full",
       ].join(" ")}
       style={{ bottom: "calc(0px + env(safe-area-inset-bottom))" }}
@@ -278,20 +290,23 @@ export default function Services() {
   const [activeSection, setActiveSection] = useState("sessions");
   const [showSticky, setShowSticky] = useState(false);
 
-  // ✅ Jump to section (top of section, not middle)
+  // ✅ Jump to section (top of section, not middle) with offset
   const jumpTo = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const offset = getSectionScrollMarginPx();
+    const top = el.getBoundingClientRect().top + window.scrollY - offset;
+
+    window.scrollTo({ top: Math.max(0, top), left: 0, behavior: "smooth" });
   };
 
-  // ✅ Active section + sticky bottom bar logic
+  // ✅ Active section + sticky bar
   useEffect(() => {
     const ids = ["sessions", "prints", "wedding", "addons"];
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // pick the most visible entry
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0];
@@ -300,9 +315,9 @@ export default function Services() {
       },
       {
         root: null,
-        // مهم: نخلي التتبع يحس بالnavbar + quicknav
-        rootMargin: "-120px 0px -60% 0px",
-        threshold: [0.15, 0.25, 0.35],
+        // ✅ حساب الـ nav + quicknav تقريباً
+        rootMargin: `-${getSectionScrollMarginPx()}px 0px -55% 0px`,
+        threshold: [0.12, 0.2, 0.3, 0.4],
       }
     );
 
@@ -311,9 +326,12 @@ export default function Services() {
       if (el) observer.observe(el);
     });
 
+    let raf = 0;
     const onScroll = () => {
-      // يظهر بعد ما تنزل شوية
-      setShowSticky(window.scrollY > 450);
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        setShowSticky(window.scrollY > 420);
+      });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -321,7 +339,14 @@ export default function Services() {
     return () => {
       observer.disconnect();
       window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
     };
+  }, []);
+
+  const sectionStyle = useMemo(() => {
+    return {
+      scrollMarginTop: `${getSectionScrollMarginPx()}px`,
+    } as React.CSSProperties;
   }, []);
 
   return (
@@ -365,10 +390,7 @@ export default function Services() {
       <QuickNav active={activeSection} onJump={jumpTo} />
 
       {/* Sections */}
-      <section
-        id="sessions"
-        className="py-16 scroll-mt-[160px]"
-      >
+      <section id="sessions" className="py-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.sessionsTitle}
@@ -384,10 +406,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section
-        id="prints"
-        className="py-16 scroll-mt-[160px]"
-      >
+      <section id="prints" className="py-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.sessionsWithPrintsTitle}
@@ -403,10 +422,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section
-        id="wedding"
-        className="py-16 bg-card border-y border-white/5 scroll-mt-[160px]"
-      >
+      <section id="wedding" className="py-16 bg-card border-y border-white/5" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.weddingTitle}
@@ -422,10 +438,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section
-        id="addons"
-        className="py-16 scroll-mt-[160px]"
-      >
+      <section id="addons" className="py-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.addonsTitle}
@@ -474,6 +487,9 @@ export default function Services() {
           </p>
         </div>
       </section>
+
+      {/* ✅ Spacer to prevent bottom bar covering content */}
+      <div className="md:hidden" style={{ height: "92px" }} />
 
       {/* Mobile Sticky Bottom Bar */}
       <MobileStickyBar show={showSticky} />
