@@ -1,22 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Camera, Heart, Star } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import {
-  photographerInfo,
-  siteImages,
-  aboutContent,
-  testimonials,
-  pageTexts,
-  ctaTexts,
-} from "@/config/siteConfig";
 
-export default function Home() {
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  // ✅ smoother parallax (no stutter)
   useEffect(() => {
     let raf = 0;
 
