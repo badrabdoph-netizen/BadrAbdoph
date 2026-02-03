@@ -136,7 +136,7 @@ export const siteImages = {
 // نصوص صفحة من أنا (About)
 // =====================================================
 export const aboutContent = {
-  title: "شغف بتصوير اللحظات العفوية",
+  title: "BADR ABDO PH",
   subtitle: "من أنا",
   description: `‏My name is Badr Abdo, I am 26 years old and I hold a bachelor’s degree from Al-Azhar University. I chose to work as a photographer because I believe in doing what I truly love.`,
 
