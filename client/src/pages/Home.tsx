@@ -13,6 +13,7 @@ import {
   homeHero,
   homeServicesPreview,
   externalPortfolioUrl,
+  contactInfo,
 } from "@/config/siteConfig";
 
 function ServiceIcon({ title }: { title: string }) {
@@ -34,6 +35,12 @@ function StarsRow() {
   );
 }
 
+function buildWhatsAppHref(text: string) {
+  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+  if (!phone) return "";
+  return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+}
+
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const portfolioRef = useRef<HTMLElement | null>(null);
@@ -48,7 +55,6 @@ export default function Home() {
           heroRef.current.style.transform = `translate3d(0, ${scrolled * 0.35}px, 0)`;
         }
 
-        // ✅ سرعة الماركي بتزيد حسب السكرول (Boost)
         const v = Math.min(10, Math.max(0, window.scrollY / 900)); // 0..10
         document.documentElement.style.setProperty("--marquee-boost", `${v}s`);
       });
@@ -109,6 +115,8 @@ export default function Home() {
     el.style.setProperty("--spot-y", `${y}%`);
   };
 
+  const waBookingHref = useMemo(() => buildWhatsAppHref("عايز احجز اوردر ❤️"), []);
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden relative z-10">
       <Navbar />
@@ -159,14 +167,14 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <Link href="/contact">
+            <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
               <Button
                 size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg rounded-none w-full sm:w-auto"
               >
                 {homeHero?.primaryCta ?? ctaTexts.bookSession}
               </Button>
-            </Link>
+            </a>
 
             <Link href="/services#sessions">
               <Button
@@ -264,7 +272,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ✅ أعمالي (كريتف زيادة + صفّين + Spotlight) */}
+      {/* ✅ أعمال (Preview) */}
       <section
         ref={(el) => (portfolioRef.current = el)}
         className="py-20 relative overflow-hidden"
@@ -274,7 +282,6 @@ export default function Home() {
           if (t) setSpot(t.clientX, t.clientY);
         }}
         style={{
-          // defaults
           // @ts-ignore
           "--spot-x": "50%",
           "--spot-y": "35%",
@@ -286,22 +293,17 @@ export default function Home() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col items-center text-center gap-3 mb-9">
-            <h3 className="text-primary text-sm tracking-widest uppercase font-bold">أعمالي</h3>
+            <h3 className="text-primary text-sm tracking-widest uppercase font-bold">أعمالنا</h3>
             <h2 className="text-3xl md:text-5xl font-bold">Preview سريع — ستايل سينمائي</h2>
-            <p className="text-muted-foreground max-w-2xl leading-relaxed">
-              الصف فوق يمشي ناحية… والصف تحت عكسه — وكل ما تسكرول، الحركة تبقى أشيك 👌
-            </p>
 
             <a
               href={externalPortfolioUrl}
               className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-4 inline-flex items-center gap-2"
+              target="_blank"
+              rel="noreferrer"
             >
-              أعمالي (Pixells) <ExternalLink className="w-4 h-4" />
+              بعض أعمالنا <ExternalLink className="w-4 h-4" />
             </a>
-
-            <div className="mt-2 text-xs text-muted-foreground/70">
-              * فتح المعرض الخارجي في نفس التبويب
-            </div>
           </div>
 
           {/* Rows */}
@@ -365,6 +367,8 @@ export default function Home() {
               <a
                 href={externalPortfolioUrl}
                 className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none px-10 py-4 inline-flex items-center gap-2"
+                target="_blank"
+                rel="noreferrer"
               >
                 عرض المعرض كامل <ZoomIn className="w-4 h-4" />
               </a>
@@ -462,11 +466,11 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/contact">
+            <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto">
                 {ctaTexts.bookNow}
               </Button>
-            </Link>
+            </a>
 
             <Link href="/services#sessions">
               <Button
@@ -529,7 +533,6 @@ export default function Home() {
         @media (min-width: 640px) { .marquee__item { width: min(38vw, 340px); } }
         @media (min-width: 1024px) { .marquee__item { width: 230px; } }
 
-        /* boost controlled by scroll: --marquee-boost (0s..10s) */
         .marquee__track--left {
           animation: marqueeLeft linear infinite;
           animation-duration: calc(28s - var(--marquee-boost, 0s));
@@ -548,7 +551,6 @@ export default function Home() {
         @keyframes marqueeLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         @keyframes marqueeRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
-        /* Spotlight follows pointer/touch */
         .spotlight-layer {
           background: radial-gradient(
             circle at var(--spot-x, 50%) var(--spot-y, 35%),
@@ -559,7 +561,6 @@ export default function Home() {
           filter: blur(0px);
         }
 
-        /* Film-frame lines */
         .film-frame {
           background:
             linear-gradient(to bottom, rgba(255,255,255,0.08), transparent 18%),
@@ -568,7 +569,6 @@ export default function Home() {
           mix-blend-mode: overlay;
         }
 
-        /* Hover glow */
         .glow-hover {
           background: radial-gradient(circle at 30% 20%, rgba(255,200,80,0.16), transparent 55%);
           mix-blend-mode: screen;
