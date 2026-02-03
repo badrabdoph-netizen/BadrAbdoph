@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Camera, Heart, Star, Sparkles, ZoomIn, ExternalLink } from "lucide-react";
@@ -41,6 +41,50 @@ function buildWhatsAppHref(text: string) {
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
 
+function FilmCard({
+  img,
+  idx,
+  onClick,
+}: {
+  img: { src: string; title: string };
+  idx: number;
+  onClick: () => void;
+}) {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <button
+      className={[
+        "marquee__item film-card premium-border border border-white/10 overflow-hidden group",
+        loaded ? "is-loaded" : "",
+      ].join(" ")}
+      onClick={onClick}
+      aria-label="Open external portfolio"
+      style={{
+        backgroundImage: `url('${img.src}')`, // ✅ fallback background (prevents blank)
+      }}
+    >
+      <img
+        src={img.src}
+        alt={img.title}
+        decoding="async"
+        loading="eager" // ✅ no lazy (moving marquee)
+        fetchPriority={idx < 2 ? "high" : "auto"}
+        onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
+        className="film-img"
+      />
+
+      <div className="absolute inset-0 film-overlay" />
+      <div className="absolute inset-0 glow-hover opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+      <div className="absolute bottom-2 left-2 right-2 text-[10px] text-white/90 line-clamp-1 text-center drop-shadow">
+        {img.title}
+      </div>
+    </button>
+  );
+}
+
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const portfolioRef = useRef<HTMLElement | null>(null);
@@ -54,7 +98,6 @@ export default function Home() {
           const scrolled = window.scrollY;
           heroRef.current.style.transform = `translate3d(0, ${scrolled * 0.35}px, 0)`;
         }
-
         const v = Math.min(10, Math.max(0, window.scrollY / 900)); // 0..10
         document.documentElement.style.setProperty("--marquee-boost", `${v}s`);
       });
@@ -226,6 +269,7 @@ export default function Home() {
                       "bg-[radial-gradient(circle_at_30%_20%,rgba(255,200,80,0.14),transparent_55%)]",
                     ].join(" ")}
                   />
+
                   {card.badge ? (
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-bold px-3 py-1">
                       {card.badge}
@@ -272,7 +316,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ✅ أعمال (Preview) */}
+      {/* ✅ أعمالنا (Film-strip preview) */}
       <section
         ref={(el) => (portfolioRef.current = el)}
         className="py-20 relative overflow-hidden"
@@ -294,7 +338,7 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col items-center text-center gap-3 mb-9">
             <h3 className="text-primary text-sm tracking-widest uppercase font-bold">أعمالنا</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">Preview سريع — ستايل سينمائي</h2>
+            <h2 className="text-3xl md:text-5xl font-bold">لمحات سريعة</h2>
 
             <a
               href={externalPortfolioUrl}
@@ -306,59 +350,22 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Rows */}
           <div className="relative">
             <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-20" />
             <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-20" />
 
-            {/* Row 1 */}
             <div className="marquee">
               <div className="marquee__track marquee__track--left" aria-hidden="true">
                 {loop1.map((img, i) => (
-                  <button
-                    key={`r1-${img.src}-${i}`}
-                    className="marquee__item premium-border border border-white/10 bg-black/10 overflow-hidden group"
-                    onClick={goPortfolio}
-                    aria-label="Open external portfolio"
-                  >
-                    <img
-                      src={img.src}
-                      alt={img.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-90" />
-                    <div className="absolute bottom-2 left-2 right-2 text-[10px] text-white/85 line-clamp-1 text-center">
-                      {img.title}
-                    </div>
-                    <div className="absolute inset-0 glow-hover opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </button>
+                  <FilmCard key={`r1-${img.src}-${i}`} img={img} idx={i} onClick={goPortfolio} />
                 ))}
               </div>
             </div>
 
-            {/* Row 2 */}
             <div className="marquee mt-3">
               <div className="marquee__track marquee__track--right" aria-hidden="true">
                 {loop2.map((img, i) => (
-                  <button
-                    key={`r2-${img.src}-${i}`}
-                    className="marquee__item premium-border border border-white/10 bg-black/10 overflow-hidden group"
-                    onClick={goPortfolio}
-                    aria-label="Open external portfolio"
-                  >
-                    <img
-                      src={img.src}
-                      alt={img.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-90" />
-                    <div className="absolute bottom-2 left-2 right-2 text-[10px] text-white/85 line-clamp-1 text-center">
-                      {img.title}
-                    </div>
-                    <div className="absolute inset-0 glow-hover opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </button>
+                  <FilmCard key={`r2-${img.src}-${i}`} img={img} idx={i} onClick={goPortfolio} />
                 ))}
               </div>
             </div>
@@ -521,25 +528,29 @@ export default function Home() {
           will-change: transform;
         }
 
+        /* ✅ Smaller on mobile to show more frames */
         .marquee__item {
           position: relative;
           flex: 0 0 auto;
-          width: min(62vw, 340px);
+          width: min(52vw, 290px);
           aspect-ratio: 3 / 4;
           transition: transform 250ms ease;
+          background-size: cover;
+          background-position: center;
+          background-color: rgba(255,255,255,0.02);
         }
         .marquee__item:hover { transform: translateY(-4px) scale(1.01); }
 
-        @media (min-width: 640px) { .marquee__item { width: min(38vw, 340px); } }
+        @media (min-width: 640px) { .marquee__item { width: min(34vw, 320px); } }
         @media (min-width: 1024px) { .marquee__item { width: 230px; } }
 
         .marquee__track--left {
           animation: marqueeLeft linear infinite;
-          animation-duration: calc(28s - var(--marquee-boost, 0s));
+          animation-duration: calc(22s - var(--marquee-boost, 0s));
         }
         .marquee__track--right {
           animation: marqueeRight linear infinite;
-          animation-duration: calc(32s - var(--marquee-boost, 0s));
+          animation-duration: calc(26s - var(--marquee-boost, 0s));
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -558,7 +569,6 @@ export default function Home() {
             transparent 55%
           );
           opacity: 0.9;
-          filter: blur(0px);
         }
 
         .film-frame {
@@ -569,8 +579,62 @@ export default function Home() {
           mix-blend-mode: overlay;
         }
 
+        /* ✅ Film look */
+        .film-card {
+          border-radius: 14px;
+          box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+        }
+
+        /* perforations top/bottom */
+        .film-card::before {
+          content:"";
+          position:absolute;
+          left:0; right:0; top:0;
+          height: 18px;
+          background:
+            repeating-linear-gradient(
+              to right,
+              rgba(0,0,0,0.85) 0px,
+              rgba(0,0,0,0.85) 10px,
+              rgba(255,255,255,0.08) 10px,
+              rgba(255,255,255,0.08) 14px
+            );
+          opacity: .55;
+          pointer-events:none;
+        }
+        .film-card::after {
+          content:"";
+          position:absolute;
+          left:0; right:0; bottom:0;
+          height: 18px;
+          background:
+            repeating-linear-gradient(
+              to right,
+              rgba(0,0,0,0.85) 0px,
+              rgba(0,0,0,0.85) 10px,
+              rgba(255,255,255,0.08) 10px,
+              rgba(255,255,255,0.08) 14px
+            );
+          opacity: .55;
+          pointer-events:none;
+        }
+
+        .film-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0;
+          transition: opacity 240ms ease;
+        }
+        .film-card.is-loaded .film-img { opacity: 1; }
+
+        .film-overlay {
+          background: linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.10), transparent);
+          opacity: 0.9;
+        }
+
         .glow-hover {
-          background: radial-gradient(circle at 30% 20%, rgba(255,200,80,0.16), transparent 55%);
+          background: radial-gradient(circle at 30% 20%, rgba(255,200,80,0.18), transparent 55%);
           mix-blend-mode: screen;
         }
       `}</style>
