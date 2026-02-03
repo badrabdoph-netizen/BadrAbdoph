@@ -108,6 +108,7 @@ function PackageCard({
   const isVipPlus = (p: any) => p?.id === "full-day-vip-plus" || p?.featured === true;
   const vip = kind === "wedding" && isVipPlus(pkg);
   const popular = !!pkg.popular;
+  const hasBadge = vip || popular;
 
   const Icon =
     kind === "wedding" ? (
@@ -125,7 +126,8 @@ function PackageCard({
   return (
     <div
       className={[
-        "relative overflow-hidden p-7 md:p-8 bg-card border transition-all duration-300 group premium-border",
+        "relative overflow-hidden bg-card border transition-all duration-300 group premium-border",
+        hasBadge ? "pt-14 p-7 md:p-8" : "p-7 md:p-8",
         vip
           ? "border-primary/45 shadow-[0_0_70px_rgba(255,200,80,0.12)] hover:shadow-[0_0_95px_rgba(255,200,80,0.18)] hover:-translate-y-2"
           : popular
@@ -141,17 +143,16 @@ function PackageCard({
         ].join(" ")}
       />
 
-      {vip && (
-        <div className="absolute top-4 right-4 z-10 bg-primary text-primary-foreground px-3 py-1 text-xs font-bold rounded-full">
+      {/* ✅ Badge centered (mobile-friendly) */}
+      {vip ? (
+        <div className="badge-pill badge-pill--vip">
           VIP PLUS ✨
         </div>
-      )}
-
-      {popular && !vip && (
-        <div className="absolute top-4 right-4 z-10 bg-primary text-primary-foreground px-3 py-1 text-xs font-bold rounded-full">
+      ) : popular ? (
+        <div className="badge-pill badge-pill--popular">
           الأكثر طلباً
         </div>
-      )}
+      ) : null}
 
       <div className="relative z-10">
         <div className="flex items-start justify-between gap-4 mb-6">
@@ -237,8 +238,7 @@ function QuickNav({
                 key={it.id}
                 onClick={() => onJump(it.id)}
                 className={[
-                  "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target",
-                  "border",
+                  "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border",
                   isActive
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-black/15 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
@@ -297,6 +297,8 @@ export default function Services() {
   const [activeSection, setActiveSection] = useState("sessions");
   const [showSticky, setShowSticky] = useState(false);
 
+  const ids = useMemo(() => ["sessions", "prints", "wedding", "addons"], []);
+
   const jumpTo = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -304,53 +306,47 @@ export default function Services() {
     const offset = getSectionScrollMarginPx();
     const top = el.getBoundingClientRect().top + window.scrollY - offset;
 
+    setActiveSection(id);
     window.scrollTo({ top: Math.max(0, top), left: 0, behavior: "smooth" });
   };
 
   useEffect(() => {
-    const ids = ["sessions", "prints", "wedding", "addons"];
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0];
-
-        if (visible?.target?.id) setActiveSection(visible.target.id);
-      },
-      {
-        root: null,
-        rootMargin: `-${getSectionScrollMarginPx()}px 0px -55% 0px`,
-        threshold: [0.12, 0.2, 0.3, 0.4],
-      }
-    );
-
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
     let raf = 0;
+
+    const computeActiveByScroll = () => {
+      const offset = getSectionScrollMarginPx() + 8;
+      const y = window.scrollY + offset;
+
+      let current = ids[0];
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.offsetTop <= y) current = id;
+      }
+      setActiveSection(current);
+    };
+
     const onScroll = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         setShowSticky(window.scrollY > 420);
+        computeActiveByScroll();
       });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    onScroll();
 
     return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
-  }, []);
+  }, [ids]);
 
   const sectionStyle = useMemo(() => {
-    return {
-      scrollMarginTop: `${getSectionScrollMarginPx()}px`,
-    } as React.CSSProperties;
+    return { scrollMarginTop: `${getSectionScrollMarginPx()}px` } as React.CSSProperties;
   }, []);
 
   return (
@@ -439,7 +435,8 @@ export default function Services() {
         </div>
       </section>
 
-      <section id="addons" className="py-16" style={sectionStyle}>
+      {/* ✅ addons gets extra bottom padding to guarantee activation near end */}
+      <section id="addons" className="py-16 pb-24" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.addonsTitle}
@@ -518,6 +515,35 @@ export default function Services() {
           pointer-events: none;
         }
         .premium-border:hover::after { opacity: 1; }
+
+        /* ✅ Badge style (centered, not overlapping text) */
+        .badge-pill {
+          position: absolute;
+          top: 14px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 20;
+          padding: 6px 12px;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.12);
+          background: rgba(0,0,0,0.35);
+          backdrop-filter: blur(10px);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+          white-space: nowrap;
+        }
+        .badge-pill--vip {
+          color: #111;
+          background: rgba(255,200,80,0.95);
+          border-color: rgba(255,200,80,0.55);
+        }
+        .badge-pill--popular {
+          color: rgba(255,255,255,0.92);
+          background: rgba(255,200,80,0.12);
+          border-color: rgba(255,200,80,0.30);
+        }
       `}</style>
 
       <Footer />
