@@ -46,12 +46,9 @@ function toEnglishDigits(input: string) {
 }
 
 function normalizePhone(raw: string) {
-  // يحوّل أرقام عربي/فارسي لإنجليزي + يشيل الرموز الزيادة
   let v = toEnglishDigits(raw);
-  v = v.replace(/[^\d+]/g, ""); // خلي + و أرقام فقط
-  // لو فيه + مش في الأول: شيله
+  v = v.replace(/[^\d+]/g, "");
   if (v.includes("+") && !v.startsWith("+")) v = v.replace(/\+/g, "");
-  // خفف + لو متكرر
   v = v.startsWith("+") ? "+" + v.slice(1).replace(/\+/g, "") : v;
   return v;
 }
@@ -65,6 +62,12 @@ function WhatsAppIcon({ size = 22 }: { size?: number }) {
       />
     </svg>
   );
+}
+
+function buildWhatsAppHref(text: string) {
+  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+  if (!phone) return "";
+  return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
 
 export default function Contact() {
@@ -90,13 +93,12 @@ export default function Contact() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // تأكيد تنظيف الرقم قبل الإرسال
     submitContact.mutate({ ...values, phone: normalizePhone(values.phone) });
   }
 
-  const whatsappHref = useMemo(() => `https://wa.me/${contactInfo.whatsappNumber}`, []);
+  const whatsappBookingHref = useMemo(() => buildWhatsAppHref("عايز احجز اوردر ❤️"), []);
+  const telHref = useMemo(() => `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`, []);
 
-  // ✅ تحسين scroll padding لو في روابط بتعمل scroll
   useEffect(() => {
     document.documentElement.style.scrollPaddingTop = "120px";
     return () => {
@@ -108,7 +110,6 @@ export default function Contact() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
-      {/* Header */}
       <header className="pt-32 pb-10 bg-card relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_15%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 text-center">
@@ -133,7 +134,7 @@ export default function Contact() {
         <div className="container mx-auto px-4 py-4">
           <div className="grid grid-cols-2 gap-3">
             <a
-              href={whatsappHref}
+              href={whatsappBookingHref}
               target="_blank"
               rel="noreferrer"
               className="premium-border bg-card/40 border border-white/10 px-4 py-4 flex items-center justify-center gap-2 hover:border-primary/35 transition-colors"
@@ -145,7 +146,7 @@ export default function Contact() {
             </a>
 
             <a
-              href={`tel:${contactInfo.phone.replace(/\s/g, "")}`}
+              href={telHref}
               className="premium-border bg-card/40 border border-white/10 px-4 py-4 flex items-center justify-center gap-2 hover:border-primary/35 transition-colors"
             >
               <Phone className="w-5 h-5 text-primary" />
@@ -240,7 +241,6 @@ export default function Contact() {
                     )}
                   />
 
-                  {/* ✅ Sticky submit on mobile */}
                   <div className="pt-2">
                     <div
                       className="md:static md:bg-transparent md:border-0 md:p-0
@@ -280,9 +280,26 @@ export default function Contact() {
                       <Phone size={22} />
                     </div>
                     <div className="text-right">
-                      <h4 className="font-bold">الهاتف / واتساب</h4>
+                      <h4 className="font-bold">الهاتف</h4>
                       <a
-                        href={whatsappHref}
+                        href={telHref}
+                        className="text-muted-foreground hover:text-primary transition-colors dir-ltr block"
+                      >
+                        {contactInfo.phone}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-black/15 border border-white/10 flex items-center justify-center text-primary">
+                      <span className="text-primary">
+                        <WhatsAppIcon size={22} />
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <h4 className="font-bold">واتساب</h4>
+                      <a
+                        href={whatsappBookingHref}
                         target="_blank"
                         rel="noreferrer"
                         className="text-muted-foreground hover:text-primary transition-colors dir-ltr block"
@@ -370,7 +387,7 @@ export default function Contact() {
 
       {/* WhatsApp Floating Button */}
       <a
-        href={whatsappHref}
+        href={whatsappBookingHref}
         target="_blank"
         rel="noreferrer"
         className="fixed z-50 premium-border bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg flex items-center gap-2 px-5 py-3 md:px-0 md:py-0 md:w-14 md:h-14 md:rounded-full rounded-full"
