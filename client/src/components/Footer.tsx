@@ -2,7 +2,9 @@ import { Link, useLocation } from "wouter";
 import { Instagram, Facebook, Phone, Mail, MapPin, ArrowLeft, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { photographerInfo, contactInfo, socialLinks, navLinks, ctaTexts } from "@/config/siteConfig";
+import { photographerInfo, contactInfo, socialLinks, navLinks, ctaTexts, externalPortfolioUrl } from "@/config/siteConfig";
+
+const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
 function WhatsAppIcon({ size = 18 }: { size?: number }) {
   return (
@@ -27,7 +29,6 @@ export default function Footer() {
     <footer className="relative border-t border-white/10 bg-card/30 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none opacity-35 [background:radial-gradient(circle_at_20%_10%,rgba(255,200,80,0.10),transparent_60%)]" />
 
-      {/* Top CTA bar */}
       <div className="relative z-10 border-b border-white/10 bg-background/20 backdrop-blur-md">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -52,37 +53,24 @@ export default function Footer() {
                 </Button>
               </Link>
 
-              {waHref ? (
-                <a
-                  href={waHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full md:w-auto border border-white/15 bg-black/15 hover:bg-white hover:text-black transition-colors rounded-none px-8 py-6 text-base inline-flex items-center justify-center gap-2"
-                >
-                  <span className="text-primary">
-                    <WhatsAppIcon size={18} />
-                  </span>
-                  واتساب
-                </a>
-              ) : (
-                <Link href="/services#sessions">
-                  <Button
-                    variant="outline"
-                    className="w-full md:w-auto border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-8 py-6 text-base"
-                  >
-                    شوف الباقات <ArrowLeft className="mr-2 w-4 h-4" />
-                  </Button>
-                </Link>
-              )}
+              <a
+                href={externalPortfolioUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full md:w-auto border border-white/15 bg-black/15 hover:bg-white hover:text-black transition-colors rounded-none px-8 py-6 text-base inline-flex items-center justify-center gap-2"
+              >
+                <span className="text-primary">
+                  <WhatsAppIcon size={18} />
+                </span>
+                المعرض الخارجي
+              </a>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main footer */}
       <div className="relative z-10 container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {/* Brand */}
           <div className="text-center md:text-right">
             <div className="text-2xl font-bold tracking-wider">
               <span className="text-foreground">{photographerInfo.brandName ?? photographerInfo.name}</span>
@@ -133,12 +121,27 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div className="text-center md:text-right">
             <h4 className="text-lg font-bold mb-4">روابط سريعة</h4>
             <div className="grid grid-cols-2 gap-2">
               {navLinks.map((l) => {
-                const active = location === l.href;
+                const active = !isExternal(l.href) && location === l.href;
+
+                if (isExternal(l.href)) {
+                  return (
+                    <a
+                      key={l.href}
+                      href={l.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-4 py-3 border border-white/10 bg-black/10 hover:border-primary/35 hover:text-primary transition-colors tap-target inline-flex items-center justify-between"
+                    >
+                      <span className="text-sm font-semibold">{l.label}</span>
+                      <ArrowLeft className="w-4 h-4 text-foreground/50" />
+                    </a>
+                  );
+                }
+
                 return (
                   <Link key={l.href} href={l.href}>
                     <a
@@ -153,16 +156,9 @@ export default function Footer() {
                   </Link>
                 );
               })}
-              <Link href="/services#sessions">
-                <a className="px-4 py-3 border border-white/10 bg-black/10 hover:border-primary/35 hover:text-primary transition-colors tap-target inline-flex items-center justify-between">
-                  <span className="text-sm font-semibold">الأسعار والباقات</span>
-                  <ArrowLeft className="w-4 h-4 text-foreground/50" />
-                </a>
-              </Link>
             </div>
           </div>
 
-          {/* Contact */}
           <div className="text-center md:text-right">
             <h4 className="text-lg font-bold mb-4">تواصل</h4>
 
@@ -218,20 +214,16 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom line */}
         <div className="mt-10 pt-6 border-t border-white/10 text-center text-xs text-muted-foreground/80">
           <div className="flex flex-col md:flex-row items-center justify-between gap-2">
             <div>
               © {new Date().getFullYear()} {photographerInfo.name}. All rights reserved.
             </div>
-            <div className="text-muted-foreground/70">
-              Built with a cinematic touch ✨
-            </div>
+            <div className="text-muted-foreground/70">Built with a cinematic touch ✨</div>
           </div>
         </div>
       </div>
 
-      {/* Safe-area bottom */}
       <div style={{ height: "env(safe-area-inset-bottom)" }} />
 
       <style>{`
