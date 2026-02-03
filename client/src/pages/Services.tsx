@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "wouter";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import {
   Receipt,
   PlusCircle,
   ArrowLeft,
+  Phone,
 } from "lucide-react";
 import {
   sessionPackages,
@@ -45,15 +45,19 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
   );
 }
 
+function buildWhatsAppHref(text: string) {
+  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+  if (!phone) return "";
+  return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+}
+
 function getNavOffsetPx() {
   const v = getComputedStyle(document.documentElement).getPropertyValue("--nav-offset").trim();
   const n = parseInt(v.replace("px", ""), 10);
-  return Number.isFinite(n) ? n : 96; // fallback
+  return Number.isFinite(n) ? n : 96;
 }
 
-// scroll margin for sections = nav + quicknav height
 function getSectionScrollMarginPx() {
-  // quicknav تقريبًا 64-72
   return getNavOffsetPx() + 78;
 }
 
@@ -81,15 +85,16 @@ function SectionHeader({
 }
 
 function PrimaryCTA() {
+  const waBookingHref = buildWhatsAppHref("عايز احجز اوردر ❤️");
   return (
-    <Link href="/contact">
+    <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
       <Button
         size="lg"
         className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-7 text-lg rounded-none w-full sm:w-auto"
       >
         {ctaTexts.bookNow}
       </Button>
-    </Link>
+    </a>
   );
 }
 
@@ -114,6 +119,8 @@ function PackageCard({
     ) : (
       <Camera className="w-9 h-9 text-primary" />
     );
+
+  const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️");
 
   return (
     <div
@@ -181,14 +188,15 @@ function PackageCard({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <PrimaryCTA />
-          <Link href="/contact">
-            <Button
-              variant="outline"
-              className="rounded-none border-white/15 text-foreground hover:bg-white hover:text-black px-10 py-7 w-full"
-            >
-              اسأل عن التفاصيل <ArrowLeft className="mr-2 w-4 h-4" />
-            </Button>
-          </Link>
+
+          <a
+            href={waInquiryHref}
+            target="_blank"
+            rel="noreferrer"
+            className="w-full h-[56px] border border-white/15 text-foreground hover:bg-white hover:text-black transition-colors inline-flex items-center justify-center gap-2 rounded-none"
+          >
+            اسأل عن التفاصيل <ArrowLeft className="mr-2 w-4 h-4" />
+          </a>
         </div>
 
         {vip && (
@@ -218,9 +226,7 @@ function QuickNav({
   return (
     <div
       className="sticky z-30 bg-background/75 backdrop-blur-md border-y border-white/10"
-      style={{
-        top: "var(--nav-offset, 96px)", // ✅ بدل رقم ثابت
-      }}
+      style={{ top: "var(--nav-offset, 96px)" }}
     >
       <div className="container mx-auto px-4 py-3">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -249,7 +255,8 @@ function QuickNav({
 }
 
 function MobileStickyBar({ show }: { show: boolean }) {
-  const waHref = `https://wa.me/${contactInfo.whatsappNumber}`;
+  const waBookingHref = buildWhatsAppHref("عايز احجز اوردر ❤️");
+  const telHref = `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`;
 
   return (
     <div
@@ -262,22 +269,22 @@ function MobileStickyBar({ show }: { show: boolean }) {
       <div className="border-t border-white/10 bg-background/85 backdrop-blur-md">
         <div className="container mx-auto px-4 py-3">
           <div className="grid grid-cols-2 gap-3">
-            <Link href="/contact">
-              <Button className="w-full h-12 rounded-none bg-primary text-primary-foreground hover:bg-primary/90">
-                {ctaTexts.bookNow}
-              </Button>
-            </Link>
-
             <a
-              href={waHref}
-              target="_blank"
-              rel="noreferrer"
+              href={telHref}
               className="w-full h-12 border border-white/15 bg-black/20 text-foreground hover:bg-white hover:text-black transition-colors inline-flex items-center justify-center gap-2"
             >
-              <span className="text-primary">
-                <WhatsAppIcon size={18} />
-              </span>
-              واتساب
+              <Phone className="w-4 h-4 text-primary" />
+              اتصال
+            </a>
+
+            <a
+              href={waBookingHref}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center gap-2"
+            >
+              <WhatsAppIcon size={18} />
+              {ctaTexts.bookNow}
             </a>
           </div>
         </div>
@@ -290,7 +297,6 @@ export default function Services() {
   const [activeSection, setActiveSection] = useState("sessions");
   const [showSticky, setShowSticky] = useState(false);
 
-  // ✅ Jump to section (top of section, not middle) with offset
   const jumpTo = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -301,7 +307,6 @@ export default function Services() {
     window.scrollTo({ top: Math.max(0, top), left: 0, behavior: "smooth" });
   };
 
-  // ✅ Active section + sticky bar
   useEffect(() => {
     const ids = ["sessions", "prints", "wedding", "addons"];
 
@@ -315,7 +320,6 @@ export default function Services() {
       },
       {
         root: null,
-        // ✅ حساب الـ nav + quicknav تقريباً
         rootMargin: `-${getSectionScrollMarginPx()}px 0px -55% 0px`,
         threshold: [0.12, 0.2, 0.3, 0.4],
       }
@@ -353,7 +357,6 @@ export default function Services() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
-      {/* Header */}
       <header className="pt-36 pb-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-background/35 to-background" />
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.10),transparent_60%)]" />
@@ -386,10 +389,8 @@ export default function Services() {
         </div>
       </header>
 
-      {/* QuickNav */}
       <QuickNav active={activeSection} onJump={jumpTo} />
 
-      {/* Sections */}
       <section id="sessions" className="py-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
@@ -488,10 +489,7 @@ export default function Services() {
         </div>
       </section>
 
-      {/* ✅ Spacer to prevent bottom bar covering content */}
       <div className="md:hidden" style={{ height: "92px" }} />
-
-      {/* Mobile Sticky Bottom Bar */}
       <MobileStickyBar show={showSticky} />
 
       <style>{`
