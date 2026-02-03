@@ -4,13 +4,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Camera, Heart, Star, Sparkles, ZoomIn } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import SmartImage from "@/components/SmartImage";
 import {
   photographerInfo,
   siteImages,
   aboutContent,
   testimonials,
-  pageTexts,
   ctaTexts,
   homeHero,
   homeServicesPreview,
@@ -41,7 +39,6 @@ export default function Home() {
   // Parallax خفيف للهيرو
   useEffect(() => {
     let raf = 0;
-
     const onScroll = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
@@ -50,7 +47,6 @@ export default function Home() {
         heroRef.current.style.transform = `translate3d(0, ${scrolled * 0.35}px, 0)`;
       });
     };
-
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       cancelAnimationFrame(raf);
@@ -70,28 +66,17 @@ export default function Home() {
     );
   }, []);
 
+  // ✅ معاينة أعمالي (من نفس الـ gallery)
   const portfolioPreview = useMemo(() => {
-    const g = (siteImages.portfolioGallery ?? []) as Array<{ src: string; title: string }>;
-    return g.slice(0, 8);
+    const g = (siteImages.portfolioGallery ?? []) as Array<{ src: string; title: string; category?: string }>;
+    return g.slice(0, 10);
   }, []);
 
-  const topTestimonials = useMemo(() => {
-    return (testimonials ?? []).slice(0, 3);
-  }, []);
+  const topTestimonials = useMemo(() => (testimonials ?? []).slice(0, 3), []);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden relative z-10">
       <Navbar />
-
-      {/* ✅ Preload hero image for faster LCP */}
-      <SmartImage
-        src={siteImages.heroImage}
-        alt=""
-        priority
-        className="hidden"
-        aria-hidden="true"
-        sizes="100vw"
-      />
 
       {/* HERO */}
       <header className="relative h-screen w-full overflow-hidden flex items-center justify-center">
@@ -154,7 +139,7 @@ export default function Home() {
                 size="lg"
                 className="border-white text-white hover:bg-white hover:text-black px-8 py-6 text-lg rounded-none w-full sm:w-auto"
               >
-                {homeHero?.secondaryCta ?? "عرض التفاصيل والاسعار"}
+                {homeHero?.secondaryCta ?? "عرض التفاصيل والأسعار"}
               </Button>
             </Link>
           </div>
@@ -172,17 +157,6 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-12">
-            <Link href="/services#sessions">
-              <Button
-                size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg rounded-none min-w-[180px]"
-              >
-                {homeHero?.secondaryCta ?? "عرض التفاصيل والاسعار"}
-              </Button>
-            </Link>
-          </div>
-
           <div className="text-center mb-16">
             <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">الخدمات</h3>
             <h2 className="text-4xl md:text-5xl font-bold">باقات التصوير</h2>
@@ -253,10 +227,6 @@ export default function Home() {
                         عرض التفاصيل
                       </Button>
                     </Link>
-
-                    <span className="text-xs text-muted-foreground/70 hidden sm:inline">
-                      * الأسعار والخيارات داخل صفحة الخدمات
-                    </span>
                   </div>
                 </div>
               );
@@ -265,47 +235,72 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PORTFOLIO PREVIEW (Mobile-first) */}
-      <section className="py-20 bg-card/30 border-y border-white/5 relative overflow-hidden">
+      {/* ✅ أعمالي (زر + صور معاينة تحت الزر) - شيك وموبايل */}
+      <section className="py-18 md:py-20 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_85%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
+
         <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-12">
-            <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">المعرض</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">لقطات مختارة</h2>
-            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto leading-relaxed">
-              شوف الستايل الحقيقي… قبل ما تختار الباقة.
+          {/* زر أعمالي + عنوان */}
+          <div className="flex flex-col items-center text-center gap-3 mb-7">
+            <h3 className="text-primary text-sm tracking-widest uppercase font-bold">أعمالي</h3>
+            <h2 className="text-3xl md:text-5xl font-bold">لقطات معاينة</h2>
+            <p className="text-muted-foreground max-w-2xl leading-relaxed">
+              دوس على الزر وشوف كل المعرض… أو اسحب الصور بإيدك على الموبايل.
             </p>
-          </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-3">
-            {portfolioPreview.map((img, i) => (
-              <div
-                key={`${img.src}-${i}`}
-                className="relative aspect-[3/4] overflow-hidden border border-white/10 premium-border group"
-              >
-                <img
-                  src={img.src}
-                  alt={img.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute bottom-2 left-2 right-2 text-[10px] text-white/80 line-clamp-1 text-center">
-                  {img.title}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10 flex justify-center">
             <Link href="/portfolio">
-              <Button
-                variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-10 py-6"
-              >
-                شوف المعرض كامل <ZoomIn className="mr-2 w-4 h-4" />
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-6 text-base">
+                أعمالي <ZoomIn className="mr-2 w-4 h-4" />
               </Button>
             </Link>
+          </div>
+
+          {/* صور المعاينة تحت الزر */}
+          <div className="relative">
+            {/* edges fade */}
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-background to-transparent z-10" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-background to-transparent z-10" />
+
+            <div className="portfolio-strip flex gap-3 overflow-x-auto px-1 pb-2">
+              {portfolioPreview.map((img, i) => (
+                <button
+                  key={`${img.src}-${i}`}
+                  className="shrink-0 w-[58vw] sm:w-[42vw] md:w-[28vw] lg:w-[22vw] max-w-[320px]
+                             aspect-[3/4] relative overflow-hidden border border-white/10 premium-border group snap-center"
+                  onClick={() => (window.location.href = "/portfolio")}
+                  aria-label="Open portfolio"
+                >
+                  <img
+                    src={img.src}
+                    alt={img.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-85 transition-opacity duration-300" />
+                  <div className="absolute bottom-3 left-3 right-3 text-[11px] md:text-xs text-white/85 text-center line-clamp-1">
+                    {img.title}
+                  </div>
+                </button>
+              ))}
+
+              {/* كارت عرض الكل */}
+              <Link href="/portfolio">
+                <a
+                  className="shrink-0 w-[58vw] sm:w-[42vw] md:w-[28vw] lg:w-[22vw] max-w-[320px]
+                             aspect-[3/4] relative overflow-hidden border border-primary/25 premium-border
+                             bg-card/40 hover:border-primary/45 transition-colors snap-center
+                             flex items-center justify-center"
+                >
+                  <div className="text-center p-6">
+                    <div className="w-14 h-14 mx-auto mb-4 border border-white/10 bg-black/20 flex items-center justify-center text-primary">
+                      <ZoomIn className="w-7 h-7" />
+                    </div>
+                    <div className="text-lg font-bold">عرض المعرض كامل</div>
+                    <div className="text-sm text-muted-foreground mt-2">اضغط هنا</div>
+                  </div>
+                </a>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -317,9 +312,8 @@ export default function Home() {
             <div className="relative order-2 md:order-1 group overflow-hidden">
               <div className="absolute -top-4 -left-4 w-full h-full border border-primary/30 z-0 hidden md:block" />
               <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-black/55 via-transparent to-black/15" />
-              <div className="about-shine absolute inset-0 z-20 pointer-events-none opacity-45 md:opacity-0 md:group-hover:opacity-55 transition-opacity duration-500" />
 
-              <SmartImage
+              <img
                 src={siteImages.aboutImage}
                 alt="Badr Photography Style"
                 className="
@@ -330,7 +324,6 @@ export default function Home() {
                   md:group-hover:scale-[1.12]
                   shadow-[0_30px_120px_rgba(0,0,0,0.65)]
                 "
-                sizes="(max-width: 768px) 100vw, 50vw"
                 loading="lazy"
               />
             </div>
@@ -367,7 +360,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TESTIMONIALS (important for conversion) */}
+      {/* TESTIMONIALS */}
       <section className="py-20 bg-card border-y border-white/5 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_20%_30%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
@@ -392,10 +385,6 @@ export default function Home() {
                 <div className="font-bold">{t.name}</div>
               </div>
             ))}
-          </div>
-
-          <div className="mt-10 text-center text-xs text-muted-foreground/80">
-            * تقييمات مختصرة — ممكن تبعتلي تقييمك بعد التصوير ❤️
           </div>
         </div>
       </section>
@@ -427,8 +416,6 @@ export default function Home() {
               </Button>
             </Link>
           </div>
-
-          <div className="mt-10 h-px w-64 mx-auto bg-gradient-to-r from-transparent via-primary/35 to-transparent" />
         </div>
       </section>
 
@@ -459,9 +446,13 @@ export default function Home() {
         }
         .premium-border:hover::after { opacity: 1; }
 
-        .about-shine {
-          background: radial-gradient(circle at 30% 20%, rgba(255,200,80,0.12), transparent 55%);
+        /* ✅ Hide scrollbar for the portfolio strip + snap */
+        .portfolio-strip {
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
         }
+        .portfolio-strip::-webkit-scrollbar { display: none; }
       `}</style>
 
       <Footer />
