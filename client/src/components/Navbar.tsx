@@ -7,6 +7,23 @@ import { navLinks, socialLinks, photographerInfo, ctaTexts, contactInfo } from "
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
+function WhatsAppIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M20.52 3.48A11.86 11.86 0 0 0 12.06 0C5.46 0 .1 5.36.1 11.96c0 2.1.56 4.15 1.62 5.96L0 24l6.2-1.62a11.95 11.95 0 0 0 5.86 1.5h.01c6.6 0 11.96-5.36 11.96-11.96 0-3.2-1.25-6.2-3.51-8.44ZM12.07 21.9h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.68.96.98-3.58-.24-.37a9.9 9.9 0 0 1-1.56-5.36C2.16 6.5 6.6 2.06 12.06 2.06c2.64 0 5.12 1.03 6.98 2.89a9.8 9.8 0 0 1 2.9 6.98c0 5.46-4.44 9.97-9.87 9.97Zm5.77-7.48c-.31-.16-1.82-.9-2.1-1-.28-.1-.48-.16-.68.16-.2.31-.78 1-.96 1.2-.18.2-.35.24-.66.08-.31-.16-1.3-.48-2.47-1.54-.92-.82-1.54-1.84-1.72-2.15-.18-.31-.02-.48.14-.64.14-.14.31-.35.47-.52.16-.18.2-.31.31-.52.1-.2.05-.39-.03-.55-.08-.16-.68-1.65-.93-2.27-.24-.58-.49-.5-.68-.5h-.58c-.2 0-.52.08-.8.39-.28.31-1.06 1.03-1.06 2.5 0 1.47 1.08 2.9 1.23 3.1.16.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.82-.74 2.08-1.45.26-.7.26-1.3.18-1.45-.08-.14-.28-.23-.58-.39Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function buildWhatsAppHref(text: string) {
+  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+  if (!phone) return "";
+  return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+}
+
 export default function Navbar() {
   const navRef = useRef<HTMLElement | null>(null);
 
@@ -66,6 +83,9 @@ export default function Navbar() {
   }, []);
 
   const telHref = `tel:${(contactInfo?.phone ?? "").replace(/\s/g, "")}`;
+
+  const waBookingHref = useMemo(() => buildWhatsAppHref("عايز احجز اوردر ❤️"), []);
+  const waInquiryHref = useMemo(() => buildWhatsAppHref("حابب استفسر ❤️"), []);
 
   return (
     <nav
@@ -162,14 +182,14 @@ export default function Navbar() {
               <Facebook size={20} />
             </a>
 
-            <Link href="/contact">
+            <a href={waBookingHref} target="_blank" rel="noreferrer">
               <Button
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-6"
               >
                 {ctaTexts.bookNow}
               </Button>
-            </Link>
+            </a>
           </div>
 
           {/* Mobile buttons */}
@@ -181,6 +201,18 @@ export default function Navbar() {
                 aria-label="Call"
               >
                 <Phone size={20} />
+              </a>
+            ) : null}
+
+            {waInquiryHref ? (
+              <a
+                href={waInquiryHref}
+                target="_blank"
+                rel="noreferrer"
+                className="w-11 h-11 border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-foreground hover:text-primary transition-colors tap-target"
+                aria-label="WhatsApp"
+              >
+                <WhatsAppIcon size={20} />
               </a>
             ) : null}
 
@@ -278,13 +310,11 @@ export default function Navbar() {
             </div>
 
             <div className="mt-4 grid grid-cols-1 gap-3">
-              <Link href="/contact">
-                <a className="w-full">
-                  <button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target">
-                    {ctaTexts.bookNow}
-                  </button>
-                </a>
-              </Link>
+              <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full">
+                <button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target">
+                  {ctaTexts.bookNow}
+                </button>
+              </a>
             </div>
 
             <div className="mt-4 text-center text-xs text-muted-foreground">
