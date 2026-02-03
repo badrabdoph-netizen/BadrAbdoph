@@ -4,17 +4,19 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Camera, Sparkles, Heart, Star, ArrowLeft } from "lucide-react";
 import { aboutContent, photographerInfo, siteImages, testimonials, ctaTexts } from "@/config/siteConfig";
+import SmartImage from "@/components/SmartImage";
 
 export default function About() {
+  const aboutImg = siteImages.aboutImage ?? siteImages.heroImage;
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Navbar />
 
-      {/* Header (Mobile-first) */}
       <header className="pt-32 pb-10 bg-card relative overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-15"
-          style={{ backgroundImage: `url('${siteImages.aboutImage ?? siteImages.heroImage}')` }}
+          style={{ backgroundImage: `url('${aboutImg}')` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-background/40 to-background" />
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_15%,rgba(255,200,80,0.10),transparent_60%)]" />
@@ -33,9 +35,7 @@ export default function About() {
           </h1>
 
           <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed">
-            {aboutContent.description ??
-              photographerInfo.descriptionAr ??
-              "تصوير يركز على اللحظة… ويطلعها بأفضل شكل."}
+            {aboutContent.description ?? photographerInfo.descriptionAr ?? "تصوير يركز على اللحظة… ويطلعها بأفضل شكل."}
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
@@ -59,22 +59,21 @@ export default function About() {
         </div>
       </header>
 
-      {/* Hero Image + Quick Stats (Mobile-first: image first) */}
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-            {/* Image */}
             <div className="order-1 lg:order-2 relative overflow-hidden premium-border">
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/55 via-transparent to-black/10 z-10" />
-              <img
-                src={siteImages.aboutImage ?? siteImages.heroImage}
+
+              <SmartImage
+                src={aboutImg}
                 alt="About"
                 className="w-full h-[520px] md:h-[620px] object-cover shadow-[0_30px_120px_rgba(0,0,0,0.65)]"
-                loading="lazy"
+                priority={false}
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
 
-            {/* Text + Stats */}
             <div className="order-2 lg:order-1 text-right">
               <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
                 {aboutContent.subtitle ?? "الستايل"}
@@ -89,7 +88,6 @@ export default function About() {
                   "بحب أصوّر اللحظات الطبيعية من غير مبالغة… مع اهتمام بالتفاصيل والإضاءة واللون. الهدف إن الصور تحسّها حقيقية وفخمة في نفس الوقت."}
               </p>
 
-              {/* Stats (mobile-first layout) */}
               <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 {(aboutContent.stats ?? []).map((s) => (
                   <div
@@ -115,7 +113,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Why Me (Mobile-first cards) */}
       <section className="py-14 md:py-20 bg-card border-y border-white/5 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
@@ -155,7 +152,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Testimonials (Short + Mobile-first) */}
       <section className="py-14 md:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
@@ -184,7 +180,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Final CTA */}
       <section className="py-16 bg-primary/5 border-t border-white/5 text-center">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold mb-5">جاهز نثبت يومك بصور تفضل معاك؟</h2>
