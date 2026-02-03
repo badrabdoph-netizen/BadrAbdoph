@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Instagram, Facebook, Sparkles, Phone, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,38 @@ import { cn } from "@/lib/utils";
 import { navLinks, socialLinks, photographerInfo, ctaTexts, contactInfo } from "@/config/siteConfig";
 
 export default function Navbar() {
+  const navRef = useRef<HTMLElement | null>(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
+
+  // ✅ 1) Compute nav offset for all section scrolls
+  useEffect(() => {
+    const el = navRef.current;
+    if (!el) return;
+
+    const setOffset = () => {
+      // ارتفاع الـ nav الحقيقي + شوية أمان (عشان الـ sticky tabs اللي تحت أحيانًا)
+      const h = el.getBoundingClientRect().height;
+      const extra = 16; // margin safety
+      document.documentElement.style.setProperty("--nav-offset", `${Math.ceil(h + extra)}px`);
+    };
+
+    setOffset();
+
+    const ro = new ResizeObserver(() => setOffset());
+    ro.observe(el);
+
+    window.addEventListener("resize", setOffset);
+    window.addEventListener("orientationchange", setOffset);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", setOffset);
+      window.removeEventListener("orientationchange", setOffset);
+    };
+  }, []);
 
   // Scroll shadow
   useEffect(() => {
@@ -43,6 +72,7 @@ export default function Navbar() {
 
   return (
     <nav
+      ref={navRef as any}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
@@ -52,7 +82,6 @@ export default function Navbar() {
       style={{ paddingTop: "env(safe-area-inset-top)" }}
       aria-label="Main navigation"
     >
-      {/* subtle bottom glow */}
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent pointer-events-none" />
 
       <div className={cn("container mx-auto px-4", scrolled ? "py-3" : "py-4")}>
@@ -130,7 +159,6 @@ export default function Navbar() {
 
           {/* Mobile buttons */}
           <div className="md:hidden flex items-center gap-2">
-            {/* Quick call (اختياري—مفيد للموبايل) */}
             {telHref && telHref !== "tel:" ? (
               <a
                 href={telHref}
@@ -141,7 +169,6 @@ export default function Navbar() {
               </a>
             ) : null}
 
-            {/* Menu toggle */}
             <button
               className="w-11 h-11 border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-foreground hover:text-primary transition-colors tap-target"
               onClick={() => setIsOpen((v) => !v)}
@@ -162,13 +189,8 @@ export default function Navbar() {
         )}
         aria-hidden={!isOpen}
       >
-        {/* backdrop */}
-        <div
-          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-          onClick={() => setIsOpen(false)}
-        />
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
 
-        {/* panel */}
         <div
           className={cn(
             "absolute inset-x-0 bottom-0",
@@ -180,12 +202,10 @@ export default function Navbar() {
           style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* drag handle */}
           <div className="pt-3 pb-2 flex justify-center">
             <div className="w-12 h-1.5 rounded-full bg-white/10" />
           </div>
 
-          {/* top row */}
           <div className="px-4 pb-3 flex items-center justify-between">
             <div className="text-right">
               <div className="text-sm text-foreground/80">القائمة</div>
@@ -202,7 +222,6 @@ export default function Navbar() {
           </div>
 
           <div className="px-4 pb-4">
-            {/* Links */}
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => {
                 const active = location === link.href;
@@ -210,8 +229,7 @@ export default function Navbar() {
                   <Link key={link.label} href={link.href}>
                     <a
                       className={cn(
-                        "w-full flex items-center justify-between px-4 py-4 border rounded-xl tap-target",
-                        "transition-colors",
+                        "w-full flex items-center justify-between px-4 py-4 border rounded-xl tap-target transition-colors",
                         active
                           ? "bg-primary/10 border-primary/30 text-primary"
                           : "bg-black/10 border-white/10 text-foreground hover:border-primary/35 hover:text-primary"
@@ -225,7 +243,6 @@ export default function Navbar() {
               })}
             </div>
 
-            {/* Quick CTAs */}
             <div className="mt-4 grid grid-cols-2 gap-3">
               <Link href="/contact">
                 <a className="w-full">
@@ -246,7 +263,6 @@ export default function Navbar() {
               </a>
             </div>
 
-            {/* Social row */}
             <div className="mt-4 flex items-center justify-center gap-3">
               <a
                 href={socialLinks.instagram}
