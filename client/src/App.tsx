@@ -12,22 +12,34 @@ import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 
+function getNavOffsetPx() {
+  const v = getComputedStyle(document.documentElement).getPropertyValue("--nav-offset").trim();
+  const n = parseInt(v.replace("px", ""), 10);
+  return Number.isFinite(n) ? n : 96; // fallback safe
+}
+
+function scrollToIdWithOffset(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return false;
+
+  const offset = getNavOffsetPx();
+  const top = el.getBoundingClientRect().top + window.scrollY - offset;
+
+  window.scrollTo({ top: Math.max(0, top), left: 0, behavior: "auto" });
+  return true;
+}
+
 function ScrollToTop() {
   const [location] = useLocation();
 
   useEffect(() => {
-    // لو فيه #section روحله، غير كده روح لأول الصفحة
-    const hash = window.location.hash;
-
-    // لازم ندي React فرصة يرندر الصفحة الجديدة الأول
+    // ادي الصفحة فرصة ترندر
     requestAnimationFrame(() => {
+      const hash = window.location.hash;
       if (hash) {
         const id = hash.replace("#", "");
-        const el = document.getElementById(id);
-        if (el) {
-          el.scrollIntoView({ behavior: "auto", block: "start" });
-          return;
-        }
+        const ok = scrollToIdWithOffset(id);
+        if (ok) return;
       }
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     });
