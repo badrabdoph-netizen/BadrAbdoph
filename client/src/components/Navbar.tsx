@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { navLinks, socialLinks, photographerInfo, ctaTexts, contactInfo } from "@/config/siteConfig";
 
+const isExternal = (href: string) => /^https?:\/\//i.test(href);
+
 export default function Navbar() {
   const navRef = useRef<HTMLElement | null>(null);
 
@@ -12,15 +14,13 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
 
-  // ✅ 1) Compute nav offset for all section scrolls
   useEffect(() => {
     const el = navRef.current;
     if (!el) return;
 
     const setOffset = () => {
-      // ارتفاع الـ nav الحقيقي + شوية أمان (عشان الـ sticky tabs اللي تحت أحيانًا)
       const h = el.getBoundingClientRect().height;
-      const extra = 16; // margin safety
+      const extra = 16;
       document.documentElement.style.setProperty("--nav-offset", `${Math.ceil(h + extra)}px`);
     };
 
@@ -39,19 +39,16 @@ export default function Navbar() {
     };
   }, []);
 
-  // Scroll shadow
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close menu on route change
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
 
-  // Lock body scroll when menu open
   useEffect(() => {
     if (!isOpen) {
       document.body.style.overflow = "";
@@ -86,7 +83,6 @@ export default function Navbar() {
 
       <div className={cn("container mx-auto px-4", scrolled ? "py-3" : "py-4")}>
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <Link
             href="/"
             className="text-2xl md:text-3xl font-bold tracking-wider text-foreground hover:text-primary transition-colors flex items-center gap-2 tap-target"
@@ -104,7 +100,26 @@ export default function Navbar() {
           {/* Desktop nav */}
           <div className="hidden md:flex items-center space-x-8 space-x-reverse">
             {navLinks.map((link) => {
-              const active = location === link.href;
+              const active = !isExternal(link.href) && location === link.href;
+
+              if (isExternal(link.href)) {
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={cn(
+                      "text-sm font-medium tracking-wide transition-colors hover:text-primary relative group",
+                      "text-foreground/80"
+                    )}
+                  >
+                    {link.label}
+                    <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full" />
+                  </a>
+                );
+              }
+
               return (
                 <Link
                   key={link.label}
@@ -224,7 +239,26 @@ export default function Navbar() {
           <div className="px-4 pb-4">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => {
-                const active = location === link.href;
+                const active = !isExternal(link.href) && location === link.href;
+
+                if (isExternal(link.href)) {
+                  return (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={cn(
+                        "w-full flex items-center justify-between px-4 py-4 border rounded-xl tap-target transition-colors",
+                        "bg-black/10 border-white/10 text-foreground hover:border-primary/35 hover:text-primary"
+                      )}
+                    >
+                      <span className="text-base font-semibold">{link.label}</span>
+                      <ArrowLeft className="w-4 h-4 text-foreground/60" />
+                    </a>
+                  );
+                }
+
                 return (
                   <Link key={link.label} href={link.href}>
                     <a
@@ -243,7 +277,7 @@ export default function Navbar() {
               })}
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-1 gap-3">
               <Link href="/contact">
                 <a className="w-full">
                   <button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target">
@@ -251,37 +285,6 @@ export default function Navbar() {
                   </button>
                 </a>
               </Link>
-
-              <a
-                href={socialLinks.instagram}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full border border-white/10 bg-black/10 hover:border-primary/35 hover:text-primary transition-colors rounded-xl px-4 py-4 flex items-center justify-center gap-2 tap-target"
-              >
-                <Instagram size={18} />
-                <span className="text-sm font-semibold">Instagram</span>
-              </a>
-            </div>
-
-            <div className="mt-4 flex items-center justify-center gap-3">
-              <a
-                href={socialLinks.instagram}
-                target="_blank"
-                rel="noreferrer"
-                className="w-12 h-12 rounded-full border border-white/10 bg-black/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300 tap-target"
-                aria-label="Instagram"
-              >
-                <Instagram size={20} />
-              </a>
-              <a
-                href={socialLinks.facebook}
-                target="_blank"
-                rel="noreferrer"
-                className="w-12 h-12 rounded-full border border-white/10 bg-black/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300 tap-target"
-                aria-label="Facebook"
-              >
-                <Facebook size={20} />
-              </a>
             </div>
 
             <div className="mt-4 text-center text-xs text-muted-foreground">
