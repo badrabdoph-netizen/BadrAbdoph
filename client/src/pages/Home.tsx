@@ -110,21 +110,22 @@ export default function Home() {
             {homeHero?.subTextAr ?? photographerInfo.descriptionAr}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <Link href="/contact">
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg rounded-none min-w-[180px]"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg rounded-none w-full sm:w-auto"
               >
                 {homeHero?.primaryCta ?? ctaTexts.bookSession}
               </Button>
             </Link>
 
-            <Link href="/services">
+            {/* ✅ يروح لأول الأسعار */}
+            <Link href="/services#sessions">
               <Button
                 variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-white hover:text-black px-8 py-6 text-lg rounded-none min-w-[180px]"
+                className="border-white text-white hover:bg-white hover:text-black px-8 py-6 text-lg rounded-none w-full sm:w-auto"
               >
                 {homeHero?.secondaryCta ?? "عرض التفاصيل والاسعار"}
               </Button>
@@ -146,9 +147,9 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
 
         <div className="container mx-auto px-4 relative z-10">
-          {/* زر كبير فوق الباقات */}
+          {/* ✅ زر كبير فوق الباقات يروح لأول الأسعار */}
           <div className="text-center mb-12">
-            <Link href="/services">
+            <Link href="/services#sessions">
               <Button
                 size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg rounded-none min-w-[180px]"
@@ -217,7 +218,8 @@ export default function Home() {
                   <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6" />
 
                   <div className="flex items-center justify-between gap-4">
-                    <Link href="/services">
+                    {/* ✅ يروح لأول الأسعار */}
+                    <Link href="/services#sessions">
                       <Button
                         variant={featured ? "default" : "outline"}
                         className={[
@@ -321,7 +323,6 @@ export default function Home() {
           </a>
         </div>
 
-        {/* ✅ snap scrolling for premium feel */}
         <div className="flex space-x-6 space-x-reverse overflow-x-auto snap-x snap-mandatory pb-8 px-4 md:px-0 scrollbar-hide">
           {siteImages.portfolioPreview.map((item, index) => (
             <div
@@ -401,7 +402,7 @@ export default function Home() {
           <Link href="/contact">
             <Button
               size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-8 text-xl rounded-none min-w-[200px]"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-8 text-xl rounded-none w-full sm:w-auto"
             >
               {ctaTexts.contactNow}
             </Button>
@@ -410,28 +411,6 @@ export default function Home() {
       </section>
 
       <style>{`
-        @keyframes aboutShine {
-          0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
-          15% { opacity: 0.35; }
-          40% { opacity: 0.6; }
-          70% { opacity: 0.25; }
-          100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
-        }
-        .about-shine {
-          background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255,255,255,0.10) 35%,
-            rgba(255,255,255,0.55) 50%,
-            rgba(255,255,255,0.10) 65%,
-            transparent 100%
-          );
-          transform: translateX(-140%) skewX(-18deg);
-          animation: aboutShine 3.2s ease-in-out infinite;
-          mix-blend-mode: overlay;
-        }
-
-        /* subtle grain overlay (very light) */
         .hero-grain {
           background-image:
             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
@@ -439,10 +418,7 @@ export default function Home() {
           mix-blend-mode: overlay;
         }
 
-        /* premium border sheen */
-        .premium-border {
-          position: relative;
-        }
+        .premium-border { position: relative; }
         .premium-border::before {
           content: "";
           position: absolute;
@@ -459,9 +435,7 @@ export default function Home() {
           transition: opacity 250ms ease;
           pointer-events: none;
         }
-        .premium-border:hover::after {
-          opacity: 1;
-        }
+        .premium-border:hover::after { opacity: 1; }
       `}</style>
 
       <Footer />
