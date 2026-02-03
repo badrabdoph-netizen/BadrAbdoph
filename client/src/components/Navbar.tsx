@@ -1,28 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Instagram, Facebook, Sparkles } from "lucide-react";
+import { Menu, X, Instagram, Facebook, Sparkles, Phone, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { navLinks, socialLinks, photographerInfo, ctaTexts } from "@/config/siteConfig";
+import { navLinks, socialLinks, photographerInfo, ctaTexts, contactInfo } from "@/config/siteConfig";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
 
-  // smooth scroll state
+  // Scroll shadow
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // close menu on route change
+  // Close menu on route change
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
 
-  // lock body scroll when menu open (mobile)
+  // Lock body scroll when menu open
   useEffect(() => {
     if (!isOpen) {
       document.body.style.overflow = "";
@@ -35,145 +35,45 @@ export default function Navbar() {
   }, [isOpen]);
 
   const brandText = useMemo(() => {
-    // keep your style, but ensure consistent output
     const b = photographerInfo.brandName?.replace(".", "") ?? "BADR";
     return `${b}.PH`;
   }, []);
 
+  const telHref = `tel:${(contactInfo?.phone ?? "").replace(/\s/g, "")}`;
+
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-background/80 backdrop-blur-md py-4 border-b border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
-          : "bg-transparent py-6"
+          ? "bg-background/85 backdrop-blur-md border-b border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+          : "bg-transparent"
       )}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
       aria-label="Main navigation"
     >
-      {/* subtle bottom glow line */}
+      {/* subtle bottom glow */}
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent pointer-events-none" />
 
-      <div className="container mx-auto px-4 flex justify-between items-center">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="text-2xl md:text-3xl font-bold tracking-wider text-foreground hover:text-primary transition-colors flex items-center gap-2"
-          style={{ fontFamily: "'Playfair Display', serif" }}
-        >
-          <span>{brandText.split(".")[0]}</span>
-          <span className="text-primary">.</span>
-          <span>PH</span>
-
-          {/* tiny premium mark */}
-          <span className="hidden md:inline-flex items-center gap-1 text-[10px] text-foreground/60 border border-white/10 px-2 py-1 ml-2">
-            <Sparkles className="w-3 h-3 text-primary" />
-            Luxury
-          </span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-          {navLinks.map((link) => {
-            const active = location === link.href;
-            return (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={cn(
-                  "text-sm font-medium tracking-wide transition-colors hover:text-primary relative group",
-                  active ? "text-primary" : "text-foreground/80"
-                )}
-              >
-                {link.label}
-                <span
-                  className={cn(
-                    "absolute -bottom-2 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full",
-                    active ? "w-full" : ""
-                  )}
-                />
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Social & CTA */}
-        <div className="hidden md:flex items-center space-x-4 space-x-reverse">
-          <a
-            href={socialLinks.instagram}
-            target="_blank"
-            rel="noreferrer"
-            className="text-foreground/70 hover:text-primary transition-colors"
-            aria-label="Instagram"
+      <div className={cn("container mx-auto px-4", scrolled ? "py-3" : "py-4")}>
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="text-2xl md:text-3xl font-bold tracking-wider text-foreground hover:text-primary transition-colors flex items-center gap-2 tap-target"
+            style={{ fontFamily: "'Playfair Display', serif" }}
           >
-            <Instagram size={20} />
-          </a>
-          <a
-            href={socialLinks.facebook}
-            target="_blank"
-            rel="noreferrer"
-            className="text-foreground/70 hover:text-primary transition-colors"
-            aria-label="Facebook"
-          >
-            <Facebook size={20} />
-          </a>
-
-          <Link href="/contact">
-            <Button
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-6"
-            >
-              {ctaTexts.bookNow}
-            </Button>
+            <span>{brandText.split(".")[0]}</span>
+            <span className="text-primary">.</span>
+            <span>PH</span>
+            <span className="hidden md:inline-flex items-center gap-1 text-[10px] text-foreground/60 border border-white/10 px-2 py-1 ml-2">
+              <Sparkles className="w-3 h-3 text-primary" />
+              Luxury
+            </span>
           </Link>
-        </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-foreground hover:text-primary transition-colors"
-          onClick={() => setIsOpen((v) => !v)}
-          aria-label={isOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isOpen}
-        >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu Overlay */}
-      <div
-        className={cn(
-          "fixed inset-0 z-40 md:hidden transition-all duration-500",
-          isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
-        )}
-        aria-hidden={!isOpen}
-      >
-        {/* background */}
-        <div
-          className={cn(
-            "absolute inset-0 bg-background/95 backdrop-blur-xl",
-            "transition-opacity duration-500"
-          )}
-          onClick={() => setIsOpen(false)}
-        />
-
-        {/* panel */}
-        <div
-          className={cn(
-            "relative h-full w-full flex flex-col justify-center items-center",
-            "transition-transform duration-500",
-            isOpen ? "translate-y-0" : "translate-y-6"
-          )}
-        >
-          <div className="absolute top-6 right-6">
-            <button
-              className="w-11 h-11 border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-foreground hover:text-primary transition-colors"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close"
-            >
-              <X size={22} />
-            </button>
-          </div>
-
-          <div className="flex flex-col items-center space-y-8">
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center space-x-8 space-x-reverse">
             {navLinks.map((link) => {
               const active = location === link.href;
               return (
@@ -181,43 +81,196 @@ export default function Navbar() {
                   key={link.label}
                   href={link.href}
                   className={cn(
-                    "text-2xl font-medium transition-colors font-heading",
-                    active ? "text-primary" : "text-foreground hover:text-primary"
+                    "text-sm font-medium tracking-wide transition-colors hover:text-primary relative group",
+                    active ? "text-primary" : "text-foreground/80"
                   )}
                 >
                   {link.label}
+                  <span
+                    className={cn(
+                      "absolute -bottom-2 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full",
+                      active ? "w-full" : ""
+                    )}
+                  />
                 </Link>
               );
             })}
+          </div>
 
-            <div className="mt-6 h-px w-52 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          {/* Desktop social + CTA */}
+          <div className="hidden md:flex items-center space-x-4 space-x-reverse">
+            <a
+              href={socialLinks.instagram}
+              target="_blank"
+              rel="noreferrer"
+              className="text-foreground/70 hover:text-primary transition-colors tap-target inline-flex items-center justify-center"
+              aria-label="Instagram"
+            >
+              <Instagram size={20} />
+            </a>
+            <a
+              href={socialLinks.facebook}
+              target="_blank"
+              rel="noreferrer"
+              className="text-foreground/70 hover:text-primary transition-colors tap-target inline-flex items-center justify-center"
+              aria-label="Facebook"
+            >
+              <Facebook size={20} />
+            </a>
 
-            <div className="flex items-center space-x-6 space-x-reverse mt-8">
+            <Link href="/contact">
+              <Button
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-6"
+              >
+                {ctaTexts.bookNow}
+              </Button>
+            </Link>
+          </div>
+
+          {/* Mobile buttons */}
+          <div className="md:hidden flex items-center gap-2">
+            {/* Quick call (اختياري—مفيد للموبايل) */}
+            {telHref && telHref !== "tel:" ? (
+              <a
+                href={telHref}
+                className="w-11 h-11 border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-foreground hover:text-primary transition-colors tap-target"
+                aria-label="Call"
+              >
+                <Phone size={20} />
+              </a>
+            ) : null}
+
+            {/* Menu toggle */}
+            <button
+              className="w-11 h-11 border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-foreground hover:text-primary transition-colors tap-target"
+              onClick={() => setIsOpen((v) => !v)}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isOpen}
+            >
+              {isOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile overlay */}
+      <div
+        className={cn(
+          "fixed inset-0 z-40 md:hidden transition-all duration-300",
+          isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+        )}
+        aria-hidden={!isOpen}
+      >
+        {/* backdrop */}
+        <div
+          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+        />
+
+        {/* panel */}
+        <div
+          className={cn(
+            "absolute inset-x-0 bottom-0",
+            "bg-background border-t border-white/10",
+            "rounded-t-2xl",
+            "transition-transform duration-300",
+            isOpen ? "translate-y-0" : "translate-y-full"
+          )}
+          style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* drag handle */}
+          <div className="pt-3 pb-2 flex justify-center">
+            <div className="w-12 h-1.5 rounded-full bg-white/10" />
+          </div>
+
+          {/* top row */}
+          <div className="px-4 pb-3 flex items-center justify-between">
+            <div className="text-right">
+              <div className="text-sm text-foreground/80">القائمة</div>
+              <div className="text-xs text-muted-foreground">اختر صفحة</div>
+            </div>
+
+            <button
+              className="w-11 h-11 border border-white/10 bg-black/15 flex items-center justify-center text-foreground hover:text-primary transition-colors tap-target"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="px-4 pb-4">
+            {/* Links */}
+            <div className="flex flex-col gap-2">
+              {navLinks.map((link) => {
+                const active = location === link.href;
+                return (
+                  <Link key={link.label} href={link.href}>
+                    <a
+                      className={cn(
+                        "w-full flex items-center justify-between px-4 py-4 border rounded-xl tap-target",
+                        "transition-colors",
+                        active
+                          ? "bg-primary/10 border-primary/30 text-primary"
+                          : "bg-black/10 border-white/10 text-foreground hover:border-primary/35 hover:text-primary"
+                      )}
+                    >
+                      <span className="text-base font-semibold">{link.label}</span>
+                      <ArrowLeft className={cn("w-4 h-4", active ? "text-primary" : "text-foreground/60")} />
+                    </a>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Quick CTAs */}
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <Link href="/contact">
+                <a className="w-full">
+                  <button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target">
+                    {ctaTexts.bookNow}
+                  </button>
+                </a>
+              </Link>
+
               <a
                 href={socialLinks.instagram}
                 target="_blank"
                 rel="noreferrer"
-                className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-foreground/70 hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                className="w-full border border-white/10 bg-black/10 hover:border-primary/35 hover:text-primary transition-colors rounded-xl px-4 py-4 flex items-center justify-center gap-2 tap-target"
+              >
+                <Instagram size={18} />
+                <span className="text-sm font-semibold">Instagram</span>
+              </a>
+            </div>
+
+            {/* Social row */}
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <a
+                href={socialLinks.instagram}
+                target="_blank"
+                rel="noreferrer"
+                className="w-12 h-12 rounded-full border border-white/10 bg-black/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300 tap-target"
                 aria-label="Instagram"
               >
-                <Instagram size={22} />
+                <Instagram size={20} />
               </a>
               <a
                 href={socialLinks.facebook}
                 target="_blank"
                 rel="noreferrer"
-                className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-foreground/70 hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                className="w-12 h-12 rounded-full border border-white/10 bg-black/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300 tap-target"
                 aria-label="Facebook"
               >
-                <Facebook size={22} />
+                <Facebook size={20} />
               </a>
             </div>
 
-            <Link href="/contact">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-6 text-lg mt-4">
-                {ctaTexts.bookNow}
-              </Button>
-            </Link>
+            <div className="mt-4 text-center text-xs text-muted-foreground">
+              {photographerInfo.name} • {photographerInfo.title}
+            </div>
           </div>
         </div>
       </div>
