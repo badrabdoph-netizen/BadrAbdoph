@@ -3,11 +3,19 @@ import Footer from "@/components/Footer";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Camera, Sparkles, Heart, Star, ArrowLeft } from "lucide-react";
-import { aboutContent, photographerInfo, siteImages, testimonials, ctaTexts } from "@/config/siteConfig";
+import { aboutContent, photographerInfo, siteImages, testimonials, ctaTexts, externalPortfolioUrl, contactInfo } from "@/config/siteConfig";
 import SmartImage from "@/components/SmartImage";
+
+function buildWhatsAppHref(text: string) {
+  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+  if (!phone) return "";
+  return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+}
 
 export default function About() {
   const aboutImg = siteImages.aboutImage ?? siteImages.heroImage;
+
+  const waBookingHref = buildWhatsAppHref("عايز احجز اوردر ❤️");
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -39,11 +47,11 @@ export default function About() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/contact">
+            <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto">
                 {ctaTexts.bookNow ?? "احجز الآن"}
               </Button>
-            </Link>
+            </a>
 
             <Link href="/services#sessions">
               <Button
@@ -101,12 +109,12 @@ export default function About() {
               </div>
 
               <div className="mt-8">
-                <Link href="/portfolio">
+                <a href={externalPortfolioUrl} target="_blank" rel="noreferrer">
                   <Button variant="link" className="text-primary p-0 text-lg hover:no-underline group">
                     شوف المعرض{" "}
                     <ArrowLeft className="mr-2 transition-transform group-hover:-translate-x-2" />
                   </Button>
-                </Link>
+                </a>
               </div>
             </div>
           </div>
@@ -188,11 +196,11 @@ export default function About() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/contact">
+            <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto">
                 {ctaTexts.contactNow ?? "تواصل الآن"}
               </Button>
-            </Link>
+            </a>
             <Link href="/services#sessions">
               <Button
                 variant="outline"
