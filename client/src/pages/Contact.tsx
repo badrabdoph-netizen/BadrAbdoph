@@ -1,36 +1,57 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { toast } from "sonner";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { Phone, Mail, MapPin, Instagram, Facebook, Send } from "lucide-react";
+import { Phone, Mail, MapPin, Instagram, Facebook, Send, Sparkles } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { contactInfo, socialLinks, pageTexts, ctaTexts } from "@/config/siteConfig";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" }),
-  phone: z.string().min(10, { message: "رقم الهاتف غير صحيح" }),
+  phone: z
+    .string()
+    .regex(/^[0-9+\s()-]{10,}$/, { message: "رقم الهاتف غير صحيح" }),
   date: z.string().min(1, { message: "يرجى اختيار التاريخ" }),
   message: z.string().optional(),
 });
 
+function WhatsAppIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M20.52 3.48A11.86 11.86 0 0 0 12.06 0C5.46 0 .1 5.36.1 11.96c0 2.1.56 4.15 1.62 5.96L0 24l6.2-1.62a11.95 11.95 0 0 0 5.86 1.5h.01c6.6 0 11.96-5.36 11.96-11.96 0-3.2-1.25-6.2-3.51-8.44ZM12.07 21.9h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.68.96.98-3.58-.24-.37a9.9 9.9 0 0 1-1.56-5.36C2.16 6.5 6.6 2.06 12.06 2.06c2.64 0 5.12 1.03 6.98 2.89a9.8 9.8 0 0 1 2.9 6.98c0 5.46-4.44 9.97-9.87 9.97Zm5.77-7.48c-.31-.16-1.82-.9-2.1-1-.28-.1-.48-.16-.68.16-.2.31-.78 1-.96 1.2-.18.2-.35.24-.66.08-.31-.16-1.3-.48-2.47-1.54-.92-.82-1.54-1.84-1.72-2.15-.18-.31-.02-.48.14-.64.14-.14.31-.35.47-.52.16-.18.2-.31.31-.52.1-.2.05-.39-.03-.55-.08-.16-.68-1.65-.93-2.27-.24-.58-.49-.5-.68-.5h-.58c-.2 0-.52.08-.8.39-.28.31-1.06 1.03-1.06 2.5 0 1.47 1.08 2.9 1.23 3.1.16.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.82-.74 2.08-1.45.26-.7.26-1.3.18-1.45-.08-.14-.28-.23-.58-.39Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 export default function Contact() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      phone: "",
-      date: "",
-      message: "",
-    },
+    defaultValues: { name: "", phone: "", date: "", message: "" },
   });
 
-  // Use tRPC mutation for contact form submission
   const submitContact = trpc.contact.submit.useMutation({
     onSuccess: (data) => {
       if (data.success) {
@@ -48,89 +69,77 @@ export default function Contact() {
     submitContact.mutate(values);
   }
 
+  // ✅ بديل لطيف: افتح واتساب برسالة جاهزة (اختياري)
+  const whatsappHref = `https://wa.me/${contactInfo.whatsappNumber}`;
+
+  // ✅ Safe bottom spacing عشان زر الواتساب العايم مايغطيش المحتوى
+  useEffect(() => {
+    document.documentElement.style.scrollPaddingTop = "120px";
+    return () => {
+      document.documentElement.style.scrollPaddingTop = "";
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: "'Cairo', sans-serif" }}>
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
-      {/* Header */}
-      <header className="pt-40 pb-12 bg-card">
+      {/* Header (Mobile-first أقل ارتفاع) */}
+      <header className="pt-32 pb-10 bg-card relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_15%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.contact.title}</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+          <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/10 bg-black/20 backdrop-blur-md mb-6">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-xs md:text-sm text-foreground/80">
+              رد سريع • تنظيم مواعيد • تفاصيل واضحة
+            </span>
+          </div>
+
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {pageTexts.contact.title}
+          </h1>
+          <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed">
             {pageTexts.contact.subtitle}
           </p>
         </div>
       </header>
 
-      <section className="py-20">
+      {/* Quick Actions (Mobile-first) */}
+      <section className="border-y border-white/10 bg-background/70 backdrop-blur-md">
+        <div className="container mx-auto px-4 py-4">
+          <div className="grid grid-cols-2 gap-3">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noreferrer"
+              className="premium-border bg-card/40 border border-white/10 px-4 py-4 flex items-center justify-center gap-2 hover:border-primary/35 transition-colors"
+            >
+              <span className="text-primary">
+                <WhatsAppIcon />
+              </span>
+              <span className="text-sm font-semibold">واتساب</span>
+            </a>
+
+            <a
+              href={`tel:${contactInfo.phone.replace(/\s/g, "")}`}
+              className="premium-border bg-card/40 border border-white/10 px-4 py-4 flex items-center justify-center gap-2 hover:border-primary/35 transition-colors"
+            >
+              <Phone className="w-5 h-5 text-primary" />
+              <span className="text-sm font-semibold">مكالمة</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-14 pb-28">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            {/* Contact Info */}
-            <div className="space-y-12">
-              <div>
-                <h2 className="text-3xl font-bold mb-6 text-primary" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.contact.infoTitle}</h2>
-                <p className="text-muted-foreground text-lg leading-relaxed mb-8">
-                  {pageTexts.contact.infoDescription}
-                </p>
-                
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-4 space-x-reverse">
-                    <div className="w-12 h-12 bg-card border border-white/10 flex items-center justify-center text-primary">
-                      <Phone size={24} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-lg">الهاتف / واتساب</h4>
-                      <a href={`https://wa.me/${contactInfo.whatsappNumber}`} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary transition-colors dir-ltr block text-right">
-                        {contactInfo.phone}
-                      </a>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-4 space-x-reverse">
-                    <div className="w-12 h-12 bg-card border border-white/10 flex items-center justify-center text-primary">
-                      <Mail size={24} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-lg">البريد الإلكتروني</h4>
-                      <a href={`mailto:${contactInfo.email}`} className="text-muted-foreground hover:text-primary transition-colors">
-                        {contactInfo.email}
-                      </a>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-4 space-x-reverse">
-                    <div className="w-12 h-12 bg-card border border-white/10 flex items-center justify-center text-primary">
-                      <MapPin size={24} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-lg">الموقع</h4>
-                      <p className="text-muted-foreground">{contactInfo.location}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+            {/* ✅ Contact Form FIRST on mobile */}
+            <div className="order-1 lg:order-2 bg-card p-7 md:p-10 border border-white/10 premium-border">
+              <h2 className="text-2xl font-bold mb-6">{pageTexts.contact.formTitle}</h2>
 
-              <div>
-                <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: "'Amiri', serif" }}>تابعنا على</h2>
-                <div className="flex space-x-4 space-x-reverse">
-                  <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="w-14 h-14 bg-card border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
-                    <Instagram size={24} />
-                  </a>
-                  <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="w-14 h-14 bg-card border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
-                    <Facebook size={24} />
-                  </a>
-                  <a href={socialLinks.tiktok} target="_blank" rel="noreferrer" className="w-14 h-14 bg-card border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Contact Form */}
-            <div className="bg-card p-8 md:p-10 border border-white/5">
-              <h2 className="text-2xl font-bold mb-8" style={{ fontFamily: "'Amiri', serif" }}>{pageTexts.contact.formTitle}</h2>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                   <FormField
                     control={form.control}
                     name="name"
@@ -138,13 +147,17 @@ export default function Contact() {
                       <FormItem>
                         <FormLabel>الاسم بالكامل</FormLabel>
                         <FormControl>
-                          <Input placeholder="أدخل اسمك" {...field} className="bg-background border-white/10 focus:border-primary h-12" />
+                          <Input
+                            placeholder="أدخل اسمك"
+                            {...field}
+                            className="bg-background border-white/10 focus:border-primary h-12"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="phone"
@@ -152,13 +165,19 @@ export default function Contact() {
                       <FormItem>
                         <FormLabel>رقم الهاتف</FormLabel>
                         <FormControl>
-                          <Input placeholder="01xxxxxxxxx" {...field} className="bg-background border-white/10 focus:border-primary h-12 text-right" dir="ltr" />
+                          <Input
+                            placeholder="01xxxxxxxxx"
+                            {...field}
+                            className="bg-background border-white/10 focus:border-primary h-12 text-right"
+                            dir="ltr"
+                            inputMode="tel"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="date"
@@ -166,13 +185,17 @@ export default function Contact() {
                       <FormItem>
                         <FormLabel>تاريخ المناسبة (تقريبي)</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} className="bg-background border-white/10 focus:border-primary h-12 text-right" />
+                          <Input
+                            type="date"
+                            {...field}
+                            className="bg-background border-white/10 focus:border-primary h-12"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="message"
@@ -180,42 +203,159 @@ export default function Contact() {
                       <FormItem>
                         <FormLabel>تفاصيل إضافية (اختياري)</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="أخبرنا المزيد عن مناسبتك..." 
-                            className="bg-background border-white/10 focus:border-primary min-h-[120px] resize-none" 
-                            {...field} 
+                          <Textarea
+                            placeholder="مثلاً: نوع المناسبة، المكان، عدد الساعات..."
+                            className="bg-background border-white/10 focus:border-primary min-h-[120px] resize-none"
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 text-lg rounded-none mt-4" 
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 text-lg rounded-none mt-2"
                     disabled={submitContact.isPending}
                   >
                     {submitContact.isPending ? "جاري الإرسال..." : ctaTexts.sendRequest}
                     {!submitContact.isPending && <Send size={18} className="mr-2" />}
                   </Button>
+
+                  <p className="text-xs text-muted-foreground/75 text-center mt-2">
+                    بالضغط على إرسال، سيتم التواصل معك لتأكيد التفاصيل والموعد.
+                  </p>
                 </form>
               </Form>
+            </div>
+
+            {/* Contact Info SECOND on mobile */}
+            <div className="order-2 lg:order-1 space-y-10">
+              <div className="premium-border bg-card/40 border border-white/10 p-7 md:p-9">
+                <h2 className="text-2xl font-bold mb-4 text-primary">{pageTexts.contact.infoTitle}</h2>
+                <p className="text-muted-foreground leading-relaxed mb-7">
+                  {pageTexts.contact.infoDescription}
+                </p>
+
+                <div className="space-y-5">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-black/15 border border-white/10 flex items-center justify-center text-primary">
+                      <Phone size={22} />
+                    </div>
+                    <div className="text-right">
+                      <h4 className="font-bold">الهاتف / واتساب</h4>
+                      <a
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-colors dir-ltr block"
+                      >
+                        {contactInfo.phone}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-black/15 border border-white/10 flex items-center justify-center text-primary">
+                      <Mail size={22} />
+                    </div>
+                    <div className="text-right">
+                      <h4 className="font-bold">البريد الإلكتروني</h4>
+                      <a
+                        href={`mailto:${contactInfo.email}`}
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        {contactInfo.email}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-black/15 border border-white/10 flex items-center justify-center text-primary">
+                      <MapPin size={22} />
+                    </div>
+                    <div className="text-right">
+                      <h4 className="font-bold">الموقع</h4>
+                      <p className="text-muted-foreground">{contactInfo.location}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="premium-border bg-card/40 border border-white/10 p-7 md:p-9">
+                <h2 className="text-xl font-bold mb-5">تابعنا على</h2>
+                <div className="flex gap-3">
+                  <a
+                    href={socialLinks.instagram}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    aria-label="Instagram"
+                  >
+                    <Instagram size={22} />
+                  </a>
+                  <a
+                    href={socialLinks.facebook}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    aria-label="Facebook"
+                  >
+                    <Facebook size={22} />
+                  </a>
+                  <a
+                    href={socialLinks.tiktok}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    aria-label="TikTok"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* WhatsApp Floating Button */}
-      <a 
-        href={`https://wa.me/${contactInfo.whatsappNumber}`}
-        target="_blank" 
+      {/* WhatsApp Floating Button (Mobile-first) */}
+      <a
+        href={whatsappHref}
+        target="_blank"
         rel="noreferrer"
-        className="fixed bottom-8 right-8 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center"
+        className="fixed z-50 premium-border bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg flex items-center gap-2 px-5 py-3 md:px-0 md:py-0 md:w-14 md:h-14 md:rounded-full rounded-full"
+        style={{ right: "1rem", bottom: "calc(1rem + env(safe-area-inset-bottom))" }}
         title="تواصل عبر واتساب"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1"/></svg>
+        <WhatsAppIcon />
+        <span className="text-sm font-semibold md:hidden">واتساب</span>
       </a>
+
+      <style>{`
+        .premium-border { position: relative; }
+        .premium-border::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border: 1px solid rgba(255,255,255,0.06);
+          pointer-events: none;
+          border-radius: inherit;
+        }
+      `}</style>
 
       <Footer />
     </div>
