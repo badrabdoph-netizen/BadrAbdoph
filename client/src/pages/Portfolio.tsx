@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { X, ZoomIn, Sparkles } from "lucide-react";
 import { siteImages, pageTexts } from "@/config/siteConfig";
+import SmartImage from "@/components/SmartImage";
 
 export default function Portfolio() {
   const [selectedImage, setSelectedImage] = useState<{
@@ -18,7 +19,6 @@ export default function Portfolio() {
       : siteImages.portfolioGallery.filter((img) => img.category === activeCategory);
   }, [activeCategory]);
 
-  // ✅ lock body scroll when lightbox open (mobile-friendly)
   useEffect(() => {
     if (!selectedImage) {
       document.body.style.overflow = "";
@@ -34,7 +34,6 @@ export default function Portfolio() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
-      {/* Header (Mobile-first: أقل ارتفاع) */}
       <header className="pt-32 pb-10 bg-card relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_15%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 text-center">
@@ -54,7 +53,6 @@ export default function Portfolio() {
         </div>
       </header>
 
-      {/* Category Filter (Sticky + أفقي للموبايل) */}
       <section className="sticky top-[76px] z-30 bg-background/75 backdrop-blur-md border-y border-white/10">
         <div className="container mx-auto px-4 py-3">
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -81,7 +79,6 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* Gallery Grid (Mobile-first: 2 columns) */}
       <section className="py-10 pb-24">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
@@ -92,14 +89,14 @@ export default function Portfolio() {
                 onClick={() => setSelectedImage({ src: img.src, title: img.title })}
                 aria-label={`Open ${img.title}`}
               >
-                <img
+                <SmartImage
                   src={img.src}
                   alt={img.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                   loading="lazy"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
 
-                {/* overlay (خفيف على الموبايل — أقوى على hover للديسكتوب) */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/0 opacity-90 md:opacity-70 md:group-hover:opacity-100 transition-opacity duration-300" />
 
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-3">
@@ -114,7 +111,6 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* Lightbox (Mobile friendly) */}
       {selectedImage && (
         <div
           className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
@@ -122,7 +118,6 @@ export default function Portfolio() {
           role="dialog"
           aria-modal="true"
         >
-          {/* Top bar */}
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-3">
             <div className="text-white/80 text-sm line-clamp-1">
               {selectedImage.title ?? ""}
@@ -137,11 +132,13 @@ export default function Portfolio() {
             </button>
           </div>
 
-          <img
+          <SmartImage
             src={selectedImage.src}
             alt={selectedImage.title ?? "Full size"}
             className="max-w-full max-h-[88vh] object-contain shadow-2xl animate-in zoom-in-95 duration-200"
+            priority
             onClick={(e) => e.stopPropagation()}
+            sizes="100vw"
           />
         </div>
       )}
