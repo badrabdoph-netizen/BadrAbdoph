@@ -67,10 +67,27 @@ export default function Home() {
   }, []);
 
   // ✅ معاينة أعمالي (من نفس الـ gallery)
-  const portfolioPreview = useMemo(() => {
-    const g = (siteImages.portfolioGallery ?? []) as Array<{ src: string; title: string; category?: string }>;
-    return g.slice(0, 10);
+  const gallery = useMemo(() => {
+    return (siteImages.portfolioGallery ?? []) as Array<{ src: string; title: string; category?: string }>;
   }, []);
+
+  // نحتاج عدد كافي للصفّين، لو قليل نكرر
+  const safeGallery = useMemo(() => {
+    if (!gallery.length) return [];
+    const min = 14;
+    if (gallery.length >= min) return gallery;
+    const times = Math.ceil(min / gallery.length);
+    const out: typeof gallery = [];
+    for (let i = 0; i < times; i++) out.push(...gallery);
+    return out;
+  }, [gallery]);
+
+  const row1 = useMemo(() => safeGallery.slice(0, 8), [safeGallery]);
+  const row2 = useMemo(() => safeGallery.slice(8, 16), [safeGallery]);
+
+  // duplication لعمل loop ناعم
+  const loop1 = useMemo(() => [...row1, ...row1], [row1]);
+  const loop2 = useMemo(() => [...row2, ...row2], [row2]);
 
   const topTestimonials = useMemo(() => (testimonials ?? []).slice(0, 3), []);
 
@@ -155,7 +172,6 @@ export default function Home() {
       {/* SERVICES PREVIEW */}
       <section className="py-24 relative">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
-
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">الخدمات</h3>
@@ -235,17 +251,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ✅ أعمالي (زر + صور معاينة تحت الزر) - شيك وموبايل */}
+      {/* ✅ أعمالي (زر + صفّين متحركين) */}
       <section className="py-18 md:py-20 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_85%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
 
         <div className="container mx-auto px-4 relative z-10">
-          {/* زر أعمالي + عنوان */}
-          <div className="flex flex-col items-center text-center gap-3 mb-7">
+          <div className="flex flex-col items-center text-center gap-3 mb-8">
             <h3 className="text-primary text-sm tracking-widest uppercase font-bold">أعمالي</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">لقطات معاينة</h2>
+            <h2 className="text-3xl md:text-5xl font-bold">معاينة سريعة</h2>
             <p className="text-muted-foreground max-w-2xl leading-relaxed">
-              دوس على الزر وشوف كل المعرض… أو اسحب الصور بإيدك على الموبايل.
+              اسحب بإيدك… أو سيبها تمشي لوحدها 👀 — ولما تعجبك لقطة دوس “أعمالي” وشوف كل المعرض.
             </p>
 
             <Link href="/portfolio">
@@ -255,50 +270,61 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* صور المعاينة تحت الزر */}
+          {/* rows wrapper */}
           <div className="relative">
-            {/* edges fade */}
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-background to-transparent z-10" />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-background to-transparent z-10" />
+            {/* edge fades */}
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-20" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-20" />
 
-            <div className="portfolio-strip flex gap-3 overflow-x-auto px-1 pb-2">
-              {portfolioPreview.map((img, i) => (
-                <button
-                  key={`${img.src}-${i}`}
-                  className="shrink-0 w-[58vw] sm:w-[42vw] md:w-[28vw] lg:w-[22vw] max-w-[320px]
-                             aspect-[3/4] relative overflow-hidden border border-white/10 premium-border group snap-center"
-                  onClick={() => (window.location.href = "/portfolio")}
-                  aria-label="Open portfolio"
-                >
-                  <img
-                    src={img.src}
-                    alt={img.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-85 transition-opacity duration-300" />
-                  <div className="absolute bottom-3 left-3 right-3 text-[11px] md:text-xs text-white/85 text-center line-clamp-1">
-                    {img.title}
-                  </div>
-                </button>
-              ))}
-
-              {/* كارت عرض الكل */}
-              <Link href="/portfolio">
-                <a
-                  className="shrink-0 w-[58vw] sm:w-[42vw] md:w-[28vw] lg:w-[22vw] max-w-[320px]
-                             aspect-[3/4] relative overflow-hidden border border-primary/25 premium-border
-                             bg-card/40 hover:border-primary/45 transition-colors snap-center
-                             flex items-center justify-center"
-                >
-                  <div className="text-center p-6">
-                    <div className="w-14 h-14 mx-auto mb-4 border border-white/10 bg-black/20 flex items-center justify-center text-primary">
-                      <ZoomIn className="w-7 h-7" />
+            {/* Row 1 */}
+            <div className="marquee">
+              <div className="marquee__track marquee__track--left">
+                {loop1.map((img, i) => (
+                  <button
+                    key={`r1-${img.src}-${i}`}
+                    className="marquee__item premium-border border border-white/10 bg-black/10 overflow-hidden"
+                    onClick={() => (window.location.href = "/portfolio")}
+                    aria-label="Open portfolio"
+                  >
+                    <img src={img.src} alt={img.title} loading="lazy" className="w-full h-full object-cover opacity-90" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-85" />
+                    <div className="absolute bottom-2 left-2 right-2 text-[10px] text-white/85 line-clamp-1 text-center">
+                      {img.title}
                     </div>
-                    <div className="text-lg font-bold">عرض المعرض كامل</div>
-                    <div className="text-sm text-muted-foreground mt-2">اضغط هنا</div>
-                  </div>
-                </a>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 2 (reverse direction) */}
+            <div className="marquee mt-3">
+              <div className="marquee__track marquee__track--right">
+                {loop2.map((img, i) => (
+                  <button
+                    key={`r2-${img.src}-${i}`}
+                    className="marquee__item premium-border border border-white/10 bg-black/10 overflow-hidden"
+                    onClick={() => (window.location.href = "/portfolio")}
+                    aria-label="Open portfolio"
+                  >
+                    <img src={img.src} alt={img.title} loading="lazy" className="w-full h-full object-cover opacity-90" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent opacity-85" />
+                    <div className="absolute bottom-2 left-2 right-2 text-[10px] text-white/85 line-clamp-1 text-center">
+                      {img.title}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* CTA card at end (tap-friendly) */}
+            <div className="mt-6 flex justify-center">
+              <Link href="/portfolio">
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-10 py-6"
+                >
+                  عرض المعرض كامل <ArrowLeft className="mr-2 w-4 h-4" />
+                </Button>
               </Link>
             </div>
           </div>
@@ -379,9 +405,7 @@ export default function Home() {
                 className="bg-background/45 border border-white/10 p-7 premium-border hover:border-primary/25 transition-colors"
               >
                 <StarsRow />
-                <p className="text-muted-foreground italic leading-relaxed mt-4 mb-5">
-                  "{t.quote}"
-                </p>
+                <p className="text-muted-foreground italic leading-relaxed mt-4 mb-5">"{t.quote}"</p>
                 <div className="font-bold">{t.name}</div>
               </div>
             ))}
@@ -393,9 +417,7 @@ export default function Home() {
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.12),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-5">
-            جاهز نثبت يومك بصور تفضل معاك؟
-          </h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-5">جاهز نثبت يومك بصور تفضل معاك؟</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
             ابعت التفاصيل بسرعة… وهنرتب كل حاجة بشكل مريح وواضح.
           </p>
@@ -446,13 +468,64 @@ export default function Home() {
         }
         .premium-border:hover::after { opacity: 1; }
 
-        /* ✅ Hide scrollbar for the portfolio strip + snap */
-        .portfolio-strip {
-          scroll-snap-type: x mandatory;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
+        /* ====== Two-row creative marquee (mobile-first) ====== */
+        .marquee {
+          overflow: hidden;
+          position: relative;
+          width: 100%;
         }
-        .portfolio-strip::-webkit-scrollbar { display: none; }
+
+        /* Pause animation on hover (desktop) and while user touches/scrolls (mobile feels ok) */
+        .marquee:hover .marquee__track { animation-play-state: paused; }
+
+        .marquee__track {
+          display: flex;
+          gap: 12px;
+          width: max-content;
+          will-change: transform;
+        }
+
+        /* Responsive card sizing */
+        .marquee__item {
+          position: relative;
+          flex: 0 0 auto;
+          width: min(62vw, 320px);
+          aspect-ratio: 3 / 4;
+        }
+        @media (min-width: 640px) {
+          .marquee__item { width: min(38vw, 320px); }
+        }
+        @media (min-width: 1024px) {
+          .marquee__item { width: 220px; }
+        }
+
+        /* Left track moves to left */
+        .marquee__track--left {
+          animation: marqueeLeft 26s linear infinite;
+        }
+        /* Right track moves to right */
+        .marquee__track--right {
+          animation: marqueeRight 30s linear infinite;
+        }
+
+        /* Reduce motion preference */
+        @media (prefers-reduced-motion: reduce) {
+          .marquee__track--left,
+          .marquee__track--right {
+            animation: none !important;
+          }
+          .marquee { overflow-x: auto; }
+          .marquee__track { width: max-content; padding-bottom: 6px; }
+        }
+
+        @keyframes marqueeLeft {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); } /* لأننا مكررين العناصر مرتين */
+        }
+        @keyframes marqueeRight {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
       `}</style>
 
       <Footer />
