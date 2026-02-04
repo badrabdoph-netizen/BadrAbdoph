@@ -207,7 +207,7 @@ function PackageCard({
         </ul>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <PrimaryCTA whatsappNumber={contactInfo.whatsappNumber} />
+          <PrimaryCTA whatsappNumber={whatsappNumber} />
 
           <a
             href={waInquiryHref}

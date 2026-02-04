@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   Camera,
+  Check,
   Phone,
   Star,
   Sparkles,
@@ -386,6 +387,7 @@ export default function Home() {
                 </a>
               ) : null}
             </div>
+            <div className="hero-follow-glow" aria-hidden="true" />
           </div>
         </div>
       </header>
@@ -421,8 +423,8 @@ export default function Home() {
                 <div
                   key={card.id}
                   className={[
-                    "relative overflow-hidden group transition-all duration-300",
-                    "bg-card p-8 border",
+                    "relative overflow-hidden group transition-all duration-300 package-card",
+                    "bg-card p-8 border rounded-2xl",
                     featured
                       ? "border-primary/30 shadow-2xl shadow-black/50 md:-translate-y-4"
                       : "border-white/10 hover:border-primary/30 hover:-translate-y-1 hover:shadow-[0_25px_80px_rgba(0,0,0,0.55)]",
@@ -457,14 +459,14 @@ export default function Home() {
                       {card.description}
                     </p>
 
-                    <ul className="text-sm text-muted-foreground space-y-2 pb-2">
-                      {card.bullets.map((b, bIdx) => (
-                        <li key={`${card.id}-b-${bIdx}`} className="flex items-start">
-                          <Star size={14} className="ml-2 mt-1 text-primary" />
-                          <span>{b}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <ul className="text-sm text-muted-foreground space-y-2 pb-2">
+                    {card.bullets.map((b, bIdx) => (
+                      <li key={`${card.id}-b-${bIdx}`} className="flex items-start">
+                        <Check size={15} className="ml-2 mt-1 text-primary" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
                   </div>
 
                   <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6" />
@@ -492,7 +494,7 @@ export default function Home() {
       </section>
 
       {/* ABOUT PREVIEW */}
-      <section className="py-24 md:py-32 relative">
+      <section className="pt-24 pb-12 md:pt-28 md:pb-16 relative">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div className="relative order-2 md:order-1 group overflow-hidden">
@@ -536,7 +538,7 @@ export default function Home() {
       {/* ✅ Story Gallery */}
       <section
         ref={(el) => (portfolioRef.current = el)}
-        className="py-20 relative overflow-hidden"
+        className="pt-6 pb-16 relative overflow-hidden"
         onMouseMove={(e) => setSpot(e.clientX, e.clientY)}
         onTouchMove={(e) => {
           const t = e.touches[0];
@@ -555,7 +557,7 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col items-center text-center gap-3 mb-9">
             <h3 className="text-primary text-sm tracking-widest uppercase font-bold">لمحات</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">صور من قصتي</h2>
+            <h2 className="text-3xl md:text-5xl font-bold">قصتي</h2>
           </div>
 
           <div className="relative">
@@ -740,6 +742,14 @@ export default function Home() {
           gap: 14px;
           flex-wrap: wrap;
         }
+        .hero-follow-glow {
+          width: min(220px, 60vw);
+          height: 18px;
+          margin-top: 2px;
+          background: radial-gradient(circle, rgba(255,210,130,0.45), transparent 70%);
+          filter: blur(8px);
+          opacity: 0.75;
+        }
         .hero-social-btn {
           width: 58px;
           height: 58px;
@@ -749,11 +759,19 @@ export default function Home() {
           justify-content: center;
           border: 1px solid rgba(255,255,255,0.16);
           background: rgba(9,9,12,0.55);
-          color: rgba(255,255,255,0.85);
+          color: #f6ddb0;
           box-shadow: 0 18px 45px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.05);
           transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
           position: relative;
           overflow: hidden;
+        }
+        .hero-social-btn::before {
+          content: "";
+          position: absolute;
+          inset: -35% -25%;
+          background: radial-gradient(circle, rgba(255,220,160,0.35), transparent 65%);
+          opacity: 0.35;
+          pointer-events: none;
         }
         .hero-social-btn::after {
           content: "";
@@ -770,22 +788,13 @@ export default function Home() {
           border-color: rgba(255,200,80,0.45);
           box-shadow: 0 22px 60px rgba(0,0,0,0.6), 0 0 22px rgba(255,200,80,0.22);
         }
-        .hero-social--ig {
-          background: radial-gradient(circle at 30% 20%, rgba(255,140,180,0.18), rgba(12,12,16,0.8));
-          color: #ffd1df;
-        }
-        .hero-social--fb {
-          background: radial-gradient(circle at 30% 20%, rgba(120,160,255,0.2), rgba(12,12,16,0.82));
-          color: #cfe0ff;
-        }
-        .hero-social--tt {
-          background: radial-gradient(circle at 30% 20%, rgba(120,240,255,0.18), rgba(12,12,16,0.82));
-          color: #d7f7ff;
-        }
+        .hero-social--ig,
+        .hero-social--fb,
+        .hero-social--tt,
         .hero-social--wa {
-          background: radial-gradient(circle at 30% 20%, rgba(80,230,150,0.2), rgba(12,12,16,0.82));
-          color: #b7f7c8;
-          border-color: rgba(56,189,116,0.45);
+          background: radial-gradient(circle at 30% 20%, rgba(255,210,120,0.18), rgba(10,10,14,0.9));
+          color: #f7e4bf;
+          border-color: rgba(255,210,120,0.35);
         }
         @media (max-width: 640px) {
           .hero-social-btn {
@@ -855,6 +864,13 @@ export default function Home() {
         }
         .premium-border:hover::after { opacity: 1; }
 
+        .package-card {
+          background:
+            linear-gradient(160deg, rgba(18,18,24,0.95), rgba(7,7,10,0.98)),
+            radial-gradient(circle at 15% 10%, rgba(255,210,120,0.08), transparent 50%);
+          box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+        }
+
         .about-badge {
           display: inline-flex;
           align-items: center;
@@ -890,18 +906,21 @@ export default function Home() {
 
         .vip-label {
           position: absolute;
-          top: 18px;
-          left: 20px;
-          font-size: 26px;
-          font-weight: 800;
-          letter-spacing: 0.2em;
-          background: linear-gradient(120deg, #ffe6b0, #fff, #ffd37a);
-          color: transparent;
-          -webkit-background-clip: text;
-          background-clip: text;
-          text-shadow: 0 0 18px rgba(255,210,130,0.5);
+          top: 16px;
+          left: 18px;
+          padding: 6px 14px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,210,120,0.5);
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.35em;
+          text-transform: uppercase;
+          background: linear-gradient(120deg, rgba(255,210,120,0.35), rgba(255,255,255,0.08));
+          color: #fff2cf;
+          text-shadow: 0 0 16px rgba(255,210,130,0.6);
           animation: vip-shine 3.2s ease-in-out infinite;
           pointer-events: none;
+          box-shadow: 0 14px 40px rgba(255,200,80,0.15);
         }
 
         .camera-badge {
@@ -1082,10 +1101,10 @@ export default function Home() {
           border-color: rgba(255,200,80,0.4);
           box-shadow: 0 18px 50px rgba(0,0,0,0.55), 0 0 20px rgba(255,200,80,0.15);
         }
-        .portfolio-social--ig { color: #ffd1df; }
-        .portfolio-social--fb { color: #cfe0ff; }
-        .portfolio-social--tt { color: #d7f7ff; }
-        .portfolio-social--wa { color: #b7f7c8; border-color: rgba(56,189,116,0.35); }
+        .portfolio-social--ig,
+        .portfolio-social--fb,
+        .portfolio-social--tt,
+        .portfolio-social--wa { color: #f7e4bf; border-color: rgba(255,210,120,0.35); }
         @media (max-width: 640px) {
           .portfolio-social {
             width: 44px;
