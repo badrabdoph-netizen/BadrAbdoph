@@ -228,21 +228,30 @@ function App() {
               gap: 8px;
               font-weight: 700;
               letter-spacing: 0.02em;
-              color: #eafff1;
+              color: #f4fff8;
               background:
-                linear-gradient(135deg, rgba(20, 160, 90, 0.55), rgba(30, 200, 120, 0.45)),
-                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
-              border: 1px solid rgba(255,255,255,0.22);
+                linear-gradient(135deg, rgba(20, 170, 95, 0.28), rgba(30, 210, 125, 0.22)),
+                linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0));
+              border: 1px solid rgba(255,255,255,0.3);
               box-shadow:
-                0 16px 45px rgba(37, 211, 102, 0.25),
-                inset 0 0 0 1px rgba(255,255,255,0.28),
-                inset 0 0 18px rgba(255,255,255,0.08);
+                0 18px 50px rgba(37, 211, 102, 0.22),
+                inset 0 0 0 1px rgba(255,255,255,0.35),
+                inset 0 0 22px rgba(255,255,255,0.10);
               position: relative;
               overflow: hidden;
               transition: transform 200ms ease, box-shadow 200ms ease;
               animation: wa-float 3.4s ease-in-out infinite, wa-pulse 2.8s ease-out infinite;
               backdrop-filter: blur(14px) saturate(140%);
               -webkit-backdrop-filter: blur(14px) saturate(140%);
+            }
+            .sticky-btn::before {
+              content: "";
+              position: absolute;
+              inset: 0;
+              border-radius: inherit;
+              background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.22), transparent 55%);
+              opacity: 0.6;
+              pointer-events: none;
             }
             .sticky-btn::after {
               content: "";
@@ -256,13 +265,13 @@ function App() {
             }
             .sticky-btn--call {
               background:
-                linear-gradient(135deg, rgba(18, 150, 85, 0.55), rgba(45, 220, 120, 0.45)),
-                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
-              color: #eafff1;
+                linear-gradient(135deg, rgba(18, 160, 90, 0.26), rgba(55, 230, 135, 0.22)),
+                linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0));
+              color: #f4fff8;
             }
             .sticky-btn:hover {
               transform: translateY(-2px) scale(1.02);
-              box-shadow: 0 22px 60px rgba(37, 211, 102, 0.35);
+              box-shadow: 0 22px 60px rgba(37, 211, 102, 0.32);
             }
           `}</style>
         </div>
