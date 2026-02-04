@@ -455,7 +455,7 @@ export default function Home() {
                     img={img}
                     onClick={goPortfolio}
                     eager={i < 2}
-                    className={["gallery-card", collageLayout[i] ?? ""].join(" ")}
+                    className={["gallery-card h-full", collageLayout[i] ?? ""].join(" ")}
                   />
                 ))}
               </div>
@@ -650,8 +650,7 @@ export default function Home() {
         .gallery-hint {
           text-align: center;
           font-size: 11px;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
+          letter-spacing: 0.06em;
           color: rgba(255,255,255,0.55);
           margin-top: 10px;
         }
