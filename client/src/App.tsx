@@ -165,9 +165,9 @@ function App() {
             }
             @media (max-width: 768px) {
               .wa-float {
-                right: auto;
-                left: 14px;
-                bottom: calc(env(safe-area-inset-bottom) + 16px);
+                right: 12px;
+                left: auto;
+                bottom: calc(env(safe-area-inset-bottom) + 18px);
                 width: 44px;
                 height: 44px;
                 border-radius: 14px;
