@@ -127,7 +127,6 @@ function App() {
                 inset 0 0 0 1px rgba(255,255,255,0.18),
                 0 0 22px rgba(255,210,130,0.35),
                 0 0 60px rgba(255,210,130,0.22);
-              position: relative;
               overflow: hidden;
               backdrop-filter: blur(12px) saturate(130%);
               -webkit-backdrop-filter: blur(12px) saturate(130%);
