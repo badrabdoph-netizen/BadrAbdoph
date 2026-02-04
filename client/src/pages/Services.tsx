@@ -150,7 +150,7 @@ function PackageCard({
   return (
     <div
       className={[
-        "relative overflow-hidden bg-card border transition-all duration-300 group premium-border p-7 md:p-8",
+        "relative overflow-hidden bg-card border transition-all duration-300 group premium-border p-7 md:p-8 services-card",
         isCustom ? "custom-package md:col-span-2" : "",
         vip
           ? "border-primary/45 shadow-[0_0_70px_rgba(255,200,80,0.12)] hover:shadow-[0_0_95px_rgba(255,200,80,0.18)] hover:-translate-y-2"
@@ -206,7 +206,10 @@ function PackageCard({
           </div>
 
           <div className="text-right sm:text-left">
-            <div className="text-primary font-bold text-2xl md:text-3xl leading-none">{pkg.price}</div>
+            <div className="text-primary font-bold text-2xl md:text-3xl leading-none">
+              {pkg.price}
+              {vip ? <span className="price-note-inline">متوسط</span> : null}
+            </div>
             {pkg.priceNote ? (
               <div className={["text-xs mt-2", vip ? "text-primary/90" : "text-muted-foreground"].join(" ")}>
                 {pkg.priceNote}
@@ -217,8 +220,8 @@ function PackageCard({
 
         {isPro ? (
           <div className="pro-note">
+            <Check size={14} className="text-primary ml-2 flex-shrink-0" />
             <span className="pro-note-text">MEDIA COVERAGE REELS & TIKTOK</span>
-            <span className="pro-note-tag">مصور خاص</span>
           </div>
         ) : null}
 
@@ -227,20 +230,37 @@ function PackageCard({
             {pkg.features.map((feature, i) => (
               <li key={i} className="flex items-start text-sm">
                 <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
-                <span className="text-gray-300 leading-relaxed">{feature}</span>
+                <span className="text-gray-300 leading-relaxed">
+                  {feature}
+                  {isPro && feature.includes("تنظيم ريلز") ? (
+                    <span className="pro-note-tag">مصور خاص</span>
+                  ) : null}
+                </span>
               </li>
             ))}
           </ul>
         ) : null}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <PrimaryCTA whatsappNumber={whatsappNumber} />
+          <Link href="/contact">
+            <Button
+              variant={vip ? "default" : "outline"}
+              className={[
+                "w-full h-[56px] rounded-none cta-glow",
+                vip
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
+              ].join(" ")}
+            >
+              {ctaTexts.bookNow}
+            </Button>
+          </Link>
 
           <a
             href={waInquiryHref}
             target="_blank"
             rel="noreferrer"
-            className="w-full h-[56px] border border-white/15 text-foreground hover:bg-white hover:text-black transition-colors inline-flex items-center justify-center gap-2 rounded-none"
+            className="w-full h-[56px] border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors inline-flex items-center justify-center gap-2 rounded-none cta-glow"
           >
             اسأل عن التفاصيل <ArrowLeft className="mr-2 w-4 h-4" />
           </a>
@@ -272,7 +292,7 @@ function QuickNav({
 
   return (
     <div
-      className="sticky z-30 bg-background/75 backdrop-blur-md border-y border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+      className="fixed z-40 bg-background/80 backdrop-blur-md border-y border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.35)] left-0 right-0"
       style={{ top: "var(--nav-offset, 96px)" }}
     >
       <div className="container mx-auto px-4 py-3">
@@ -404,6 +424,7 @@ export default function Services() {
       </header>
 
       <QuickNav active={activeSection} onJump={jumpTo} />
+      <div className="h-14 md:h-16" aria-hidden="true" />
 
       <section id="sessions" className="py-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
@@ -552,6 +573,17 @@ export default function Services() {
         }
         .premium-border:hover::after { opacity: 1; }
 
+        .services-card::after {
+          content: "";
+          position: absolute;
+          inset: -40% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.28) 48%, transparent 72%);
+          transform: translateX(-120%);
+          animation: services-shine 6s ease-in-out infinite;
+          opacity: 0.3;
+          pointer-events: none;
+        }
+
         .services-subtitle-glow {
           color: rgba(255,245,220,0.9);
           text-shadow: 0 0 16px rgba(255,210,130,0.45);
@@ -594,18 +626,50 @@ export default function Services() {
           opacity: 0.9;
         }
         .pro-note-tag {
+          display: inline-block;
+          margin-right: 8px;
           font-size: 10px;
-          letter-spacing: 0.2em;
-          padding: 3px 8px;
-          border-radius: 999px;
-          border: 1px solid rgba(255,210,120,0.5);
-          color: rgba(255,245,220,0.95);
-          text-shadow: 0 0 14px rgba(255,210,130,0.6);
-          box-shadow: 0 6px 20px rgba(255,200,80,0.2);
+          letter-spacing: 0.18em;
+          color: rgba(255,240,205,0.9);
+          text-shadow: 0 0 10px rgba(255,210,130,0.4);
         }
         .vip-note {
           color: rgba(255,235,200,0.95);
           text-shadow: 0 0 14px rgba(255,210,130,0.5);
+        }
+        .price-note-inline {
+          margin-right: 8px;
+          font-size: 10px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(255,235,200,0.85);
+          text-shadow: 0 0 10px rgba(255,210,130,0.35);
+        }
+
+        .cta-glow {
+          position: relative;
+          overflow: hidden;
+          isolation: isolate;
+          box-shadow: 0 0 0 1px rgba(255, 200, 80, 0.18) inset, 0 18px 50px rgba(255, 200, 80, 0.12);
+        }
+        .cta-glow::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: linear-gradient(135deg, rgba(255, 220, 150, 0.18), transparent 60%);
+          opacity: 0.8;
+          pointer-events: none;
+        }
+        .cta-glow::after {
+          content: "";
+          position: absolute;
+          inset: -120% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 45%, transparent 70%);
+          transform: translateX(-120%);
+          animation: cta-shine 3.6s ease-in-out infinite;
+          pointer-events: none;
+          opacity: 0.6;
         }
 
         .custom-package {
@@ -654,6 +718,16 @@ export default function Services() {
         @keyframes promo-float {
           0%, 100% { transform: translateY(0); opacity: 0.55; }
           50% { transform: translateY(4px); opacity: 0.9; }
+        }
+        @keyframes services-shine {
+          0% { transform: translateX(-120%); }
+          65% { transform: translateX(120%); }
+          100% { transform: translateX(120%); }
+        }
+        @keyframes cta-shine {
+          0% { transform: translateX(-120%); }
+          60% { transform: translateX(120%); }
+          100% { transform: translateX(120%); }
         }
 
       `}</style>
