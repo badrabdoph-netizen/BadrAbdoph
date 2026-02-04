@@ -527,6 +527,15 @@ export default function Services() {
         }
         .premium-border:hover::after { opacity: 1; }
 
+        .promo-arrow {
+          filter: drop-shadow(0 0 10px rgba(255,200,80,0.35));
+          animation: promo-float 2.8s ease-in-out infinite;
+        }
+        @keyframes promo-float {
+          0%, 100% { transform: translateY(0); opacity: 0.55; }
+          50% { transform: translateY(4px); opacity: 0.9; }
+        }
+
       `}</style>
 
       <Footer />
