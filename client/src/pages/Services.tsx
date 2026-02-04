@@ -401,8 +401,6 @@ export default function Services() {
         </div>
       </div>
 
-      <QuickNav active={activeSection} onJump={jumpTo} />
-
       <header className="pt-28 md:pt-32 pb-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-background/35 to-background" />
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.10),transparent_60%)]" />
@@ -424,6 +422,8 @@ export default function Services() {
           </p>
         </div>
       </header>
+
+      <QuickNav active={activeSection} onJump={jumpTo} />
 
       <section id="sessions" className="py-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
