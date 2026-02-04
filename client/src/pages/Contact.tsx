@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -16,9 +16,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { Phone, Mail, MapPin, Instagram, Facebook, Send, Sparkles } from "lucide-react";
-import { trpc } from "@/lib/trpc";
-import { contactInfo, socialLinks, pageTexts, ctaTexts } from "@/config/siteConfig";
+import { Phone, Mail, MapPin, Instagram, Facebook, Send, Sparkles, Copy } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  contactInfo,
+  socialLinks,
+  pageTexts,
+  sessionPackages,
+  sessionPackagesWithPrints,
+  weddingPackages,
+} from "@/config/siteConfig";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" }),
@@ -27,7 +34,7 @@ const formSchema = z.object({
     .min(10, { message: "رقم الهاتف قصير" })
     .regex(/^[0-9+\s()-]+$/, { message: "اكتب رقم صحيح (أرقام فقط)" }),
   date: z.string().min(1, { message: "يرجى اختيار التاريخ" }),
-  message: z.string().optional(),
+  packageId: z.string().min(1, { message: "اختر الباقة" }),
 });
 
 function toEnglishDigits(input: string) {
@@ -73,31 +80,64 @@ function buildWhatsAppHref(text: string) {
 export default function Contact() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", phone: "", date: "", message: "" },
+    defaultValues: { name: "", phone: "", date: "", packageId: "" },
     mode: "onBlur",
   });
 
-  const submitContact = trpc.contact.submit.useMutation({
-    onSuccess: (data) => {
-      if (data.success) {
-        toast.success("تم إرسال طلبك بنجاح! سنتواصل معك قريباً.");
-        form.reset();
-      } else {
-        toast.error("حصلت مشكلة أثناء الإرسال. جرّب تاني.");
-      }
-    },
-    onError: (error) => {
-      toast.error("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.");
-      console.error("Contact form error:", error);
-    },
-  });
+  const packageOptions = useMemo(() => {
+    const map = (items: Array<{ id: string; name: string; price: string }>) =>
+      items.map((p) => ({ id: p.id, label: p.name, price: p.price }));
+    return [
+      ...map(sessionPackages as any),
+      ...map(sessionPackagesWithPrints as any),
+      ...map(weddingPackages as any),
+    ];
+  }, []);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    submitContact.mutate({ ...values, phone: normalizePhone(values.phone) });
-  }
+  const watchedName = useWatch({ control: form.control, name: "name" }) ?? "";
+  const watchedPhone = useWatch({ control: form.control, name: "phone" }) ?? "";
+  const watchedDate = useWatch({ control: form.control, name: "date" }) ?? "";
+  const watchedPackageId = useWatch({ control: form.control, name: "packageId" }) ?? "";
+
+  const selectedPackage = useMemo(
+    () => packageOptions.find((p) => p.id === watchedPackageId),
+    [packageOptions, watchedPackageId]
+  );
+
+  const priceValue = selectedPackage?.price ?? "";
+  const receiptText = useMemo(() => {
+    const lines = [
+      "إيصال حجز ❤️",
+      `الاسم: ${watchedName || "—"}`,
+      `الهاتف: ${watchedPhone || "—"}`,
+      `التاريخ: ${watchedDate || "—"}`,
+      `الباقة: ${selectedPackage?.label || "—"}`,
+      `السعر: ${priceValue || "—"}`,
+    ];
+    return lines.join("\n");
+  }, [watchedName, watchedPhone, watchedDate, selectedPackage, priceValue]);
+
+  const whatsappReceiptHref = useMemo(() => buildWhatsAppHref(receiptText), [receiptText]);
 
   const whatsappBookingHref = useMemo(() => buildWhatsAppHref("عايز احجز اوردر ❤️"), []);
   const telHref = useMemo(() => `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`, []);
+
+  const onSendReceipt = () => {
+    if (!whatsappReceiptHref) {
+      toast.error("أدخل البيانات كاملة أولاً.");
+      return;
+    }
+    window.open(whatsappReceiptHref, "_blank");
+  };
+
+  const onCopyReceipt = async () => {
+    try {
+      await navigator.clipboard.writeText(receiptText);
+      toast.success("تم نسخ الإيصال.");
+    } catch {
+      toast.error("تعذر النسخ. جرّب مرة أخرى.");
+    }
+  };
 
   useEffect(() => {
     document.documentElement.style.scrollPaddingTop = "120px";
@@ -164,7 +204,7 @@ export default function Contact() {
               <h2 className="text-2xl font-bold mb-6">{pageTexts.contact.formTitle}</h2>
 
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                <form className="space-y-5">
                   <FormField
                     control={form.control}
                     name="name"
@@ -177,6 +217,52 @@ export default function Contact() {
                             {...field}
                             className="bg-background border-white/10 focus:border-primary h-12"
                           />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>تاريخ المناسبة</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            className="bg-background border-white/10 focus:border-primary h-12"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="packageId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>اختر الباقة</FormLabel>
+                        <FormControl>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="w-full bg-background border-white/10 focus:border-primary h-12">
+                              <SelectValue placeholder="اختر الباقة المناسبة" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {packageOptions.map((opt) => (
+                                <SelectItem key={opt.id} value={opt.id}>
+                                  <span className="flex items-center justify-between w-full gap-3">
+                                    <span>{opt.label}</span>
+                                    <span className="text-xs text-muted-foreground">{opt.price}</span>
+                                  </span>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -205,41 +291,32 @@ export default function Contact() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="date"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>تاريخ المناسبة (تقريبي)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="date"
-                            {...field}
-                            className="bg-background border-white/10 focus:border-primary h-12"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid gap-2">
+                    <Label>السعر المختار</Label>
+                    <Input
+                      value={priceValue}
+                      readOnly
+                      placeholder="سيظهر السعر تلقائياً"
+                      className="bg-background border-white/10 focus:border-primary h-12 text-right"
+                    />
+                  </div>
 
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>تفاصيل إضافية (اختياري)</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="مثلاً: نوع المناسبة، المكان، عدد الساعات..."
-                            className="bg-background border-white/10 focus:border-primary min-h-[120px] resize-none"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="rounded-md border border-white/10 bg-background/60 p-4 relative">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-semibold">الإيصال</div>
+                      <button
+                        type="button"
+                        onClick={onCopyReceipt}
+                        className="inline-flex items-center gap-2 text-xs text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <Copy size={14} />
+                        نسخ
+                      </button>
+                    </div>
+                    <pre className="whitespace-pre-line text-sm text-muted-foreground leading-relaxed">
+                      {receiptText}
+                    </pre>
+                  </div>
 
                   <div className="pt-2">
                     <div
@@ -249,16 +326,16 @@ export default function Contact() {
                       style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
                     >
                       <Button
-                        type="submit"
+                        type="button"
                         className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 text-lg rounded-none"
-                        disabled={submitContact.isPending}
+                        onClick={form.handleSubmit(onSendReceipt)}
                       >
-                        {submitContact.isPending ? "جاري الإرسال..." : ctaTexts.sendRequest}
-                        {!submitContact.isPending && <Send size={18} className="mr-2" />}
+                        إرسال الإيصال على واتساب
+                        <Send size={18} className="mr-2" />
                       </Button>
 
                       <p className="text-[11px] text-muted-foreground/75 text-center mt-3 leading-relaxed">
-                        بالضغط على إرسال، سيتم التواصل معك لتأكيد التفاصيل والموعد.
+                        بالضغط على إرسال، سيتم فتح واتساب بإيصال جاهز حسب اختياراتك.
                       </p>
                     </div>
                   </div>
