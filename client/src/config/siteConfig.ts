@@ -76,7 +76,7 @@ export const homeServicesPreview = [
   },
   {
     id: "home-service-wedding",
-    title: "باقات الزفاف",
+    title: "Full Day",
     description:
       "تغطية شاملة ليوم الزفاف من التحضيرات حتى نهاية الحفل، لتوثيق كل لحظة وكل تفصيل.",
     bullets: ["ألبومات فاخرة مطبوعة", "تابلوهات خشبية", "تغطية فيديو Reels"],
@@ -320,7 +320,7 @@ export const pageTexts = {
     subtitle: "باقات تصوير متنوعة تناسب جميع المناسبات",
     sessionsTitle: "جلسات التصوير",
     sessionsWithPrintsTitle: "جلسات التصوير شامل المطبوعات",
-    weddingTitle: "باقات الزفاف",
+    weddingTitle: "Full Day",
     addonsTitle: "خدمات إضافية (اختياري)",
   },
   portfolio: {
