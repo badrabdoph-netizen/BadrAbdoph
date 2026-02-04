@@ -584,28 +584,21 @@ export default function Services() {
         }
 
         .quicknav-glass {
-          background:
-            linear-gradient(135deg, rgba(18,18,24,0.82), rgba(10,10,14,0.92)),
-            radial-gradient(circle at 50% 0%, rgba(255,215,140,0.12), transparent 60%);
-          backdrop-filter: blur(16px) saturate(140%);
-          -webkit-backdrop-filter: blur(16px) saturate(140%);
-          box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.06);
-          position: sticky;
+          background: rgba(12,12,16,0.78);
+          backdrop-filter: blur(12px) saturate(130%);
+          -webkit-backdrop-filter: blur(12px) saturate(130%);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05);
         }
         .quicknav-glass::after {
           content: "";
           position: absolute;
-          inset: -40% -10%;
-          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.25) 48%, transparent 72%);
-          transform: translateX(-120%);
-          animation: services-shine 6s ease-in-out infinite;
-          opacity: 0.35;
+          inset: 0;
+          border-bottom: 1px solid rgba(255,200,80,0.14);
           pointer-events: none;
+          opacity: 0.6;
         }
         .nav-active {
-          box-shadow:
-            0 0 24px rgba(255,200,80,0.55),
-            inset 0 0 14px rgba(255,220,150,0.35);
+          box-shadow: 0 0 18px rgba(255,200,80,0.45);
         }
 
         .services-subtitle-glow {
