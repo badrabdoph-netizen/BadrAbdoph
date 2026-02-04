@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,7 +19,7 @@ import {
 import { toast } from "sonner";
 import { Phone, Mail, MapPin, Instagram, Facebook, Send, Sparkles, Copy, ChevronDown, Receipt } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   contactInfo,
   socialLinks,
@@ -283,15 +283,42 @@ export default function Contact() {
                             <SelectTrigger className={`w-full ${fieldClass}`}>
                               <SelectValue placeholder="اختر الباقة المناسبة" />
                             </SelectTrigger>
-                            <SelectContent>
-                              {packageOptions.map((opt) => (
-                                <SelectItem key={opt.id} value={opt.id}>
-                                  <span className="flex items-center justify-between w-full gap-3">
-                                    <span>{opt.label}</span>
-                                    <span className="text-xs text-muted-foreground">{opt.price}</span>
-                                  </span>
-                                </SelectItem>
-                              ))}
+                            <SelectContent className="border-white/10 bg-background/95 backdrop-blur-md">
+                              {packageOptions.map((opt, index) => {
+                                const isVip =
+                                  /vip/i.test(opt.label) || /vip/i.test(String(opt.price ?? ""));
+                                return (
+                                  <Fragment key={opt.id}>
+                                    <SelectItem
+                                      value={opt.id}
+                                      className="rounded-md px-3 py-2.5 text-sm data-[highlighted]:bg-primary/10 data-[state=checked]:bg-primary/15 data-[state=checked]:text-foreground"
+                                    >
+                                      <span className="flex items-center justify-between w-full gap-3">
+                                        <span className="text-foreground">{opt.label}</span>
+                                        <span className="flex items-center gap-2">
+                                          {isVip ? (
+                                            <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-primary-foreground bg-primary/80 border border-primary/50 px-2 py-0.5 rounded-full shadow-[0_0_14px_rgba(255,200,80,0.65)]">
+                                              VIP
+                                            </span>
+                                          ) : null}
+                                          <span
+                                            className={
+                                              isVip
+                                                ? "text-xs font-semibold text-primary/90 drop-shadow-[0_0_10px_rgba(255,200,80,0.55)]"
+                                                : "text-xs text-muted-foreground"
+                                            }
+                                          >
+                                            {opt.price}
+                                          </span>
+                                        </span>
+                                      </span>
+                                    </SelectItem>
+                                    {index < packageOptions.length - 1 ? (
+                                      <SelectSeparator className="mx-3 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-70" />
+                                    ) : null}
+                                  </Fragment>
+                                );
+                              })}
                             </SelectContent>
                           </Select>
                         </FormControl>
