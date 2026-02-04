@@ -114,23 +114,6 @@ export default function Contact() {
     }));
   }, []);
 
-  const addonOptions = useMemo(() => {
-    const list = (additionalServices ?? []) as Array<{
-      id: string;
-      name: string;
-      price: string;
-      emoji?: string;
-      priceNote?: string;
-    }>;
-    return list.map((a) => ({
-      id: a.id,
-      label: a.name,
-      price: a.price,
-      emoji: a.emoji,
-      priceNote: a.priceNote,
-    }));
-  }, []);
-
   const watchedName = useWatch({ control: form.control, name: "name" }) ?? "";
   const watchedPhone = useWatch({ control: form.control, name: "phone" }) ?? "";
   const watchedDate = useWatch({ control: form.control, name: "date" }) ?? "";
