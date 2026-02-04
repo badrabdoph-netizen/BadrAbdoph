@@ -259,14 +259,6 @@ export const weddingPackages = [
 
 export const additionalServices = [
   {
-    id: "vip-full-day",
-    name: "تصوير اليوم الكامل FULL DAY (VIP)",
-    price: "اتصل للسعر",
-    emoji: "🚀",
-    description: "تجربة تصوير كاملة بمستوى VIP لأن اليوم ده مش هيتكرر ❤️",
-    features: ["تغطية يوم كامل", "فيديو برومو سينمائي", "هدايا حصرية"],
-  },
-  {
     id: "promo-video",
     name: "PROMO VIDEO",
     price: "2500",

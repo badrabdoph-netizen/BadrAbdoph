@@ -17,7 +17,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { Phone, Mail, MapPin, Instagram, Facebook, Send, Sparkles, Copy } from "lucide-react";
+import { Phone, Mail, MapPin, Instagram, Facebook, Send, Sparkles, Copy, ChevronDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   contactInfo,
@@ -133,6 +134,10 @@ export default function Contact() {
   const addonsText = selectedAddons.length
     ? selectedAddons.map((a) => a.label).join("، ")
     : "—";
+
+  const addonsPreview = selectedAddons.length
+    ? selectedAddons.map((a) => a.label).join("، ")
+    : "اختر الإضافات";
 
   const priceValue = selectedPackage?.price ?? "";
   const receiptText = useMemo(() => {
@@ -339,46 +344,64 @@ export default function Contact() {
                       <FormItem>
                         <FormLabel>اختيارات الإضافات (اختياري)</FormLabel>
                         <FormControl>
-                          <div className="rounded-md border border-white/10 bg-background/60 p-3 space-y-3">
-                            {addonOptions.length ? (
-                              addonOptions.map((opt) => {
-                                const checked = (field.value ?? []).includes(opt.id);
-                                return (
-                                  <label key={opt.id} className="flex items-start gap-3 text-sm">
-                                    <Checkbox
-                                      checked={checked}
-                                      onCheckedChange={(value) => {
-                                        const next = new Set(field.value ?? []);
-                                        const isChecked = value === true;
-                                        if (isChecked) {
-                                          next.add(opt.id);
-                                        } else {
-                                          next.delete(opt.id);
-                                        }
-                                        field.onChange(Array.from(next));
-                                      }}
-                                    />
-                                    <div className="flex-1 space-y-1">
-                                      <div className="flex items-center justify-between gap-3">
-                                        <div className="flex items-center gap-2">
-                                          {opt.emoji ? <span className="text-base">{opt.emoji}</span> : null}
-                                          <span>{opt.label}</span>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                className="w-full h-12 px-3 rounded-md border border-white/10 bg-background flex items-center justify-between text-sm text-foreground hover:border-primary/40 transition-colors"
+                              >
+                                <span className={selectedAddons.length ? "text-foreground" : "text-muted-foreground"}>
+                                  {addonsPreview}
+                                </span>
+                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              align="start"
+                              className="w-[min(92vw,360px)] border border-white/10 bg-background/95 backdrop-blur-md p-3"
+                            >
+                              <div className="space-y-3">
+                                {addonOptions.length ? (
+                                  addonOptions.map((opt) => {
+                                    const checked = (field.value ?? []).includes(opt.id);
+                                    return (
+                                      <label key={opt.id} className="flex items-start gap-3 text-sm">
+                                        <Checkbox
+                                          checked={checked}
+                                          onCheckedChange={(value) => {
+                                            const next = new Set(field.value ?? []);
+                                            const isChecked = value === true;
+                                            if (isChecked) {
+                                              next.add(opt.id);
+                                            } else {
+                                              next.delete(opt.id);
+                                            }
+                                            field.onChange(Array.from(next));
+                                          }}
+                                        />
+                                        <div className="flex-1 space-y-1">
+                                          <div className="flex items-center justify-between gap-3">
+                                            <div className="flex items-center gap-2">
+                                              {opt.emoji ? <span className="text-base">{opt.emoji}</span> : null}
+                                              <span>{opt.label}</span>
+                                            </div>
+                                            <span className="text-xs text-muted-foreground">{opt.price}</span>
+                                          </div>
+                                          {opt.priceNote ? (
+                                            <div className="text-[11px] text-muted-foreground/70 pr-6">
+                                              {opt.priceNote}
+                                            </div>
+                                          ) : null}
                                         </div>
-                                        <span className="text-xs text-muted-foreground">{opt.price}</span>
-                                      </div>
-                                      {opt.priceNote ? (
-                                        <div className="text-[11px] text-muted-foreground/70 pr-6">
-                                          {opt.priceNote}
-                                        </div>
-                                      ) : null}
-                                    </div>
-                                  </label>
-                                );
-                              })
-                            ) : (
-                              <div className="text-sm text-muted-foreground">لا توجد إضافات حالياً.</div>
-                            )}
-                          </div>
+                                      </label>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="text-sm text-muted-foreground">لا توجد إضافات حالياً.</div>
+                                )}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
