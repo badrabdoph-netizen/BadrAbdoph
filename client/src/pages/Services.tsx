@@ -108,7 +108,6 @@ function PackageCard({
   const isVipPlus = (p: any) => p?.id === "full-day-vip-plus" || p?.featured === true;
   const vip = kind === "wedding" && isVipPlus(pkg);
   const popular = !!pkg.popular;
-  const hasBadge = vip || popular;
 
   const Icon =
     kind === "wedding" ? (
@@ -126,8 +125,7 @@ function PackageCard({
   return (
     <div
       className={[
-        "relative overflow-hidden bg-card border transition-all duration-300 group premium-border",
-        hasBadge ? "pt-14 p-7 md:p-8" : "p-7 md:p-8",
+        "relative overflow-hidden bg-card border transition-all duration-300 group premium-border p-7 md:p-8",
         vip
           ? "border-primary/45 shadow-[0_0_70px_rgba(255,200,80,0.12)] hover:shadow-[0_0_95px_rgba(255,200,80,0.18)] hover:-translate-y-2"
           : popular
@@ -143,32 +141,35 @@ function PackageCard({
         ].join(" ")}
       />
 
-      {/* ✅ Badge centered (mobile-friendly) */}
-      {vip ? (
-        <div className="badge-pill badge-pill--vip">
-          VIP PLUS ✨
-        </div>
-      ) : popular ? (
-        <div className="badge-pill badge-pill--popular">
-          الأكثر طلباً
-        </div>
-      ) : null}
-
       <div className="relative z-10">
-        <div className="flex items-start justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 border border-white/10 bg-black/15 backdrop-blur-md flex items-center justify-center">
               {Icon}
             </div>
             <div className="text-right">
-              <h3 className={["text-xl md:text-2xl font-bold", vip ? "text-primary" : ""].join(" ")}>
-                {pkg.name}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-1">{pkg.description}</p>
+              <div className="flex items-baseline gap-2">
+                <h3 className={["text-xl md:text-2xl font-bold leading-tight", vip ? "text-primary" : ""].join(" ")}>
+                  {pkg.name}
+                </h3>
+                {vip && (
+                  <span className="inline-flex items-center justify-center px-2.5 py-1 text-[10px] md:text-xs font-semibold tracking-wide rounded-full border border-amber-300/50 text-amber-100/90 bg-[linear-gradient(135deg,rgba(255,215,140,0.22),rgba(255,180,60,0.12))] shadow-[0_10px_28px_rgba(255,200,80,0.18)] backdrop-blur-sm relative md:-translate-y-[1px]">
+                    VIP PLUS
+                  </span>
+                )}
+                {popular && !vip && (
+                  <span className="inline-flex items-center justify-center px-2.5 py-1 text-[10px] md:text-xs font-semibold rounded-full border border-white/15 text-foreground/90 bg-white/5 shadow-[0_10px_24px_rgba(0,0,0,0.25)] backdrop-blur-sm relative md:-translate-y-[1px]">
+                    الأكثر طلباً
+                  </span>
+                )}
+              </div>
+              <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2 md:line-clamp-none">
+                {pkg.description}
+              </p>
             </div>
           </div>
 
-          <div className="text-left">
+          <div className="text-right sm:text-left">
             <div className="text-primary font-bold text-2xl md:text-3xl leading-none">{pkg.price}</div>
             {pkg.priceNote ? (
               <div className={["text-xs mt-2", vip ? "text-primary/90" : "text-muted-foreground"].join(" ")}>
@@ -178,14 +179,25 @@ function PackageCard({
           </div>
         </div>
 
-        <ul className="space-y-3 mb-7">
+        <ul className="space-y-3 mb-6 md:mb-7">
           {pkg.features.map((feature, i) => (
-            <li key={i} className="flex items-start text-sm">
+            <li
+              key={i}
+              className={[
+                "items-start text-sm",
+                i > 3 ? "hidden md:flex" : "flex",
+              ].join(" ")}
+            >
               <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
               <span className="text-gray-300 leading-relaxed">{feature}</span>
             </li>
           ))}
         </ul>
+        {pkg.features.length > 4 && (
+          <div className="text-xs text-muted-foreground/80 md:hidden mb-6">
+            + تفاصيل أكتر جوه الباقة
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <PrimaryCTA />
@@ -516,34 +528,6 @@ export default function Services() {
         }
         .premium-border:hover::after { opacity: 1; }
 
-        /* ✅ Badge style (centered, not overlapping text) */
-        .badge-pill {
-          position: absolute;
-          top: 14px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 20;
-          padding: 6px 12px;
-          font-size: 11px;
-          font-weight: 800;
-          letter-spacing: 0.06em;
-          border-radius: 999px;
-          border: 1px solid rgba(255,255,255,0.12);
-          background: rgba(0,0,0,0.35);
-          backdrop-filter: blur(10px);
-          box-shadow: 0 16px 40px rgba(0,0,0,0.35);
-          white-space: nowrap;
-        }
-        .badge-pill--vip {
-          color: #111;
-          background: rgba(255,200,80,0.95);
-          border-color: rgba(255,200,80,0.55);
-        }
-        .badge-pill--popular {
-          color: rgba(255,255,255,0.92);
-          background: rgba(255,200,80,0.12);
-          border-color: rgba(255,200,80,0.30);
-        }
       `}</style>
 
       <Footer />

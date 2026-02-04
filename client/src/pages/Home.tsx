@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Camera, Heart, Star, Sparkles, ZoomIn, ExternalLink } from "lucide-react";
+import { ArrowLeft, Camera, Heart, Phone, Star, Sparkles, ZoomIn, ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import {
@@ -41,53 +41,100 @@ function buildWhatsAppHref(text: string) {
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
 
-function FilmCard({
+function MosaicCard({
   img,
-  idx,
   onClick,
+  className,
+  eager = false,
 }: {
   img: { src: string; title: string };
-  idx: number;
   onClick: () => void;
+  className?: string;
+  eager?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
 
   return (
     <button
       className={[
-        "marquee__item film-card premium-border border border-white/10 overflow-hidden group",
+        "mosaic-card premium-border border border-white/10 overflow-hidden group",
         loaded ? "is-loaded" : "",
+        className ?? "",
       ].join(" ")}
       onClick={onClick}
       aria-label="Open external portfolio"
       style={{
-        backgroundImage: `url('${img.src}')`, // ✅ fallback background (prevents blank)
+        backgroundImage: `url('${img.src}')`,
       }}
     >
       <img
         src={img.src}
         alt={img.title}
         decoding="async"
-        loading="eager" // ✅ no lazy (moving marquee)
-        fetchPriority={idx < 2 ? "high" : "auto"}
+        loading={eager ? "eager" : "lazy"}
+        fetchPriority={eager ? "high" : "auto"}
         onLoad={() => setLoaded(true)}
         onError={() => setLoaded(true)}
-        className="film-img"
+        className="mosaic-img"
       />
 
-      <div className="absolute inset-0 film-overlay" />
-      <div className="absolute inset-0 glow-hover opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 mosaic-overlay" />
+      <div className="absolute inset-0 mosaic-glow opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      <div className="absolute bottom-2 left-2 right-2 text-[10px] text-white/90 line-clamp-1 text-center drop-shadow">
+      <div className="absolute bottom-2 left-2 right-2 text-[11px] text-white/90 line-clamp-1 text-center drop-shadow">
         {img.title}
       </div>
     </button>
   );
 }
 
+function MobileStickyBar({
+  show,
+  bookingHref,
+}: {
+  show: boolean;
+  bookingHref: string;
+}) {
+  const telHref = `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`;
+
+  return (
+    <div
+      className={[
+        "fixed md:hidden left-0 right-0 z-50 transition-transform duration-300 will-change-transform",
+        show ? "translate-y-0" : "translate-y-full",
+      ].join(" ")}
+      style={{ bottom: "calc(0px + env(safe-area-inset-bottom))" }}
+    >
+      <div className="border-t border-white/10 bg-background/85 backdrop-blur-md">
+        <div className="container mx-auto px-4 py-3">
+          <div className="grid grid-cols-2 gap-3">
+            <a
+              href={telHref}
+              className="w-full h-12 border border-white/15 bg-black/20 text-foreground hover:bg-white hover:text-black transition-colors inline-flex items-center justify-center gap-2"
+            >
+              <Phone className="w-4 h-4 text-primary" />
+              اتصال
+            </a>
+
+            <a
+              href={bookingHref}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center gap-2"
+            >
+              {ctaTexts.bookSession}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const portfolioRef = useRef<HTMLElement | null>(null);
+  const [showSticky, setShowSticky] = useState(false);
 
   useEffect(() => {
     let raf = 0;
@@ -98,8 +145,7 @@ export default function Home() {
           const scrolled = window.scrollY;
           heroRef.current.style.transform = `translate3d(0, ${scrolled * 0.35}px, 0)`;
         }
-        const v = Math.min(10, Math.max(0, window.scrollY / 900)); // 0..10
-        document.documentElement.style.setProperty("--marquee-boost", `${v}s`);
+        setShowSticky(window.scrollY > 380);
       });
     };
 
@@ -137,10 +183,29 @@ export default function Home() {
     return out;
   }, [gallery]);
 
-  const row1 = useMemo(() => safeGallery.slice(0, 8), [safeGallery]);
-  const row2 = useMemo(() => safeGallery.slice(8, 16), [safeGallery]);
-  const loop1 = useMemo(() => [...row1, ...row1], [row1]);
-  const loop2 = useMemo(() => [...row2, ...row2], [row2]);
+  const mobileGallery = useMemo(() => {
+    if (!gallery.length) return [];
+    if (gallery.length <= 7) return gallery;
+    return gallery.slice(0, 7);
+  }, [gallery]);
+
+  const desktopGallery = useMemo(() => {
+    if (!safeGallery.length) return [];
+    return safeGallery.slice(0, 10);
+  }, [safeGallery]);
+
+  const desktopLayout = [
+    "md:col-span-2 md:row-span-2",
+    "md:col-span-1 md:row-span-1",
+    "md:col-span-1 md:row-span-1",
+    "md:col-span-1 md:row-span-2",
+    "md:col-span-1 md:row-span-1",
+    "md:col-span-1 md:row-span-1",
+    "md:col-span-2 md:row-span-1",
+    "md:col-span-1 md:row-span-1",
+    "md:col-span-1 md:row-span-1",
+    "md:col-span-2 md:row-span-1",
+  ];
 
   const topTestimonials = useMemo(() => (testimonials ?? []).slice(0, 3), []);
 
@@ -165,12 +230,14 @@ export default function Home() {
       <Navbar />
 
       {/* HERO */}
-      <header className="relative h-screen w-full overflow-hidden flex items-center justify-center">
+      <header className="relative min-h-[86vh] md:h-screen w-full overflow-hidden flex items-center justify-center">
         <div
           ref={heroRef}
-          className="absolute inset-0 w-full h-[120%] bg-cover bg-center z-0 will-change-transform"
+          className="absolute inset-0 w-full h-[120%] bg-cover bg-center z-0 will-change-transform hero-image"
           style={{
-            backgroundImage: `url('${siteImages.heroImage}')`,
+            // @ts-ignore
+            "--hero-image": `url('${siteImages.heroImage}')`,
+            "--hero-image-mobile": `url('${siteImages.heroImageMobile ?? siteImages.heroImage}')`,
             filter: "brightness(0.36)",
           }}
         />
@@ -195,7 +262,7 @@ export default function Home() {
             {photographerInfo.title}
           </h2>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
             {heroHeadline ?? (
               <>
                 مش مجرد <span className="italic text-primary">صور</span>
@@ -205,7 +272,7 @@ export default function Home() {
             )}
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mb-10 font-light leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mb-10 font-light leading-relaxed">
             {homeHero?.subTextAr ?? photographerInfo.descriptionAr}
           </p>
 
