@@ -206,14 +206,6 @@ export const sessionPackages = [
     ],
     popular: true,
   },
-  {
-    id: "special-montage-design",
-    name: "تصميم بامدج متنوع خاص",
-    price: "اتصل للسعر",
-    description: "تصميمات متنوعة ومخصصة حسب ذوقك",
-    features: ["أفكار وتصميمات متنوعة", "تسليم بجودة عالية", "تنفيذ حسب الطلب"],
-    popular: false,
-  },
 ];
 
 export const sessionPackagesWithPrints = [
@@ -248,6 +240,14 @@ export const sessionPackagesWithPrints = [
     ],
     popular: true,
   },
+  {
+    id: "special-montage-design",
+    name: "تصميم بامدج متنوع خاص",
+    price: "اتصل للسعر",
+    description: "خصص باقتك حسب زوقك واختار ال يناسبك وحنا نجمعه",
+    features: [],
+    popular: false,
+  },
 ];
 
 export const weddingPackages = [
@@ -278,14 +278,6 @@ export const weddingPackages = [
 
 export const additionalServices = [
   {
-    id: "promo-video",
-    name: "PROMO VIDEO",
-    price: "2500",
-    emoji: "🎬",
-    description: "فيديو ترويجي سينمائي احترافي",
-    features: ["مونتاج احترافي", "افكار كريتف", "تسليم سريع"],
-  },
-  {
     id: "wedding-party",
     name: "بارتي القاعة",
     price: "1100",
@@ -312,6 +304,14 @@ export const additionalServices = [
       "تنظيم ريلز واستوريهات السوشيال ميديا",
     ],
     popular: false,
+  },
+  {
+    id: "promo-video",
+    name: "PROMO VIDEO",
+    price: "2500",
+    emoji: "🎬",
+    description: "فيديو ترويجي سينمائي احترافي",
+    features: ["مونتاج احترافي", "افكار كريتف", "تسليم سريع"],
   },
 ];
 

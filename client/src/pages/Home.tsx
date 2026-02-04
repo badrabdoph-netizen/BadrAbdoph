@@ -418,6 +418,11 @@ export default function Home() {
             {homeServicesPreview.map((card, idx) => {
               const featured = !!card.featured;
               const tone = ["tone-amber", "tone-rose", "tone-emerald"][idx % 3];
+              const meta = [
+                { label: "جلسات تصوير", icon: <Camera size={14} /> },
+                { label: "باقات زفاف", icon: <CoupleIcon className="w-4 h-4" /> },
+                { label: "VIP تجربة", icon: <Sparkles size={14} /> },
+              ][idx % 3];
 
               return (
                 <div
@@ -445,15 +450,17 @@ export default function Home() {
                     </div>
                   ) : null}
 
-                  {card.vipLabel ? (
-                    <div className="vip-label">{card.vipLabel}</div>
-                  ) : null}
+                  {card.vipLabel ? <div className="vip-label">{card.vipLabel}</div> : null}
 
                   <div className={featured ? "" : "group-hover:scale-110 transition-transform duration-300"}>
                     <ServiceIcon title={card.title} />
                   </div>
 
-                  <h3 className="text-2xl font-bold mb-4">{card.title}</h3>
+                  <h3 className="text-2xl font-bold mb-3">{card.title}</h3>
+                  <div className="card-meta">
+                    <span className="card-meta-icon">{meta.icon}</span>
+                    <span>{meta.label}</span>
+                  </div>
                   <div className="card-fade">
                     <p className="text-muted-foreground mb-4 leading-relaxed text-sm md:text-base">
                       {card.description}
@@ -517,17 +524,13 @@ export default function Home() {
             </div>
 
             <div className="order-1 md:order-2 text-right">
-              <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
+              <h3 className="about-subtitle">
                 {aboutContent.subtitle}
               </h3>
-              <div className="flex flex-wrap items-center gap-3 mb-5">
-                <span className="about-badge">تصوير زفاف • ستايل سينمائي فاخر</span>
-                <span className="about-badge">تركيز على التفاصيل والمشاعر</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <h2 className="about-name">
                 {content.aboutTitle || aboutContent.title}
               </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
+              <p className="about-text">
                 {content.aboutDescription || aboutContent.description}
               </p>
             </div>
@@ -538,7 +541,7 @@ export default function Home() {
       {/* ✅ Story Gallery */}
       <section
         ref={(el) => (portfolioRef.current = el)}
-        className="pt-6 pb-16 relative overflow-hidden"
+        className="pt-2 pb-10 relative overflow-hidden"
         onMouseMove={(e) => setSpot(e.clientX, e.clientY)}
         onTouchMove={(e) => {
           const t = e.touches[0];
@@ -555,11 +558,6 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none gallery-frame" />
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col items-center text-center gap-3 mb-9">
-            <h3 className="text-primary text-sm tracking-widest uppercase font-bold">لمحات</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">قصتي</h2>
-          </div>
-
           <div className="relative">
             <div className="md:hidden">
               <div className="gallery-rail">
@@ -596,16 +594,16 @@ export default function Home() {
       </section>
 
       {/* STATS */}
-      <section className="py-16">
+      <section className="pt-4 pb-6">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-3 gap-3 max-w-4xl mx-auto">
             {aboutContent.stats.map((s) => (
               <div
                 key={s.label}
-                className="bg-card/40 border border-white/10 backdrop-blur-sm px-5 py-5 text-center premium-border"
+                className="bg-card/40 border border-white/10 backdrop-blur-sm px-3 py-4 text-center premium-border"
               >
-                <div className="text-2xl md:text-3xl font-bold text-foreground">{s.number}</div>
-                <div className="text-xs md:text-sm text-muted-foreground mt-1">{s.label}</div>
+                <div className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground">{s.number}</div>
+                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground mt-1">{s.label}</div>
               </div>
             ))}
           </div>
@@ -613,11 +611,11 @@ export default function Home() {
       </section>
 
       {/* PORTFOLIO CTA */}
-      <section className="py-16 relative overflow-hidden">
+      <section className="pt-6 pb-16 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_35%_25%,rgba(255,200,80,0.12),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">المعرض</h3>
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">شوف الأعمال كاملة</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">شوف تصوير بالكولتي الكامله</h2>
 
           <a
             href={externalPortfolioUrl}
@@ -695,17 +693,38 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
             <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">آراء العملاء</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">قصص سعيدة</h2>
-            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto leading-relaxed">
-              أهم حاجة… الناس تطلع مبسوطة ومرتاحه من أول لحظة لحد التسليم.
+            <h2 className="text-3xl md:text-5xl font-bold">عرساني🫶</h2>
+            <p className="testimonials-glow mt-4 max-w-2xl mx-auto leading-relaxed">
+              أهم حاجة… الناس تطلع مبسوطة ومرتاحه من أول لحظة لحد التسليم ❤️
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {topTestimonials.map((t, i) => (
+            {[
+              {
+                name: "Mohamed & Heba",
+                quote:
+                  "بجد احلي فوتوغرافر اتعاملنا معاه في خطوبتنا والصور مشاء الله طالعه احلي مما كنا عايزين كمان وانشاء الله مش اخر تعامل ♥️",
+              },
+              {
+                name: "Basent & Abdo",
+                quote:
+                  "الصور احنا مش مصدقين حلاوتها بجد ولا الألوان خطيره اكيد مش اخر مره ما بينا انشاء الله ♥️",
+              },
+              {
+                name: "Norhan & Hossam",
+                quote:
+                  "صور الفرح مشاء الله جميله اوي اوي عجبت كل صحابنا وأهلنا دا غير البرومو التحفه اللي اتعرض في الفرح كلو انبهر بيه ♥️",
+              },
+              {
+                name: "Shahd",
+                quote:
+                  "سيشن عيد ميلادي كان خطير بجد متصورتش صور بالحلاوه دي قبل كد تسلم ايدك ❤️",
+              },
+            ].map((t, i) => (
               <div
                 key={i}
-                className="bg-background/45 border border-white/10 p-7 premium-border hover:border-primary/25 transition-colors"
+                className="bg-background/45 border border-white/10 p-7 premium-border testimonial-card hover:border-primary/25 transition-colors"
               >
                 <StarsRow />
                 <p className="text-muted-foreground italic leading-relaxed mt-4 mb-5">"{t.quote}"</p>
@@ -749,6 +768,7 @@ export default function Home() {
           background: radial-gradient(circle, rgba(255,210,130,0.45), transparent 70%);
           filter: blur(8px);
           opacity: 0.75;
+          animation: glow-pulse 4.2s ease-in-out infinite;
         }
         .hero-social-btn {
           width: 58px;
@@ -868,7 +888,79 @@ export default function Home() {
           background:
             linear-gradient(160deg, rgba(18,18,24,0.95), rgba(7,7,10,0.98)),
             radial-gradient(circle at 15% 10%, rgba(255,210,120,0.08), transparent 50%);
-          box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+          box-shadow: 0 25px 80px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,210,120,0.18) inset;
+          border-color: rgba(255,210,120,0.22);
+          backdrop-filter: blur(16px) saturate(120%);
+          -webkit-backdrop-filter: blur(16px) saturate(120%);
+        }
+        .package-card .card-glow {
+          animation: glow-drift 6s ease-in-out infinite;
+        }
+
+        .card-meta {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 14px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,210,120,0.25);
+          background: rgba(12,12,16,0.6);
+          color: rgba(255,230,190,0.9);
+          font-size: 11px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          margin-bottom: 14px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        }
+        .card-meta-icon {
+          width: 22px;
+          height: 22px;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(255,210,120,0.3);
+          background: rgba(255,210,120,0.12);
+          color: #f8e5bf;
+          box-shadow: inset 0 0 12px rgba(255,210,120,0.2);
+        }
+
+        .about-subtitle {
+          display: inline-block;
+          font-size: 12px;
+          letter-spacing: 0.4em;
+          text-transform: uppercase;
+          font-weight: 700;
+          color: rgba(255,210,120,0.9);
+          position: relative;
+          margin-bottom: 12px;
+        }
+        .about-subtitle::after {
+          content: "";
+          display: block;
+          width: 60px;
+          height: 2px;
+          margin-top: 10px;
+          background: linear-gradient(90deg, transparent, rgba(255,210,120,0.8), transparent);
+          box-shadow: 0 0 12px rgba(255,200,80,0.4);
+        }
+        .about-name {
+          font-size: clamp(28px, 4vw, 46px);
+          font-weight: 700;
+          margin-bottom: 14px;
+          font-family: "Playfair Display", serif;
+          background: linear-gradient(120deg, #fff, #f7e0b5, #fff);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          text-shadow: 0 10px 30px rgba(255,210,120,0.12);
+        }
+        .about-text {
+          color: rgba(255,255,255,0.72);
+          font-size: clamp(15px, 1.6vw, 18px);
+          line-height: 1.9;
+          margin-bottom: 8px;
+          font-family: "Cairo", sans-serif;
         }
 
         .about-badge {
@@ -906,21 +998,21 @@ export default function Home() {
 
         .vip-label {
           position: absolute;
-          top: 16px;
+          top: 14px;
           left: 18px;
-          padding: 6px 14px;
+          padding: 8px 16px;
           border-radius: 999px;
           border: 1px solid rgba(255,210,120,0.5);
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.35em;
+          font-size: 14px;
+          font-weight: 800;
+          letter-spacing: 0.4em;
           text-transform: uppercase;
-          background: linear-gradient(120deg, rgba(255,210,120,0.35), rgba(255,255,255,0.08));
-          color: #fff2cf;
-          text-shadow: 0 0 16px rgba(255,210,130,0.6);
-          animation: vip-shine 3.2s ease-in-out infinite;
+          background: linear-gradient(120deg, rgba(255,210,120,0.55), rgba(255,255,255,0.12));
+          color: #fff5d6;
+          text-shadow: 0 0 20px rgba(255,210,130,0.8);
+          animation: vip-shine 2.8s ease-in-out infinite;
           pointer-events: none;
-          box-shadow: 0 14px 40px rgba(255,200,80,0.15);
+          box-shadow: 0 18px 50px rgba(255,200,80,0.25);
         }
 
         .camera-badge {
@@ -1105,6 +1197,31 @@ export default function Home() {
         .portfolio-social--fb,
         .portfolio-social--tt,
         .portfolio-social--wa { color: #f7e4bf; border-color: rgba(255,210,120,0.35); }
+
+        .testimonials-glow {
+          color: rgba(255,255,255,0.85);
+          text-shadow: 0 0 14px rgba(255,210,130,0.45), 0 0 30px rgba(255,210,130,0.25);
+        }
+        .testimonial-card {
+          position: relative;
+          background:
+            linear-gradient(160deg, rgba(18,18,26,0.85), rgba(8,8,12,0.96));
+          border-color: rgba(255,210,120,0.2);
+          box-shadow: 0 22px 70px rgba(0,0,0,0.5);
+          overflow: hidden;
+          backdrop-filter: blur(14px) saturate(120%);
+          -webkit-backdrop-filter: blur(14px) saturate(120%);
+        }
+        .testimonial-card::after {
+          content: "";
+          position: absolute;
+          inset: -40% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 48%, transparent 70%);
+          transform: translateX(-120%);
+          animation: social-shine 6s ease-in-out infinite;
+          opacity: 0.25;
+          pointer-events: none;
+        }
         @media (max-width: 640px) {
           .portfolio-social {
             width: 44px;
@@ -1137,6 +1254,34 @@ export default function Home() {
         @keyframes vip-shine {
           0%, 100% { opacity: 0.8; text-shadow: 0 0 18px rgba(255,210,130,0.45); }
           50% { opacity: 1; text-shadow: 0 0 28px rgba(255,220,150,0.8); }
+        }
+        @keyframes glow-drift {
+          0%, 100% { transform: translateY(0); opacity: 0.35; }
+          50% { transform: translateY(-8px); opacity: 0.6; }
+        }
+        @keyframes glow-pulse {
+          0%, 100% { opacity: 0.55; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.15); }
+        }
+        @keyframes float-soft {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        @media (max-width: 768px) {
+          .package-card { animation: float-soft 7s ease-in-out infinite; }
+          .package-card:nth-child(2) { animation-delay: -1.8s; }
+          .package-card:nth-child(3) { animation-delay: -3.6s; }
+          .testimonial-card { animation: float-soft 8s ease-in-out infinite; }
+          .testimonial-card:nth-child(2) { animation-delay: -2s; }
+          .testimonial-card:nth-child(3) { animation-delay: -4s; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .package-card,
+          .testimonial-card,
+          .hero-follow-glow,
+          .card-glow,
+          .hero-social-btn::after,
+          .portfolio-social::after { animation: none !important; }
         }
       `}</style>
 

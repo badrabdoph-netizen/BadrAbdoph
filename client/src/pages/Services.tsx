@@ -130,6 +130,7 @@ function PackageCard({
   const isVipPlus = (p: any) => p?.id === "full-day-vip-plus" || p?.featured === true;
   const vip = kind === "wedding" && isVipPlus(pkg);
   const popular = !!pkg.popular;
+  const isCustom = pkg.id === "special-montage-design";
 
   const Icon =
     kind === "wedding" || kind === "prints" ? (
@@ -146,6 +147,7 @@ function PackageCard({
     <div
       className={[
         "relative overflow-hidden bg-card border transition-all duration-300 group premium-border p-7 md:p-8",
+        isCustom ? "custom-package" : "",
         vip
           ? "border-primary/45 shadow-[0_0_70px_rgba(255,200,80,0.12)] hover:shadow-[0_0_95px_rgba(255,200,80,0.18)] hover:-translate-y-2"
           : popular
@@ -183,7 +185,11 @@ function PackageCard({
                   </span>
                 )}
               </div>
-              <p className="text-xs md:text-sm text-muted-foreground mt-1">{pkg.description}</p>
+              {isCustom ? (
+                <div className="custom-line">{pkg.description}</div>
+              ) : (
+                <p className="text-xs md:text-sm text-muted-foreground mt-1">{pkg.description}</p>
+              )}
             </div>
           </div>
 
@@ -197,14 +203,16 @@ function PackageCard({
           </div>
         </div>
 
-        <ul className="space-y-3 mb-6 md:mb-7">
-          {pkg.features.map((feature, i) => (
-            <li key={i} className="flex items-start text-sm">
-              <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
-              <span className="text-gray-300 leading-relaxed">{feature}</span>
-            </li>
-          ))}
-        </ul>
+        {pkg.features.length && !isCustom ? (
+          <ul className="space-y-3 mb-6 md:mb-7">
+            {pkg.features.map((feature, i) => (
+              <li key={i} className="flex items-start text-sm">
+                <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
+                <span className="text-gray-300 leading-relaxed">{feature}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <PrimaryCTA whatsappNumber={whatsappNumber} />
@@ -527,9 +535,13 @@ export default function Services() {
             ))}
           </div>
 
-          <p className="text-center text-muted-foreground mt-10 text-sm">
-            * الأسعار قد تختلف حسب الموقع والتفاصيل الإضافية. غير شامل رسوم اللوكيشن.
-          </p>
+          <div className="text-center text-muted-foreground mt-10 text-sm leading-relaxed space-y-2">
+            <div>* الأسعار قد تختلف حسب الموقع والتفاصيل الإضافية. غير شامل رسوم اللوكيشن.</div>
+            <div>حجز اليوم بالأسبقية — Full Day لو اليوم محجوز لعريس تاني قبلك بنعتذر.</div>
+            <div>الحجز يتم بتأكيد على واتساب + ديبوزيت تأكيد.</div>
+            <div>الاستفسار فقط لا يعتبر حجزًا ويتم إلغاؤه تلقائيًا بدون تأكيد.</div>
+            <div>أقدر أساعدك في أي شيء خارج التصوير يوم الزفاف (خدمات ونصائح مجانية).</div>
+          </div>
         </div>
       </section>
 
@@ -562,6 +574,27 @@ export default function Services() {
           pointer-events: none;
         }
         .premium-border:hover::after { opacity: 1; }
+
+        .custom-package {
+          background:
+            linear-gradient(145deg, rgba(18,18,24,0.9), rgba(8,8,12,0.98)),
+            radial-gradient(circle at 20% 15%, rgba(255,210,120,0.12), transparent 55%);
+          border-style: dashed;
+          border-color: rgba(255,210,120,0.45);
+          box-shadow: 0 22px 70px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,210,120,0.25);
+        }
+        .custom-line {
+          margin-top: 8px;
+          padding: 10px 14px;
+          border-radius: 14px;
+          border: 1px solid rgba(255,210,120,0.3);
+          background: rgba(12,12,16,0.6);
+          color: rgba(255,230,190,0.92);
+          font-size: 13px;
+          letter-spacing: 0.04em;
+          line-height: 1.6;
+          box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+        }
 
         .promo-arrow {
           filter: drop-shadow(0 0 10px rgba(255,200,80,0.35));
