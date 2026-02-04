@@ -72,7 +72,7 @@ function FloatingWhatsApp() {
 
   return (
     <a href={href} className="wa-float" target="_blank" rel="noreferrer" aria-label="WhatsApp">
-      <WhatsAppIcon size={18} />
+      <WhatsAppIcon size={16} />
       <span className="wa-text">واتساب</span>
     </a>
   );
@@ -113,18 +113,18 @@ function App() {
               z-index: 70;
               display: inline-flex;
               align-items: center;
-              gap: 8px;
-              padding: 12px 16px;
+              gap: 6px;
+              padding: 9px 12px;
               border-radius: 999px;
-              background: #25d366;
+              background: linear-gradient(135deg, #1ab055 0%, #25d366 55%, #42e08c 100%);
               color: #0b2014;
-              font-weight: 700;
-              letter-spacing: 0.02em;
-              box-shadow: 0 18px 50px rgba(37, 211, 102, 0.45);
-              border: 1px solid rgba(255,255,255,0.22);
+              font-weight: 600;
+              letter-spacing: 0.01em;
+              box-shadow: 0 14px 40px rgba(37, 211, 102, 0.38);
+              border: 1px solid rgba(255,255,255,0.26);
               isolation: isolate;
               transition: transform 200ms ease, box-shadow 200ms ease;
-              animation: wa-float 3.4s ease-in-out infinite;
+              animation: wa-float 3.2s ease-in-out infinite;
             }
             .wa-float::before {
               content: "";
@@ -141,25 +141,26 @@ function App() {
             .wa-float::after {
               content: "";
               position: absolute;
-              inset: -10px;
+              inset: -8px;
               border-radius: inherit;
-              border: 1px solid rgba(37,211,102,0.35);
+              border: 1px solid rgba(37,211,102,0.30);
               box-shadow: 0 0 0 0 rgba(37,211,102,0.55);
               animation: wa-pulse 2.8s ease-out infinite;
               pointer-events: none;
             }
             .wa-float:hover {
               transform: translateY(-2px) scale(1.02);
-              box-shadow: 0 24px 70px rgba(37, 211, 102, 0.6);
+              box-shadow: 0 22px 60px rgba(37, 211, 102, 0.55);
             }
-            .wa-text { font-size: 13px; }
+            .wa-text { font-size: 12px; }
             @media (max-width: 768px) {
               .wa-float {
-                left: 16px;
+                left: 14px;
                 right: auto;
-                bottom: 96px;
+                bottom: 92px;
+                padding: 8px 10px;
               }
-              .wa-text { font-size: 12px; }
+              .wa-text { font-size: 11px; }
             }
             @keyframes wa-shine {
               0% { transform: translateX(-120%); }
