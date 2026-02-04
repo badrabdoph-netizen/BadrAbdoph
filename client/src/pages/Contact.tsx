@@ -349,34 +349,58 @@ export default function Contact() {
                     />
                   </div>
 
-                  <div className="grid gap-2">
-                    <Label>الإضافات المتاحة</Label>
-                    <div className="rounded-md border border-white/10 bg-background/60 p-3 space-y-2">
-                      {addonOptions.length ? (
-                        addonOptions.map((opt) => (
-                          <div key={opt.id} className="space-y-1">
-                            <div className="flex items-center justify-between gap-3 text-sm">
-                              <div className="flex items-center gap-2">
-                                {opt.emoji ? <span className="text-base">{opt.emoji}</span> : null}
-                                <span>{opt.label}</span>
-                              </div>
-                              <span className="text-xs text-muted-foreground">{opt.price}</span>
-                            </div>
-                            {opt.priceNote ? (
-                              <div className="text-[11px] text-muted-foreground/70 pr-6">
-                                {opt.priceNote}
-                              </div>
-                            ) : null}
+                  <FormField
+                    control={form.control}
+                    name="addonIds"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>اختيارات الإضافات (اختياري)</FormLabel>
+                        <FormControl>
+                          <div className="rounded-md border border-white/10 bg-background/60 p-3 space-y-3">
+                            {addonOptions.length ? (
+                              addonOptions.map((opt) => {
+                                const checked = (field.value ?? []).includes(opt.id);
+                                return (
+                                  <label key={opt.id} className="flex items-start gap-3 text-sm">
+                                    <Checkbox
+                                      checked={checked}
+                                      onCheckedChange={(value) => {
+                                        const next = new Set(field.value ?? []);
+                                        const isChecked = value === true;
+                                        if (isChecked) {
+                                          next.add(opt.id);
+                                        } else {
+                                          next.delete(opt.id);
+                                        }
+                                        field.onChange(Array.from(next));
+                                      }}
+                                    />
+                                    <div className="flex-1 space-y-1">
+                                      <div className="flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-2">
+                                          {opt.emoji ? <span className="text-base">{opt.emoji}</span> : null}
+                                          <span>{opt.label}</span>
+                                        </div>
+                                        <span className="text-xs text-muted-foreground">{opt.price}</span>
+                                      </div>
+                                      {opt.priceNote ? (
+                                        <div className="text-[11px] text-muted-foreground/70 pr-6">
+                                          {opt.priceNote}
+                                        </div>
+                                      ) : null}
+                                    </div>
+                                  </label>
+                                );
+                              })
+                            ) : (
+                              <div className="text-sm text-muted-foreground">لا توجد إضافات حالياً.</div>
+                            )}
                           </div>
-                        ))
-                      ) : (
-                        <div className="text-sm text-muted-foreground">لا توجد إضافات حالياً.</div>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-muted-foreground/70">
-                      هذه الإضافات للعرض فقط، ويتم تأكيدها لاحقًا عبر واتساب.
-                    </p>
-                  </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   <div className="rounded-md border border-white/10 bg-background/60 p-4 relative">
                     <div className="flex items-center justify-between mb-2">

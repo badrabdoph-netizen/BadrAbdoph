@@ -187,6 +187,14 @@ export const sessionPackages = [
     ],
     popular: true,
   },
+  {
+    id: "special-montage-design",
+    name: "تصميم بامدج متنوع خاص",
+    price: "اتصل للسعر",
+    description: "تصميمات متنوعة ومخصصة حسب ذوقك",
+    features: ["أفكار وتصميمات متنوعة", "تسليم بجودة عالية", "تنفيذ حسب الطلب"],
+    popular: false,
+  },
 ];
 
 export const sessionPackagesWithPrints = [
