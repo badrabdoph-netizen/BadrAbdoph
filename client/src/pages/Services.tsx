@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "wouter";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -108,16 +109,15 @@ function SectionHeader({
 }
 
 function PrimaryCTA() {
-  const waBookingHref = buildWhatsAppHref("عايز احجز اوردر ❤️");
   return (
-    <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
+    <Link href="/contact">
       <Button
         size="lg"
         className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-7 text-lg rounded-none w-full sm:w-auto"
       >
         {ctaTexts.bookNow}
       </Button>
-    </a>
+    </Link>
   );
 }
 
@@ -275,7 +275,6 @@ function QuickNav({
 }
 
 function MobileStickyBar({ show }: { show: boolean }) {
-  const waBookingHref = buildWhatsAppHref("عايز احجز اوردر ❤️");
   const telHref = `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`;
 
   return (
@@ -297,15 +296,12 @@ function MobileStickyBar({ show }: { show: boolean }) {
               اتصال
             </a>
 
-            <a
-              href={waBookingHref}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center gap-2"
-            >
-              <WhatsAppIcon size={18} />
-              {ctaTexts.bookNow}
-            </a>
+            <Link href="/contact">
+              <a className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center gap-2">
+                <WhatsAppIcon size={18} />
+                {ctaTexts.bookNow}
+              </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -35,12 +35,6 @@ function StarsRow() {
   );
 }
 
-function buildWhatsAppHref(text: string) {
-  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
-  if (!phone) return "";
-  return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
-}
-
 function MosaicCard({
   img,
   onClick,
@@ -88,13 +82,7 @@ function MosaicCard({
   );
 }
 
-function MobileStickyBar({
-  show,
-  bookingHref,
-}: {
-  show: boolean;
-  bookingHref: string;
-}) {
+function MobileStickyBar({ show }: { show: boolean }) {
   const telHref = `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`;
 
   return (
@@ -116,14 +104,11 @@ function MobileStickyBar({
               اتصال
             </a>
 
-            <a
-              href={bookingHref}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center gap-2"
-            >
-              {ctaTexts.bookSession}
-            </a>
+            <Link href="/contact">
+              <a className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center gap-2">
+                {ctaTexts.bookSession}
+              </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -218,8 +203,6 @@ export default function Home() {
     el.style.setProperty("--spot-y", `${y}%`);
   };
 
-  const waBookingHref = useMemo(() => buildWhatsAppHref("عايز احجز اوردر ❤️"), []);
-
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden relative z-10">
       <Navbar />
@@ -272,14 +255,14 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
+            <Link href="/contact">
               <Button
                 size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg rounded-none w-full sm:w-auto"
               >
                 {homeHero?.primaryCta ?? ctaTexts.bookSession}
               </Button>
-            </a>
+            </Link>
 
             <Link href="/services">
               <Button
@@ -569,11 +552,11 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
+            <Link href="/contact">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto">
                 {ctaTexts.bookNow}
               </Button>
-            </a>
+            </Link>
 
             <Link href="/services">
               <Button
@@ -818,7 +801,7 @@ export default function Home() {
       `}</style>
 
       <div className="md:hidden" style={{ height: "86px" }} />
-      <MobileStickyBar show={showSticky} bookingHref={waBookingHref} />
+      <MobileStickyBar show={showSticky} />
 
       <Footer />
     </div>

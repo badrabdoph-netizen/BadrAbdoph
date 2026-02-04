@@ -79,7 +79,6 @@ export default function Navbar() {
 
   const telHref = `tel:${(contactInfo?.phone ?? "").replace(/\s/g, "")}`;
 
-  const waBookingHref = useMemo(() => buildWhatsAppHref("عايز احجز اوردر ❤️"), []);
   const waInquiryHref = useMemo(() => buildWhatsAppHref("حابب استفسر ❤️"), []);
 
   return (
@@ -178,14 +177,14 @@ export default function Navbar() {
               <Facebook size={18} />
             </a>
 
-            <a href={waBookingHref} target="_blank" rel="noreferrer">
+            <Link href="/contact">
               <Button
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-6"
               >
                 {ctaTexts.bookNow}
               </Button>
-            </a>
+            </Link>
           </div>
 
           {/* Mobile buttons */}
@@ -306,11 +305,11 @@ export default function Navbar() {
             </div>
 
             <div className="mt-4 grid grid-cols-1 gap-3">
-              <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full">
-                <button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target">
+              <Link href="/contact">
+                <a className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target text-center">
                   {ctaTexts.bookNow}
-                </button>
-              </a>
+                </a>
+              </Link>
             </div>
 
             <div className="mt-4 text-center text-xs text-muted-foreground">

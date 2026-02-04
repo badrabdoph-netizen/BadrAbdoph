@@ -30,7 +30,6 @@ export default function Footer() {
   const telHref = phoneClean ? `tel:${phoneClean}` : "";
   const mailHref = contactInfo.email ? `mailto:${contactInfo.email}` : "";
 
-  const waBookingHref = buildWhatsAppHref("عايز احجز اوردر ❤️");
   const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️");
 
   return (
@@ -55,11 +54,11 @@ export default function Footer() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-              <a href={waBookingHref} target="_blank" rel="noreferrer" className="w-full md:w-auto">
+              <Link href="/contact">
                 <Button className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-8 py-6 text-base">
                   {ctaTexts.bookNow}
                 </Button>
-              </a>
+              </Link>
 
               <a
                 href={externalPortfolioUrl}
