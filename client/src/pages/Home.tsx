@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
   Camera,
   Check,
-  Phone,
   Star,
   Sparkles,
   ZoomIn,
@@ -18,7 +17,6 @@ import {
   photographerInfo,
   siteImages,
   aboutContent,
-  ctaTexts,
   homeHero,
   homeServicesPreview,
   externalPortfolioUrl,
@@ -148,44 +146,9 @@ function MosaicCard({
   );
 }
 
-function MobileStickyBar({ show, phone }: { show: boolean; phone: string }) {
-  const telHref = `tel:${(phone ?? "").replace(/\s/g, "")}`;
-
-  return (
-    <div
-      className={[
-        "fixed md:hidden left-0 right-0 z-50 transition-transform duration-300 will-change-transform",
-        show ? "translate-y-0" : "translate-y-full",
-      ].join(" ")}
-      style={{ bottom: "calc(0px + env(safe-area-inset-bottom))" }}
-    >
-      <div className="border-t border-white/10 bg-background/85 backdrop-blur-md">
-        <div className="container mx-auto px-4 py-3">
-          <div className="grid grid-cols-2 gap-3">
-            <a
-              href={telHref}
-              className="w-full h-12 border border-white/15 bg-black/20 text-foreground hover:bg-white hover:text-black transition-colors inline-flex items-center justify-center gap-2"
-            >
-              <Phone className="w-4 h-4 text-primary" />
-              اتصال
-            </a>
-
-            <Link href="/contact">
-              <a className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center gap-2">
-                {ctaTexts.bookSession}
-              </a>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const portfolioRef = useRef<HTMLElement | null>(null);
-  const [showSticky, setShowSticky] = useState(false);
   const { contactInfo, socialLinks } = useContactData();
   const content = useContentData();
   const testimonials = useTestimonialsData();
@@ -205,7 +168,6 @@ export default function Home() {
           const scrolled = window.scrollY;
           heroRef.current.style.transform = `translate3d(0, ${scrolled * 0.35}px, 0)`;
         }
-        setShowSticky(window.scrollY > 380);
       });
     };
 
@@ -293,7 +255,7 @@ export default function Home() {
       <Navbar />
 
       {/* HERO */}
-      <header className="relative min-h-[86vh] md:h-screen w-full overflow-hidden flex items-center justify-center pt-[calc(var(--nav-offset,96px)+12px)]">
+      <header className="relative min-h-[82vh] md:h-screen w-full overflow-hidden flex items-center justify-center pt-[calc(var(--nav-offset,96px)+8px)]">
         <div
           ref={heroRef}
           className="absolute inset-0 w-full h-[120%] bg-cover bg-center z-0 will-change-transform hero-image"
@@ -394,7 +356,7 @@ export default function Home() {
       </header>
 
       {/* SERVICES PREVIEW */}
-      <section className="py-24 relative">
+      <section className="pt-20 pb-12 relative">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
@@ -511,7 +473,7 @@ export default function Home() {
       </section>
 
       {/* ABOUT PREVIEW */}
-      <section className="pt-24 pb-12 md:pt-28 md:pb-16 relative">
+      <section className="pt-16 pb-10 md:pt-20 md:pb-14 relative">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div className="relative order-2 md:order-1 group overflow-hidden">
@@ -625,7 +587,7 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_35%_25%,rgba(255,200,80,0.12),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">المعرض</h3>
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">شوف تصوير بالكوالتي الكاملة</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">شوف جزء من تصويري بالكوالتي الكاملة</h2>
 
           <a
             href={externalPortfolioUrl}
@@ -1329,9 +1291,6 @@ export default function Home() {
           .portfolio-social::after { animation: none !important; }
         }
       `}</style>
-
-      <div className="md:hidden" style={{ height: "86px" }} />
-      <MobileStickyBar show={showSticky} phone={contactInfo.phone ?? ""} />
 
       <Footer />
     </div>

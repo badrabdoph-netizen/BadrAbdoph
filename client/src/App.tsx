@@ -6,6 +6,7 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { useContactData } from "@/hooks/useSiteData";
+import { Phone } from "lucide-react";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Portfolio from "./pages/Portfolio";
@@ -72,10 +73,38 @@ function FloatingWhatsApp() {
   if (!href) return null;
 
   return (
-    <a href={href} className="wa-float" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+    <a href={href} className="wa-float hidden md:inline-flex" target="_blank" rel="noreferrer" aria-label="WhatsApp">
       <WhatsAppIcon size={16} />
       <span className="wa-text">واتساب</span>
     </a>
+  );
+}
+
+function GlobalStickyBar() {
+  const { contactInfo } = useContactData();
+  const telHref = contactInfo.phone ? `tel:${contactInfo.phone.replace(/\s/g, "")}` : "";
+  const waHref = buildWhatsAppHref("❤️", contactInfo.whatsappNumber);
+  if (!telHref && !waHref) return null;
+
+  return (
+    <div className="sticky-bar md:hidden">
+      <div className="container mx-auto px-4">
+        <div className="sticky-bar-inner">
+          {telHref ? (
+            <a href={telHref} className="sticky-btn sticky-btn--call" aria-label="Call">
+              <Phone className="w-4 h-4" />
+              اتصل
+            </a>
+          ) : null}
+          {waHref ? (
+            <a href={waHref} className="sticky-btn sticky-btn--wa" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+              <WhatsAppIcon size={16} />
+              واتساب
+            </a>
+          ) : null}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -105,6 +134,7 @@ function App() {
             <Toaster position="top-center" />
             <Router />
             <FloatingWhatsApp />
+            <GlobalStickyBar />
           </TooltipProvider>
           <style>{`
             .wa-float {
@@ -173,6 +203,57 @@ function App() {
               100% {
                 box-shadow: 0 14px 40px rgba(37, 211, 102, 0.38), 0 0 0 0 rgba(37,211,102,0);
               }
+            }
+
+            .sticky-bar {
+              position: fixed;
+              left: 0;
+              right: 0;
+              bottom: calc(env(safe-area-inset-bottom) + 10px);
+              z-index: 65;
+              pointer-events: none;
+            }
+            .sticky-bar-inner {
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 10px;
+              pointer-events: auto;
+            }
+            .sticky-btn {
+              height: 52px;
+              border-radius: 999px;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+              font-weight: 700;
+              letter-spacing: 0.02em;
+              color: #0b2014;
+              background: linear-gradient(135deg, #1ab055 0%, #25d366 55%, #42e08c 100%);
+              border: 1px solid rgba(255,255,255,0.25);
+              box-shadow: 0 14px 40px rgba(37, 211, 102, 0.38), inset 0 0 0 1px rgba(255,255,255,0.25);
+              position: relative;
+              overflow: hidden;
+              transition: transform 200ms ease, box-shadow 200ms ease;
+              animation: wa-float 3.4s ease-in-out infinite, wa-pulse 2.8s ease-out infinite;
+            }
+            .sticky-btn::after {
+              content: "";
+              position: absolute;
+              inset: -40% -10%;
+              background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 48%, transparent 70%);
+              transform: translateX(-120%);
+              animation: wa-shine 3.6s ease-in-out infinite;
+              opacity: 0.5;
+              pointer-events: none;
+            }
+            .sticky-btn--call {
+              background: linear-gradient(135deg, #1fbf6b 0%, #22c55e 55%, #4ade80 100%);
+              color: #082012;
+            }
+            .sticky-btn:hover {
+              transform: translateY(-2px) scale(1.02);
+              box-shadow: 0 22px 60px rgba(37, 211, 102, 0.55);
             }
           `}</style>
         </div>

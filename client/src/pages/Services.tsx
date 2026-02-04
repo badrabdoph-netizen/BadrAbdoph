@@ -151,7 +151,7 @@ function PackageCard({
     <div
       className={[
         "relative overflow-hidden bg-card border transition-all duration-300 group premium-border p-7 md:p-8",
-        isCustom ? "custom-package" : "",
+        isCustom ? "custom-package md:col-span-2" : "",
         vip
           ? "border-primary/45 shadow-[0_0_70px_rgba(255,200,80,0.12)] hover:shadow-[0_0_95px_rgba(255,200,80,0.18)] hover:-translate-y-2"
           : popular || isPro
@@ -167,8 +167,13 @@ function PackageCard({
         ].join(" ")}
       />
 
-      <div className="relative z-10">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+      <div className={["relative z-10", isCustom ? "custom-body" : ""].join(" ")}>
+        <div
+          className={[
+            "flex flex-col gap-4 mb-6",
+            isCustom ? "items-center text-center" : "sm:flex-row sm:items-start sm:justify-between",
+          ].join(" ")}
+        >
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 border border-white/10 bg-black/15 backdrop-blur-md flex items-center justify-center">
               {Icon}
@@ -210,6 +215,13 @@ function PackageCard({
           </div>
         </div>
 
+        {isPro ? (
+          <div className="pro-note">
+            <span className="pro-note-text">MEDIA COVERAGE REELS & TIKTOK</span>
+            <span className="pro-note-tag">مصور خاص</span>
+          </div>
+        ) : null}
+
         {pkg.features.length && !isCustom ? (
           <ul className="space-y-3 mb-6 md:mb-7">
             {pkg.features.map((feature, i) => (
@@ -219,10 +231,6 @@ function PackageCard({
               </li>
             ))}
           </ul>
-        ) : null}
-
-        {isPro ? (
-          <div className="pro-note">MEDIA COVERAGE REELS & TIKTOK (مصور خاص)</div>
         ) : null}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -264,7 +272,7 @@ function QuickNav({
 
   return (
     <div
-      className="sticky z-30 bg-background/75 backdrop-blur-md border-y border-white/10"
+      className="sticky z-30 bg-background/75 backdrop-blur-md border-y border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
       style={{ top: "var(--nav-offset, 96px)" }}
     >
       <div className="container mx-auto px-4 py-3">
@@ -278,7 +286,7 @@ function QuickNav({
                 className={[
                   "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border",
                   isActive
-                    ? "bg-primary text-primary-foreground border-primary"
+                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_24px_rgba(255,200,80,0.45)] ring-1 ring-primary/30"
                     : "bg-black/15 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
                 ].join(" ")}
               >
@@ -286,41 +294,6 @@ function QuickNav({
               </button>
             );
           })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MobileStickyBar({ show, phone }: { show: boolean; phone: string }) {
-  const telHref = `tel:${(phone ?? "").replace(/\s/g, "")}`;
-
-  return (
-    <div
-      className={[
-        "fixed md:hidden left-0 right-0 z-50 transition-transform duration-300 will-change-transform",
-        show ? "translate-y-0" : "translate-y-full",
-      ].join(" ")}
-      style={{ bottom: "calc(0px + env(safe-area-inset-bottom))" }}
-    >
-      <div className="border-t border-white/10 bg-background/85 backdrop-blur-md">
-        <div className="container mx-auto px-4 py-3">
-          <div className="grid grid-cols-2 gap-3">
-            <a
-              href={telHref}
-              className="w-full h-12 border border-white/15 bg-black/20 text-foreground hover:bg-white hover:text-black transition-colors inline-flex items-center justify-center gap-2"
-            >
-              <Phone className="w-4 h-4 text-primary" />
-              اتصال
-            </a>
-
-            <Link href="/contact">
-              <a className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center justify-center gap-2">
-                <WhatsAppIcon size={18} />
-                {ctaTexts.bookNow}
-              </a>
-            </Link>
-          </div>
         </div>
       </div>
     </div>
@@ -336,7 +309,6 @@ export default function Services() {
     additionalServices,
   } = usePackagesData();
   const [activeSection, setActiveSection] = useState("sessions");
-  const [showSticky, setShowSticky] = useState(false);
 
   const ids = useMemo(() => ["sessions", "prints", "wedding", "addons"], []);
 
@@ -370,7 +342,6 @@ export default function Services() {
     const onScroll = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        setShowSticky(window.scrollY > 420);
         computeActiveByScroll();
       });
     };
@@ -410,7 +381,7 @@ export default function Services() {
         </div>
       </div>
 
-      <header className="pt-28 md:pt-32 pb-6 relative overflow-hidden">
+      <header className="pt-28 md:pt-32 pb-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-background/35 to-background" />
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="absolute inset-0 pointer-events-none hero-grain opacity-[0.10]" />
@@ -554,9 +525,6 @@ export default function Services() {
         </div>
       </section>
 
-      <div className="md:hidden" style={{ height: "92px" }} />
-      <MobileStickyBar show={showSticky} phone={contactInfo.phone ?? ""} />
-
       <style>{`
         .hero-grain {
           background-image:
@@ -612,11 +580,28 @@ export default function Services() {
         .pro-note {
           margin-top: -8px;
           margin-bottom: 18px;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          justify-content: center;
           font-size: 11px;
           letter-spacing: 0.08em;
           text-transform: uppercase;
           color: rgba(255,235,200,0.9);
           text-shadow: 0 0 14px rgba(255,210,130,0.45);
+        }
+        .pro-note-text {
+          opacity: 0.9;
+        }
+        .pro-note-tag {
+          font-size: 10px;
+          letter-spacing: 0.2em;
+          padding: 3px 8px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,210,120,0.5);
+          color: rgba(255,245,220,0.95);
+          text-shadow: 0 0 14px rgba(255,210,130,0.6);
+          box-shadow: 0 6px 20px rgba(255,200,80,0.2);
         }
         .vip-note {
           color: rgba(255,235,200,0.95);
@@ -630,6 +615,24 @@ export default function Services() {
           border-style: dashed;
           border-color: rgba(255,210,120,0.45);
           box-shadow: 0 22px 70px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,210,120,0.25);
+          border-radius: 999px;
+          aspect-ratio: 1 / 1;
+          max-width: 380px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .custom-body {
+          text-align: center;
+          align-items: center;
+        }
+        @media (max-width: 640px) {
+          .custom-package {
+            aspect-ratio: auto;
+            border-radius: 28px;
+            max-width: 100%;
+          }
         }
         .custom-line {
           margin-top: 8px;

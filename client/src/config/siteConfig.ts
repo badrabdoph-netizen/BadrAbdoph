@@ -208,6 +208,14 @@ export const sessionPackages = [
     ],
     popular: false,
   },
+  {
+    id: "special-montage-design",
+    name: "خصص باقتك حسب ذوقك واختار اللي يناسبك",
+    price: "أنت من تحدد السعر لنفسك",
+    description: "",
+    features: [],
+    popular: false,
+  },
 ];
 
 export const sessionPackagesWithPrints = [
@@ -242,21 +250,13 @@ export const sessionPackagesWithPrints = [
     ],
     popular: true,
   },
-  {
-    id: "special-montage-design",
-    name: "خصص باقتك حسب ذوقك واختار اللي يناسبك",
-    price: "أنت من تحدد السعر لنفسك",
-    description: "",
-    features: [],
-    popular: false,
-  },
 ];
 
 export const weddingPackages = [
   {
     id: "full-day-vip-plus",
     name: "تصوير اليوم الكامل (VIP Plus)",
-    price: "اتصل للسعر",
+    price: "17.000",
     priceNote: "باكدج أعلى — يتم تحديد السعر حسب تفاصيل اليوم ❤️",
     description: "تجربة أقوى وتغطية أوسع + مفاجآت أثناء الفرح",
     features: [
