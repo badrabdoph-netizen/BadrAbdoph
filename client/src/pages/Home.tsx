@@ -2,14 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
   Camera,
-  Heart,
   Phone,
   Star,
   Sparkles,
   ZoomIn,
-  ExternalLink,
   Instagram,
   Facebook,
 } from "lucide-react";
@@ -28,9 +25,55 @@ import { useContactData, useContentData, usePortfolioData, useTestimonialsData }
 
 function ServiceIcon({ title }: { title: string }) {
   const t = title.toLowerCase();
-  if (t.includes("زفاف") || t.includes("wedding")) return <Heart className="w-12 h-12 text-primary mb-6" />;
+  if (t.includes("زفاف") || t.includes("wedding")) return <CoupleIcon className="w-12 h-12 text-primary mb-6" />;
   if (t.includes("vip")) return <Sparkles className="w-12 h-12 text-primary mb-6" />;
   return <Camera className="w-12 h-12 text-primary mb-6" />;
+}
+
+function CoupleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 64 64"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+    >
+      <path
+        d="M20 30c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9Z"
+        stroke="currentColor"
+        strokeWidth="2.5"
+      />
+      <path
+        d="M44 30c5 0 9-4 9-9s-4-9-9-9-9 4-9 9 4 9 9 9Z"
+        stroke="currentColor"
+        strokeWidth="2.5"
+      />
+      <path
+        d="M6 54c2-9 10-15 19-15s17 6 19 15"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M22 54c2-8 9-13 16-13s14 5 16 13"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M32 18c0 4-3 7-7 7"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M32 18c0 4 3 7 7 7"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 function StarsRow() {
@@ -96,8 +139,8 @@ function MosaicCard({
       <div className="absolute inset-0 mosaic-overlay" />
       <div className="absolute inset-0 mosaic-glow opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      <div className="absolute bottom-2 left-2 right-2 text-[11px] text-white/90 line-clamp-1 text-center drop-shadow">
-        {img.title}
+      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-center">
+        <span className="camera-badge">📸</span>
       </div>
     </button>
   );
@@ -264,18 +307,7 @@ export default function Home() {
         <div className="absolute inset-0 z-10 pointer-events-none [background:radial-gradient(circle_at_50%_35%,rgba(255,200,80,0.10),transparent_55%)]" />
         <div className="absolute inset-0 z-10 pointer-events-none hero-grain opacity-[0.12]" />
 
-        <div className="relative z-20 container mx-auto px-4 text-center flex flex-col items-center animate-in fade-in zoom-in duration-1000">
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
-            <span className="inline-flex items-center gap-2 px-4 py-2 text-xs md:text-sm border border-white/10 bg-black/30 backdrop-blur-md">
-              <Star className="w-4 h-4 text-primary" />
-              تصوير زفاف • ستايل سينمائي فاخر
-            </span>
-            <span className="inline-flex items-center gap-2 px-4 py-2 text-xs md:text-sm border border-white/10 bg-black/30 backdrop-blur-md">
-              <Sparkles className="w-4 h-4 text-primary" />
-              تركيز على التفاصيل والمشاعر
-            </span>
-          </div>
-
+        <div className="relative z-20 container mx-auto px-4 text-center flex flex-col items-center -translate-y-1 md:-translate-y-6 animate-in fade-in zoom-in duration-1000">
           <h2 className="text-primary text-lg md:text-xl tracking-[0.3em] uppercase mb-4 font-medium">
             {photographerInfo.title}
           </h2>
@@ -290,40 +322,19 @@ export default function Home() {
             )}
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mb-10 font-light leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mb-6 font-light leading-relaxed">
             {content.heroDescription || homeHero?.subTextAr || photographerInfo.descriptionAr}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <Link href="/contact">
-              <Button
-                size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg rounded-none w-full sm:w-auto"
-              >
-                {homeHero?.primaryCta ?? ctaTexts.bookSession}
-              </Button>
-            </Link>
-
-            <Link href="/services">
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-white text-white hover:bg-white hover:text-black px-8 py-6 text-lg rounded-none w-full sm:w-auto cta-glow"
-              >
-                {homeHero?.secondaryCta ?? "عرض التفاصيل والأسعار"}
-              </Button>
-            </Link>
-          </div>
-
           <div className="mt-8 flex flex-col items-center gap-4">
-            <div className="text-[11px] tracking-[0.35em] uppercase text-foreground/60">تابعنا</div>
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="hero-follow-title">تابعنا</div>
+            <div className="hero-follow-icons">
               {socialLinks.instagram ? (
                 <a
                   href={socialLinks.instagram}
                   target="_blank"
                   rel="noreferrer"
-                  className="social-orb hero-social"
+                  className="hero-social-btn hero-social--ig"
                   aria-label="Instagram"
                 >
                   <Instagram size={20} />
@@ -334,7 +345,7 @@ export default function Home() {
                   href={socialLinks.facebook}
                   target="_blank"
                   rel="noreferrer"
-                  className="social-orb hero-social"
+                  className="hero-social-btn hero-social--fb"
                   aria-label="Facebook"
                 >
                   <Facebook size={20} />
@@ -345,7 +356,7 @@ export default function Home() {
                   href={socialLinks.tiktok}
                   target="_blank"
                   rel="noreferrer"
-                  className="social-orb hero-social"
+                  className="hero-social-btn hero-social--tt"
                   aria-label="TikTok"
                 >
                   <svg
@@ -368,7 +379,7 @@ export default function Home() {
                   href={waSocialHref}
                   target="_blank"
                   rel="noreferrer"
-                  className="social-orb social-orb--wa hero-social"
+                  className="hero-social-btn hero-social--wa"
                   aria-label="WhatsApp"
                 >
                   <WhatsAppIcon size={20} />
@@ -389,11 +400,22 @@ export default function Home() {
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto leading-relaxed">
               اختار الباقة المناسبة… وكلها بتتعمل بنفس الجودة والاهتمام بالتفاصيل.
             </p>
+            <div className="mt-6 flex justify-center">
+              <Link href="/services">
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-10 py-4 cta-glow"
+                >
+                  {homeHero?.secondaryCta ?? "عرض التفاصيل والأسعار"}
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {homeServicesPreview.map((card) => {
+            {homeServicesPreview.map((card, idx) => {
               const featured = !!card.featured;
+              const tone = ["tone-amber", "tone-rose", "tone-emerald"][idx % 3];
 
               return (
                 <div
@@ -405,13 +427,13 @@ export default function Home() {
                       ? "border-primary/30 shadow-2xl shadow-black/50 md:-translate-y-4"
                       : "border-white/10 hover:border-primary/30 hover:-translate-y-1 hover:shadow-[0_25px_80px_rgba(0,0,0,0.55)]",
                     "premium-border",
+                    tone,
                   ].join(" ")}
                 >
                   <div
                     className={[
-                      "absolute inset-0 pointer-events-none transition-opacity duration-300",
+                      "absolute inset-0 pointer-events-none transition-opacity duration-300 card-glow",
                       featured ? "opacity-45" : "opacity-0 group-hover:opacity-100",
-                      "bg-[radial-gradient(circle_at_30%_20%,rgba(255,200,80,0.14),transparent_55%)]",
                     ].join(" ")}
                   />
 
@@ -421,29 +443,29 @@ export default function Home() {
                     </div>
                   ) : null}
 
+                  {card.vipLabel ? (
+                    <div className="vip-label">{card.vipLabel}</div>
+                  ) : null}
+
                   <div className={featured ? "" : "group-hover:scale-110 transition-transform duration-300"}>
                     <ServiceIcon title={card.title} />
                   </div>
 
                   <h3 className="text-2xl font-bold mb-4">{card.title}</h3>
-                  <p className="text-muted-foreground mb-5 md:mb-6 leading-relaxed text-sm md:text-base line-clamp-3 md:line-clamp-none">
-                    {card.description}
-                  </p>
+                  <div className="card-fade">
+                    <p className="text-muted-foreground mb-4 leading-relaxed text-sm md:text-base">
+                      {card.description}
+                    </p>
 
-                  <ul className="text-sm text-muted-foreground space-y-2 mb-6 md:mb-8">
-                    {card.bullets.map((b, idx) => (
-                      <li
-                        key={`${card.id}-b-${idx}`}
-                        className={[
-                          "items-center",
-                          idx > 1 ? "hidden md:flex" : "flex",
-                        ].join(" ")}
-                      >
-                        <Star size={14} className="ml-2 text-primary" />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
+                    <ul className="text-sm text-muted-foreground space-y-2 pb-2">
+                      {card.bullets.map((b, bIdx) => (
+                        <li key={`${card.id}-b-${bIdx}`} className="flex items-start">
+                          <Star size={14} className="ml-2 mt-1 text-primary" />
+                          <span>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
                   <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6" />
 
@@ -465,95 +487,6 @@ export default function Home() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* ✅ أعمالنا (Editorial preview) */}
-      <section
-        ref={(el) => (portfolioRef.current = el)}
-        className="py-20 relative overflow-hidden"
-        onMouseMove={(e) => setSpot(e.clientX, e.clientY)}
-        onTouchMove={(e) => {
-          const t = e.touches[0];
-          if (t) setSpot(t.clientX, t.clientY);
-        }}
-        style={{
-          // @ts-ignore
-          "--spot-x": "50%",
-          "--spot-y": "35%",
-        }}
-      >
-        <div className="absolute inset-0 pointer-events-none opacity-45 [background:radial-gradient(circle_at_85%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
-        <div className="absolute inset-0 pointer-events-none spotlight-layer" />
-        <div className="absolute inset-0 pointer-events-none gallery-frame" />
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col items-center text-center gap-3 mb-9">
-            <h3 className="text-primary text-sm tracking-widest uppercase font-bold">أعمالنا</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">لمحات سريعة</h2>
-
-            <a
-              href={externalPortfolioUrl}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-4 inline-flex items-center gap-2"
-              target="_blank"
-              rel="noreferrer"
-            >
-              بعض أعمالنا <ExternalLink className="w-4 h-4" />
-            </a>
-          </div>
-
-          <div className="relative">
-            <div className="md:hidden">
-              <div className="gallery-rail">
-                {mobileGallery.map((img, i) => (
-                  <MosaicCard
-                    key={`m-${img.src}-${i}`}
-                    img={img}
-                    onClick={goPortfolio}
-                    eager={i < 2}
-                    className="gallery-slide aspect-[4/5]"
-                  />
-                ))}
-              </div>
-              <div className="gallery-hint">اسحب لمشاهدة المزيد</div>
-
-              <div className="mt-5 flex justify-center">
-                <a
-                  href={externalPortfolioUrl}
-                  className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none px-10 py-4 inline-flex items-center gap-2"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  عرض المعرض كامل <ZoomIn className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
-
-            <div className="hidden md:block">
-              <div className="gallery-collage">
-                {desktopGallery.map((img, i) => (
-                  <MosaicCard
-                    key={`d-${img.src}-${i}`}
-                    img={img}
-                    onClick={goPortfolio}
-                    eager={i < 2}
-                    className={["gallery-card h-full", collageLayout[i] ?? ""].join(" ")}
-                  />
-                ))}
-              </div>
-
-              <div className="mt-7 flex justify-center">
-                <a
-                  href={externalPortfolioUrl}
-                  className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none px-10 py-4 inline-flex items-center gap-2"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  عرض المعرض كامل <ZoomIn className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -585,31 +518,171 @@ export default function Home() {
               <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
                 {aboutContent.subtitle}
               </h3>
+              <div className="flex flex-wrap items-center gap-3 mb-5">
+                <span className="about-badge">تصوير زفاف • ستايل سينمائي فاخر</span>
+                <span className="about-badge">تركيز على التفاصيل والمشاعر</span>
+              </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
                 {content.aboutTitle || aboutContent.title}
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed mb-8">
                 {content.aboutDescription || aboutContent.description}
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-10">
-                {aboutContent.stats.map((s) => (
-                  <div
-                    key={s.label}
-                    className="bg-card/40 border border-white/10 backdrop-blur-sm px-4 py-4 text-center premium-border"
-                  >
-                    <div className="text-2xl md:text-3xl font-bold text-foreground">{s.number}</div>
-                    <div className="text-xs md:text-sm text-muted-foreground mt-1">{s.label}</div>
-                  </div>
+      {/* ✅ Story Gallery */}
+      <section
+        ref={(el) => (portfolioRef.current = el)}
+        className="py-20 relative overflow-hidden"
+        onMouseMove={(e) => setSpot(e.clientX, e.clientY)}
+        onTouchMove={(e) => {
+          const t = e.touches[0];
+          if (t) setSpot(t.clientX, t.clientY);
+        }}
+        style={{
+          // @ts-ignore
+          "--spot-x": "50%",
+          "--spot-y": "35%",
+        }}
+      >
+        <div className="absolute inset-0 pointer-events-none opacity-45 [background:radial-gradient(circle_at_85%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
+        <div className="absolute inset-0 pointer-events-none spotlight-layer" />
+        <div className="absolute inset-0 pointer-events-none gallery-frame" />
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex flex-col items-center text-center gap-3 mb-9">
+            <h3 className="text-primary text-sm tracking-widest uppercase font-bold">لمحات</h3>
+            <h2 className="text-3xl md:text-5xl font-bold">صور من قصتي</h2>
+          </div>
+
+          <div className="relative">
+            <div className="md:hidden">
+              <div className="gallery-rail">
+                {mobileGallery.map((img, i) => (
+                  <MosaicCard
+                    key={`m-${img.src}-${i}`}
+                    img={img}
+                    onClick={goPortfolio}
+                    eager={i < 2}
+                    className="gallery-slide aspect-[4/5]"
+                  />
+                ))}
+              </div>
+              <div className="gallery-hint">اسحب لمشاهدة المزيد</div>
+
+            </div>
+
+            <div className="hidden md:block">
+              <div className="gallery-collage">
+                {desktopGallery.map((img, i) => (
+                  <MosaicCard
+                    key={`d-${img.src}-${i}`}
+                    img={img}
+                    onClick={goPortfolio}
+                    eager={i < 2}
+                    className={["gallery-card h-full", collageLayout[i] ?? ""].join(" ")}
+                  />
                 ))}
               </div>
 
-              <Link href="/about">
-                <Button variant="link" className="text-primary p-0 text-lg hover:no-underline group">
-                  {ctaTexts.readMore} <ArrowLeft className="mr-2 transition-transform group-hover:-translate-x-2" />
-                </Button>
-              </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            {aboutContent.stats.map((s) => (
+              <div
+                key={s.label}
+                className="bg-card/40 border border-white/10 backdrop-blur-sm px-5 py-5 text-center premium-border"
+              >
+                <div className="text-2xl md:text-3xl font-bold text-foreground">{s.number}</div>
+                <div className="text-xs md:text-sm text-muted-foreground mt-1">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PORTFOLIO CTA */}
+      <section className="py-16 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_35%_25%,rgba(255,200,80,0.12),transparent_60%)]" />
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">المعرض</h3>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">شوف الأعمال كاملة</h2>
+
+          <a
+            href={externalPortfolioUrl}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-4 inline-flex items-center gap-2 cta-glow"
+            target="_blank"
+            rel="noreferrer"
+          >
+            عرض المعرض كامل <ZoomIn className="w-4 h-4" />
+          </a>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {socialLinks.instagram ? (
+              <a
+                href={socialLinks.instagram}
+                target="_blank"
+                rel="noreferrer"
+                className="portfolio-social portfolio-social--ig"
+                aria-label="Instagram"
+              >
+                <Instagram size={18} />
+              </a>
+            ) : null}
+            {socialLinks.facebook ? (
+              <a
+                href={socialLinks.facebook}
+                target="_blank"
+                rel="noreferrer"
+                className="portfolio-social portfolio-social--fb"
+                aria-label="Facebook"
+              >
+                <Facebook size={18} />
+              </a>
+            ) : null}
+            {socialLinks.tiktok ? (
+              <a
+                href={socialLinks.tiktok}
+                target="_blank"
+                rel="noreferrer"
+                className="portfolio-social portfolio-social--tt"
+                aria-label="TikTok"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+                </svg>
+              </a>
+            ) : null}
+            {waSocialHref ? (
+              <a
+                href={waSocialHref}
+                target="_blank"
+                rel="noreferrer"
+                className="portfolio-social portfolio-social--wa"
+                aria-label="WhatsApp"
+              >
+                <WhatsAppIcon size={18} />
+              </a>
+            ) : null}
           </div>
         </div>
       </section>
@@ -641,95 +714,91 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.12),transparent_60%)]" />
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-5">
-            {content.ctaTitle || "جاهز نثبت يومك بصور تفضل معاك؟"}
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            {content.ctaDescription || "ابعت التفاصيل بسرعة… وهنرتب كل حاجة بشكل مريح وواضح."}
-          </p>
-
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/contact">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto">
-                {ctaTexts.bookNow}
-              </Button>
-            </Link>
-
-            <Link href="/services">
-              <Button
-                variant="outline"
-                className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto cta-glow"
-              >
-                شوف الباقات
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <style>{`
-        .hero-divider {
-          width: 2px;
-          height: 72px;
-          background: linear-gradient(
-            to bottom,
-            transparent,
-            rgba(255,200,80,0.45),
-            rgba(255,200,80,0.15),
-            transparent
-          );
-          box-shadow: 0 0 18px rgba(255,200,80,0.25);
+        .hero-follow-title {
+          font-size: 12px;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          font-weight: 600;
+          color: rgba(255,255,255,0.7);
           position: relative;
+          padding-bottom: 10px;
         }
-        .hero-divider::after {
+        .hero-follow-title::after {
           content: "";
-          position: absolute;
-          inset: -18px -10px;
-          background: radial-gradient(circle, rgba(255,220,140,0.35), transparent 60%);
-          opacity: 0.6;
-          animation: hero-pulse 2.8s ease-in-out infinite;
-          pointer-events: none;
+          width: 54px;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(255,200,80,0.8), transparent);
+          display: block;
+          margin: 10px auto 0;
+          box-shadow: 0 0 12px rgba(255,200,80,0.35);
         }
-        .hero-arrow {
-          width: 34px;
-          height: 34px;
-          border-radius: 999px;
+        .hero-follow-icons {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 14px;
+          flex-wrap: wrap;
+        }
+        .hero-social-btn {
+          width: 58px;
+          height: 58px;
+          border-radius: 18px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          color: rgba(255,220,150,0.9);
-          background: rgba(255,200,80,0.12);
-          border: 1px solid rgba(255,200,80,0.35);
-          box-shadow: 0 0 18px rgba(255,200,80,0.25);
-          animation: hero-bounce 2.1s ease-in-out infinite;
+          border: 1px solid rgba(255,255,255,0.16);
+          background: rgba(9,9,12,0.55);
+          color: rgba(255,255,255,0.85);
+          box-shadow: 0 18px 45px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.05);
+          transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
+          position: relative;
+          overflow: hidden;
         }
-        .hero-arrow svg {
-          filter: drop-shadow(0 0 10px rgba(255,200,80,0.55));
+        .hero-social-btn::after {
+          content: "";
+          position: absolute;
+          inset: -40% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 48%, transparent 70%);
+          transform: translateX(-120%);
+          animation: social-shine 4.8s ease-in-out infinite;
+          opacity: 0.35;
+          pointer-events: none;
         }
-
-        @keyframes hero-bounce {
-          0%, 100% { transform: translateY(0); opacity: 0.85; }
-          50% { transform: translateY(6px); opacity: 1; }
+        .hero-social-btn:hover {
+          transform: translateY(-3px) scale(1.03);
+          border-color: rgba(255,200,80,0.45);
+          box-shadow: 0 22px 60px rgba(0,0,0,0.6), 0 0 22px rgba(255,200,80,0.22);
         }
-        @keyframes hero-pulse {
-          0%, 100% { opacity: 0.35; }
-          50% { opacity: 0.75; }
+        .hero-social--ig {
+          background: radial-gradient(circle at 30% 20%, rgba(255,140,180,0.18), rgba(12,12,16,0.8));
+          color: #ffd1df;
         }
-
-        .hero-social {
-          width: 52px;
-          height: 52px;
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 22px rgba(255, 200, 80, 0.2);
-          border-color: rgba(255, 255, 255, 0.22);
+        .hero-social--fb {
+          background: radial-gradient(circle at 30% 20%, rgba(120,160,255,0.2), rgba(12,12,16,0.82));
+          color: #cfe0ff;
+        }
+        .hero-social--tt {
+          background: radial-gradient(circle at 30% 20%, rgba(120,240,255,0.18), rgba(12,12,16,0.82));
+          color: #d7f7ff;
+        }
+        .hero-social--wa {
+          background: radial-gradient(circle at 30% 20%, rgba(80,230,150,0.2), rgba(12,12,16,0.82));
+          color: #b7f7c8;
+          border-color: rgba(56,189,116,0.45);
+        }
+        @media (max-width: 640px) {
+          .hero-social-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+          }
         }
 
         .cta-glow {
           position: relative;
           overflow: hidden;
+          isolation: isolate;
           box-shadow: 0 0 0 1px rgba(255, 200, 80, 0.18) inset, 0 20px 60px rgba(255, 200, 80, 0.12);
         }
         .cta-glow::before {
@@ -744,7 +813,7 @@ export default function Home() {
         .cta-glow::after {
           content: "";
           position: absolute;
-          inset: -120% 0;
+          inset: -120% -10%;
           background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 45%, transparent 70%);
           transform: translateX(-120%);
           animation: cta-shine 3.6s ease-in-out infinite;
@@ -785,6 +854,64 @@ export default function Home() {
           pointer-events: none;
         }
         .premium-border:hover::after { opacity: 1; }
+
+        .about-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 16px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.12);
+          background: rgba(12,12,16,0.55);
+          color: rgba(255,255,255,0.8);
+          font-size: 12px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+        }
+
+        .card-glow {
+          background: radial-gradient(circle at 30% 20%, var(--tone, rgba(255,200,80,0.18)), transparent 55%);
+        }
+        .tone-amber { --tone: rgba(255,200,80,0.18); }
+        .tone-rose { --tone: rgba(255,140,170,0.18); }
+        .tone-emerald { --tone: rgba(110,240,200,0.16); }
+
+        .card-fade {
+          position: relative;
+          max-height: 240px;
+          overflow: hidden;
+          mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0));
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0));
+        }
+        @media (min-width: 768px) {
+          .card-fade { max-height: 260px; }
+        }
+
+        .vip-label {
+          position: absolute;
+          top: 18px;
+          left: 20px;
+          font-size: 26px;
+          font-weight: 800;
+          letter-spacing: 0.2em;
+          background: linear-gradient(120deg, #ffe6b0, #fff, #ffd37a);
+          color: transparent;
+          -webkit-background-clip: text;
+          background-clip: text;
+          text-shadow: 0 0 18px rgba(255,210,130,0.5);
+          animation: vip-shine 3.2s ease-in-out infinite;
+          pointer-events: none;
+        }
+
+        .camera-badge {
+          font-size: 16px;
+          padding: 6px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.2);
+          background: rgba(0,0,0,0.45);
+          box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+        }
 
         .spotlight-layer {
           background: radial-gradient(
@@ -925,6 +1052,48 @@ export default function Home() {
           box-shadow: 0 28px 90px rgba(0,0,0,0.48);
         }
 
+        .portfolio-social {
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(255,255,255,0.16);
+          background: rgba(12,12,16,0.5);
+          color: rgba(255,255,255,0.8);
+          box-shadow: 0 12px 35px rgba(0,0,0,0.45);
+          transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .portfolio-social::after {
+          content: "";
+          position: absolute;
+          inset: -40% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 72%);
+          transform: translateX(-120%);
+          animation: social-shine 5.2s ease-in-out infinite;
+          opacity: 0.35;
+          pointer-events: none;
+        }
+        .portfolio-social:hover {
+          transform: translateY(-2px) scale(1.03);
+          border-color: rgba(255,200,80,0.4);
+          box-shadow: 0 18px 50px rgba(0,0,0,0.55), 0 0 20px rgba(255,200,80,0.15);
+        }
+        .portfolio-social--ig { color: #ffd1df; }
+        .portfolio-social--fb { color: #cfe0ff; }
+        .portfolio-social--tt { color: #d7f7ff; }
+        .portfolio-social--wa { color: #b7f7c8; border-color: rgba(56,189,116,0.35); }
+        @media (max-width: 640px) {
+          .portfolio-social {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+          }
+        }
+
         @keyframes rail-float {
           0%, 100% { transform: translateY(0) scale(1) rotate(var(--tilt, 0deg)); }
           50% { transform: translateY(-4px) scale(1.02) rotate(var(--tilt, 0deg)); }
@@ -939,6 +1108,16 @@ export default function Home() {
           0% { transform: translateX(-120%); }
           60% { transform: translateX(120%); }
           100% { transform: translateX(120%); }
+        }
+
+        @keyframes social-shine {
+          0% { transform: translateX(-120%); }
+          70% { transform: translateX(120%); }
+          100% { transform: translateX(120%); }
+        }
+        @keyframes vip-shine {
+          0%, 100% { opacity: 0.8; text-shadow: 0 0 18px rgba(255,210,130,0.45); }
+          50% { opacity: 1; text-shadow: 0 0 28px rgba(255,220,150,0.8); }
         }
       `}</style>
 
