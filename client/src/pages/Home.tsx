@@ -185,26 +185,21 @@ export default function Home() {
 
   const mobileGallery = useMemo(() => {
     if (!gallery.length) return [];
-    if (gallery.length <= 7) return gallery;
-    return gallery.slice(0, 7);
+    if (gallery.length <= 8) return gallery;
+    return gallery.slice(0, 8);
   }, [gallery]);
 
   const desktopGallery = useMemo(() => {
     if (!safeGallery.length) return [];
-    return safeGallery.slice(0, 10);
+    return safeGallery.slice(0, 5);
   }, [safeGallery]);
 
-  const desktopLayout = [
-    "md:col-span-2 md:row-span-2",
-    "md:col-span-1 md:row-span-1",
-    "md:col-span-1 md:row-span-1",
-    "md:col-span-1 md:row-span-2",
-    "md:col-span-1 md:row-span-1",
-    "md:col-span-1 md:row-span-1",
-    "md:col-span-2 md:row-span-1",
-    "md:col-span-1 md:row-span-1",
-    "md:col-span-1 md:row-span-1",
-    "md:col-span-2 md:row-span-1",
+  const collageLayout = [
+    "gallery-hero",
+    "gallery-tall",
+    "gallery-wide",
+    "gallery-stack",
+    "gallery-stack-2",
   ];
 
   const topTestimonials = useMemo(() => (testimonials ?? []).slice(0, 3), []);
@@ -427,17 +422,18 @@ export default function Home() {
 
           <div className="relative">
             <div className="md:hidden">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="gallery-rail">
                 {mobileGallery.map((img, i) => (
                   <MosaicCard
                     key={`m-${img.src}-${i}`}
                     img={img}
                     onClick={goPortfolio}
                     eager={i < 2}
-                    className={i % 5 === 0 ? "col-span-2 aspect-[16/9]" : "aspect-[4/5]"}
+                    className="gallery-slide aspect-[4/5]"
                   />
                 ))}
               </div>
+              <div className="gallery-hint">اسحب لمشاهدة المزيد</div>
 
               <div className="mt-5 flex justify-center">
                 <a
@@ -452,14 +448,14 @@ export default function Home() {
             </div>
 
             <div className="hidden md:block">
-              <div className="gallery-grid">
+              <div className="gallery-collage">
                 {desktopGallery.map((img, i) => (
                   <MosaicCard
                     key={`d-${img.src}-${i}`}
                     img={img}
                     onClick={goPortfolio}
                     eager={i < 2}
-                    className={["gallery-card h-full", desktopLayout[i] ?? ""].join(" ")}
+                    className={["gallery-card", collageLayout[i] ?? ""].join(" ")}
                   />
                 ))}
               </div>
@@ -639,35 +635,68 @@ export default function Home() {
           mix-blend-mode: screen;
         }
 
-        .gallery-grid {
+        .gallery-rail {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-auto-flow: column;
+          grid-auto-columns: minmax(72%, 1fr);
           gap: 14px;
+          overflow-x: auto;
+          padding: 6px 2px 10px;
+          scroll-snap-type: x mandatory;
+          scrollbar-width: none;
         }
-        @media (min-width: 768px) {
-          .gallery-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            grid-auto-rows: 150px;
-          }
-        }
-        @media (min-width: 1024px) {
-          .gallery-grid { grid-auto-rows: 180px; }
+        .gallery-rail::-webkit-scrollbar { display: none; }
+        .gallery-slide { scroll-snap-align: center; }
+        .gallery-hint {
+          text-align: center;
+          font-size: 11px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.55);
+          margin-top: 10px;
         }
 
+        .gallery-collage {
+          display: grid;
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+          grid-auto-rows: 34px;
+          gap: 14px;
+        }
+        @media (min-width: 1024px) {
+          .gallery-collage { grid-auto-rows: 38px; }
+        }
+
+        .gallery-hero { grid-column: 1 / span 7; grid-row: 1 / span 12; }
+        .gallery-tall { grid-column: 8 / span 5; grid-row: 1 / span 9; }
+        .gallery-wide { grid-column: 1 / span 6; grid-row: 13 / span 7; }
+        .gallery-stack { grid-column: 7 / span 6; grid-row: 10 / span 6; }
+        .gallery-stack-2 { grid-column: 7 / span 6; grid-row: 16 / span 5; }
+
         .gallery-card {
-          border-radius: 22px;
+          border-radius: 26px;
           box-shadow: 0 28px 90px rgba(0,0,0,0.48);
           background: rgba(10,10,10,0.55);
+          --tilt: 0deg;
         }
         .gallery-card::before {
           content:"";
           position:absolute;
-          inset: 12px;
+          inset: 10px;
           border: 1px solid rgba(255,255,255,0.08);
           pointer-events:none;
         }
-        .gallery-grid .mosaic-card:nth-child(3n) { transform: rotate(-0.4deg); }
-        .gallery-grid .mosaic-card:nth-child(4n) { transform: rotate(0.5deg); }
+        .gallery-card::after {
+          content:"";
+          position:absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.10), transparent 40%);
+          opacity: 0.45;
+          pointer-events:none;
+        }
+        .gallery-collage .gallery-card:nth-child(2) { --tilt: 0.6deg; }
+        .gallery-collage .gallery-card:nth-child(3) { --tilt: -0.5deg; }
+        .gallery-collage .gallery-card:nth-child(4) { --tilt: 0.4deg; }
+        .gallery-collage .gallery-card:nth-child(5) { --tilt: -0.3deg; }
 
         .mosaic-card {
           position: relative;
@@ -678,8 +707,9 @@ export default function Home() {
           background-color: rgba(255,255,255,0.02);
           box-shadow: 0 22px 70px rgba(0,0,0,0.45);
           transition: transform 240ms ease;
+          transform: rotate(var(--tilt, 0deg));
         }
-        .mosaic-card:hover { transform: translateY(-3px) scale(1.01); }
+        .mosaic-card:hover { transform: translateY(-3px) scale(1.01) rotate(var(--tilt, 0deg)); }
         .mosaic-img {
           width: 100%;
           height: 100%;
