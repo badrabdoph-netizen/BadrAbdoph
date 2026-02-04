@@ -163,6 +163,16 @@ function App() {
                 0 0 30px rgba(255,220,150,0.5),
                 0 0 70px rgba(255,210,130,0.3);
             }
+            @media (max-width: 768px) {
+              .wa-float {
+                right: auto;
+                left: 14px;
+                bottom: calc(env(safe-area-inset-bottom) + 16px);
+                width: 44px;
+                height: 44px;
+                border-radius: 14px;
+              }
+            }
             @keyframes wa-shine {
               0% { transform: translateX(-120%); }
               70% { transform: translateX(120%); }
