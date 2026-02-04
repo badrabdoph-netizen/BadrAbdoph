@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, Instagram, Facebook, Sparkles, Phone, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { navLinks, socialLinks, photographerInfo, ctaTexts, contactInfo } from "@/config/siteConfig";
+import { navLinks, socialLinks, ctaTexts, contactInfo } from "@/config/siteConfig";
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
@@ -77,11 +77,6 @@ export default function Navbar() {
     };
   }, [isOpen]);
 
-  const brandText = useMemo(() => {
-    const b = photographerInfo.brandName?.replace(".", "") ?? "BADR";
-    return `${b}.PH`;
-  }, []);
-
   const telHref = `tel:${(contactInfo?.phone ?? "").replace(/\s/g, "")}`;
 
   const waBookingHref = useMemo(() => buildWhatsAppHref("عايز احجز اوردر ❤️"), []);
@@ -105,12 +100,13 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-2xl md:text-3xl font-bold tracking-wider text-foreground hover:text-primary transition-colors flex items-center gap-2 tap-target"
+            className="text-2xl md:text-3xl font-bold tracking-wider text-foreground hover:text-primary transition-colors flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2 tap-target leading-tight"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
-            <span>{brandText.split(".")[0]}</span>
-            <span className="text-primary">.</span>
-            <span>PH</span>
+            <span>BADR ABDO</span>
+            <span className="text-primary text-sm md:text-base font-semibold tracking-[0.2em] uppercase">
+              Photograpy
+            </span>
             <span className="hidden md:inline-flex items-center gap-1 text-[10px] text-foreground/60 border border-white/10 px-2 py-1 ml-2">
               <Sparkles className="w-3 h-3 text-primary" />
               Luxury

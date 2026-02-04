@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Camera, Heart, Phone, Star, Sparkles, ZoomIn, ExternalLink } from "lucide-react";
+import { ArrowDown, ArrowLeft, Camera, Heart, Phone, Star, Sparkles, ZoomIn, ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import {
@@ -292,7 +292,12 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="mt-10 h-[1px] w-52 bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <div className="hero-divider" />
+            <div className="hero-arrow">
+              <ArrowDown className="w-4 h-4" />
+            </div>
+          </div>
         </div>
       </header>
 
@@ -583,6 +588,54 @@ export default function Home() {
       </section>
 
       <style>{`
+        .hero-divider {
+          width: 2px;
+          height: 72px;
+          background: linear-gradient(
+            to bottom,
+            transparent,
+            rgba(255,200,80,0.45),
+            rgba(255,200,80,0.15),
+            transparent
+          );
+          box-shadow: 0 0 18px rgba(255,200,80,0.25);
+          position: relative;
+        }
+        .hero-divider::after {
+          content: "";
+          position: absolute;
+          inset: -18px -10px;
+          background: radial-gradient(circle, rgba(255,220,140,0.35), transparent 60%);
+          opacity: 0.6;
+          animation: hero-pulse 2.8s ease-in-out infinite;
+          pointer-events: none;
+        }
+        .hero-arrow {
+          width: 34px;
+          height: 34px;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          color: rgba(255,220,150,0.9);
+          background: rgba(255,200,80,0.12);
+          border: 1px solid rgba(255,200,80,0.35);
+          box-shadow: 0 0 18px rgba(255,200,80,0.25);
+          animation: hero-bounce 2.1s ease-in-out infinite;
+        }
+        .hero-arrow svg {
+          filter: drop-shadow(0 0 10px rgba(255,200,80,0.55));
+        }
+
+        @keyframes hero-bounce {
+          0%, 100% { transform: translateY(0); opacity: 0.85; }
+          50% { transform: translateY(6px); opacity: 1; }
+        }
+        @keyframes hero-pulse {
+          0%, 100% { opacity: 0.35; }
+          50% { opacity: 0.75; }
+        }
+
         .hero-image { background-image: var(--hero-image); }
         @media (max-width: 640px) {
           .hero-image { background-image: var(--hero-image-mobile); }
