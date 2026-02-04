@@ -110,7 +110,7 @@ function App() {
               position: fixed;
               right: 16px;
               bottom: 16px;
-              z-index: 70;
+              z-index: 90;
               display: inline-flex;
               align-items: center;
               justify-content: center;
@@ -122,12 +122,17 @@ function App() {
                 linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
               color: rgba(247,228,191,0.95);
               border: 1px solid rgba(255,220,170,0.28);
-              box-shadow: 0 16px 40px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.18);
+              box-shadow:
+                0 16px 40px rgba(0,0,0,0.35),
+                inset 0 0 0 1px rgba(255,255,255,0.18),
+                0 0 22px rgba(255,210,130,0.35),
+                0 0 60px rgba(255,210,130,0.22);
               position: relative;
               overflow: hidden;
               backdrop-filter: blur(12px) saturate(130%);
               -webkit-backdrop-filter: blur(12px) saturate(130%);
               transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+              animation: wa-pulse 3.2s ease-in-out infinite;
             }
             .wa-float::before {
               content: "";
@@ -136,19 +141,40 @@ function App() {
               border-radius: inherit;
               background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 45%, transparent 70%);
               transform: translateX(-120%);
-              animation: wa-shine 7.5s ease-in-out infinite;
-              opacity: 0.25;
+              animation: wa-shine 5.2s ease-in-out infinite;
+              opacity: 0.45;
               pointer-events: none;
+            }
+            .wa-float::after {
+              content: "";
+              position: absolute;
+              inset: -6px;
+              border-radius: 18px;
+              box-shadow: 0 0 26px rgba(255,220,150,0.45), 0 0 60px rgba(255,210,130,0.25);
+              opacity: 0.6;
+              pointer-events: none;
+              animation: wa-halo 3.4s ease-in-out infinite;
             }
             .wa-float:hover {
               transform: translateY(-1px);
               border-color: rgba(255,220,170,0.45);
-              box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+              box-shadow:
+                0 18px 50px rgba(0,0,0,0.45),
+                0 0 30px rgba(255,220,150,0.5),
+                0 0 70px rgba(255,210,130,0.3);
             }
             @keyframes wa-shine {
               0% { transform: translateX(-120%); }
               70% { transform: translateX(120%); }
               100% { transform: translateX(120%); }
+            }
+            @keyframes wa-pulse {
+              0%, 100% { transform: translateY(0) scale(1); }
+              50% { transform: translateY(-1px) scale(1.03); }
+            }
+            @keyframes wa-halo {
+              0%, 100% { opacity: 0.45; }
+              50% { opacity: 0.85; }
             }
           `}</style>
         </div>
