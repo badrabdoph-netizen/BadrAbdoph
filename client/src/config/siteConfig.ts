@@ -97,27 +97,28 @@ export const homeServicesPreview = [
 // صور الموقع
 // =====================================================
 export const siteImages = {
-  heroImage: "/images/hero-1.jpg",
-  heroImage2: "/images/hero-2.webp",
-  aboutImage: "/images/portrait-1.jpg",
+  heroImage: "/images/opt/hero-1.jpg",
+  heroImageMobile: "/images/opt/hero-1-mobile.jpg",
+  heroImage2: "/images/opt/hero-2.jpg",
+  aboutImage: "/images/opt/portrait-1.jpg",
 
   portfolioPreview: [
-    { src: "/images/wedding-1.jpg", title: "لحظات الزفاف" },
-    { src: "/images/outdoor-1.jpg", title: "جلسات خارجية" },
-    { src: "/images/bw-1.jpg", title: "بورتريه كلاسيكي" },
-    { src: "/images/golden-1.jpg", title: "ساعة ذهبية" },
-    { src: "/images/wedding-2.jpg", title: "تفاصيل دقيقة" },
+    { src: "/images/opt/wedding-1.jpg", title: "لحظات الزفاف" },
+    { src: "/images/opt/outdoor-1.jpg", title: "جلسات خارجية" },
+    { src: "/images/opt/bw-1.jpg", title: "بورتريه كلاسيكي" },
+    { src: "/images/opt/golden-1.jpg", title: "ساعة ذهبية" },
+    { src: "/images/opt/wedding-2.jpg", title: "تفاصيل دقيقة" },
   ],
 
   portfolioGallery: [
-    { src: "/images/wedding-1.jpg", category: "wedding", title: "لحظة الزفاف" },
-    { src: "/images/wedding-2.jpg", category: "wedding", title: "تفاصيل الفرح" },
-    { src: "/images/outdoor-1.jpg", category: "outdoor", title: "جلسة خارجية" },
-    { src: "/images/bw-1.jpg", category: "portrait", title: "بورتريه أبيض وأسود" },
-    { src: "/images/golden-1.jpg", category: "outdoor", title: "الساعة الذهبية" },
-    { src: "/images/portrait-1.jpg", category: "portrait", title: "بورتريه فني" },
-    { src: "/images/hero-1.jpg", category: "wedding", title: "لحظة رومانسية" },
-    { src: "/images/hero-2.webp", category: "outdoor", title: "جلسة مميزة" },
+    { src: "/images/opt/wedding-1.jpg", category: "wedding", title: "لحظة الزفاف" },
+    { src: "/images/opt/wedding-2.jpg", category: "wedding", title: "تفاصيل الفرح" },
+    { src: "/images/opt/outdoor-1.jpg", category: "outdoor", title: "جلسة خارجية" },
+    { src: "/images/opt/bw-1.jpg", category: "portrait", title: "بورتريه أبيض وأسود" },
+    { src: "/images/opt/golden-1.jpg", category: "outdoor", title: "الساعة الذهبية" },
+    { src: "/images/opt/portrait-1.jpg", category: "portrait", title: "بورتريه فني" },
+    { src: "/images/opt/hero-1.jpg", category: "wedding", title: "لحظة رومانسية" },
+    { src: "/images/opt/hero-2.jpg", category: "outdoor", title: "جلسة مميزة" },
   ],
 };
 
