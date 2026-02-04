@@ -726,6 +726,11 @@ export default function Home() {
           background: radial-gradient(circle at 30% 20%, rgba(255,200,80,0.22), transparent 60%);
           mix-blend-mode: screen;
         }
+
+        .gallery-collage .gallery-card {
+          border-radius: 26px;
+          box-shadow: 0 28px 90px rgba(0,0,0,0.48);
+        }
       `}</style>
 
       <div className="md:hidden" style={{ height: "86px" }} />
