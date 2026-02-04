@@ -193,10 +193,10 @@ export default function Navbar() {
             {telHref && telHref !== "tel:" ? (
               <a
                 href={telHref}
-                className="w-11 h-11 border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-foreground hover:text-primary transition-colors tap-target"
+                className="social-orb social-orb--phone tap-target"
                 aria-label="Call"
               >
-                <Phone size={20} />
+                <Phone size={18} />
               </a>
             ) : null}
 
