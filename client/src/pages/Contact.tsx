@@ -25,6 +25,7 @@ import {
   sessionPackages,
   sessionPackagesWithPrints,
   weddingPackages,
+  additionalServices,
 } from "@/config/siteConfig";
 
 const formSchema = z.object({
@@ -92,6 +93,23 @@ export default function Contact() {
       ...map(sessionPackagesWithPrints as any),
       ...map(weddingPackages as any),
     ];
+  }, []);
+
+  const addonOptions = useMemo(() => {
+    const list = (additionalServices ?? []) as Array<{
+      id: string;
+      name: string;
+      price: string;
+      emoji?: string;
+      priceNote?: string;
+    }>;
+    return list.map((a) => ({
+      id: a.id,
+      label: a.name,
+      price: a.price,
+      emoji: a.emoji,
+      priceNote: a.priceNote,
+    }));
   }, []);
 
   const watchedName = useWatch({ control: form.control, name: "name" }) ?? "";
@@ -299,6 +317,35 @@ export default function Contact() {
                       placeholder="سيظهر السعر تلقائياً"
                       className="bg-background border-white/10 focus:border-primary h-12 text-right"
                     />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label>الإضافات المتاحة</Label>
+                    <div className="rounded-md border border-white/10 bg-background/60 p-3 space-y-2">
+                      {addonOptions.length ? (
+                        addonOptions.map((opt) => (
+                          <div key={opt.id} className="space-y-1">
+                            <div className="flex items-center justify-between gap-3 text-sm">
+                              <div className="flex items-center gap-2">
+                                {opt.emoji ? <span className="text-base">{opt.emoji}</span> : null}
+                                <span>{opt.label}</span>
+                              </div>
+                              <span className="text-xs text-muted-foreground">{opt.price}</span>
+                            </div>
+                            {opt.priceNote ? (
+                              <div className="text-[11px] text-muted-foreground/70 pr-6">
+                                {opt.priceNote}
+                              </div>
+                            ) : null}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-sm text-muted-foreground">لا توجد إضافات حالياً.</div>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground/70">
+                      هذه الإضافات للعرض فقط، ويتم تأكيدها لاحقًا عبر واتساب.
+                    </p>
                   </div>
 
                   <div className="rounded-md border border-white/10 bg-background/60 p-4 relative">
