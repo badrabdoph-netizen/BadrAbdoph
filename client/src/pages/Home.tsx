@@ -291,7 +291,7 @@ export default function Home() {
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mb-10 font-light leading-relaxed">
-            {content.heroDescription || homeHero?.subTextAr ?? photographerInfo.descriptionAr}
+            {content.heroDescription || homeHero?.subTextAr || photographerInfo.descriptionAr}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
