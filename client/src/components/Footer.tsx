@@ -50,9 +50,6 @@ export default function Footer() {
               <h3 className="text-xl md:text-2xl font-bold mt-3">
                 جاهز نبدأ؟ ابعت التفاصيل وهنرتب كل حاجة
               </h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                مناسب جدًا للموبايل… خطوة واحدة وتوصلنا.
-              </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -81,8 +78,6 @@ export default function Footer() {
           <div className="text-center md:text-right">
             <div className="text-2xl font-bold tracking-wider">
               <span className="text-foreground">{photographerInfo.brandName ?? photographerInfo.name}</span>
-              <span className="text-primary">.</span>
-              <span className="text-foreground">PH</span>
             </div>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
               {photographerInfo.descriptionAr ??

@@ -10,6 +10,7 @@ import {
   ZoomIn,
   Instagram,
   Facebook,
+  ArrowDownRight,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -400,15 +401,15 @@ export default function Home() {
             <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">الخدمات</h3>
             <h2 className="text-4xl md:text-5xl font-bold">باقات التصوير</h2>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto leading-relaxed">
-              اختار الباقة المناسبة… وكلها بتتعمل بنفس الجودة والاهتمام بالتفاصيل.
+              كلها بتتعمل بنفس الجودة والاهتمام بالتفاصيل لأن التزامي في المواعيد وجودة التسليم جزء من شغلي، مش ميزة إضافية.
             </p>
             <div className="mt-6 flex justify-center">
               <Link href="/services">
                 <Button
                   variant="outline"
-                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-10 py-4 cta-glow"
+                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-12 py-5 text-lg cta-glow"
                 >
-                  {homeHero?.secondaryCta ?? "عرض التفاصيل والأسعار"}
+                  شوف الباقات <ArrowDownRight className="w-4 h-4 cta-icon" />
                 </Button>
               </Link>
             </div>
@@ -418,17 +419,18 @@ export default function Home() {
             {homeServicesPreview.map((card, idx) => {
               const featured = !!card.featured;
               const tone = ["tone-amber", "tone-rose", "tone-emerald"][idx % 3];
-              const meta = [
-                { label: "جلسات تصوير", icon: <Camera size={14} /> },
-                { label: "باقات زفاف", icon: <CoupleIcon className="w-4 h-4" /> },
-                { label: "VIP تجربة", icon: <Sparkles size={14} /> },
+              const titleIcon = [
+                <Camera key="cam" size={15} />,
+                <CoupleIcon key="couple" className="w-4 h-4" />,
+                <Sparkles key="spark" size={15} />,
               ][idx % 3];
+              const isSignature = card.id === "home-service-sessions";
 
               return (
                 <div
                   key={card.id}
                   className={[
-                    "relative overflow-hidden group transition-all duration-300 package-card",
+                    "relative overflow-hidden group transition-all duration-300 package-card flex flex-col",
                     "bg-card p-8 border rounded-2xl",
                     featured
                       ? "border-primary/30 shadow-2xl shadow-black/50 md:-translate-y-4"
@@ -452,46 +454,54 @@ export default function Home() {
 
                   {card.vipLabel ? <div className="vip-label">{card.vipLabel}</div> : null}
 
-                  <div className={featured ? "" : "group-hover:scale-110 transition-transform duration-300"}>
-                    <ServiceIcon title={card.title} />
-                  </div>
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className={featured ? "" : "group-hover:scale-110 transition-transform duration-300"}>
+                      <ServiceIcon title={card.title} />
+                    </div>
 
-                  <h3 className="text-2xl font-bold mb-3">{card.title}</h3>
-                  <div className="card-meta">
-                    <span className="card-meta-icon">{meta.icon}</span>
-                    <span>{meta.label}</span>
-                  </div>
-                  <div className="card-fade">
-                    <p className="text-muted-foreground mb-4 leading-relaxed text-sm md:text-base">
-                      {card.description}
-                    </p>
+                    <h3 className="card-title-chip">
+                      <span className="title-icon">{titleIcon}</span>
+                      <span>{card.title}</span>
+                    </h3>
 
-                  <ul className="text-sm text-muted-foreground space-y-2 pb-2">
-                    {card.bullets.map((b, bIdx) => (
-                      <li key={`${card.id}-b-${bIdx}`} className="flex items-start">
-                        <Check size={15} className="ml-2 mt-1 text-primary" />
-                        <span>{b}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  </div>
-
-                  <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6" />
-
-                  <div className="flex items-center justify-between gap-4">
-                    <Link href="/services">
-                      <Button
-                        variant={featured ? "default" : "outline"}
+                    <div className="card-fade">
+                      <p
                         className={[
-                          "rounded-none px-7 cta-glow",
-                          featured
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                            : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
+                          "text-muted-foreground mb-3 leading-relaxed text-sm md:text-base",
+                          isSignature ? "card-desc--glow" : "",
                         ].join(" ")}
                       >
-                        عرض التفاصيل
-                      </Button>
-                    </Link>
+                        {card.description}
+                      </p>
+                      {card.note ? <div className="card-note">{card.note}</div> : null}
+
+                      <ul className="text-sm text-muted-foreground space-y-2 pb-2">
+                        {card.bullets.map((b, bIdx) => (
+                          <li key={`${card.id}-b-${bIdx}`} className="flex items-start">
+                            <Check size={15} className="ml-2 mt-1 text-primary" />
+                            <span>{b}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6 mt-auto" />
+
+                    <div className="flex items-center justify-between gap-4">
+                      <Link href="/services">
+                        <Button
+                          variant={featured ? "default" : "outline"}
+                          className={[
+                            "rounded-none px-7 cta-glow",
+                            featured
+                              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                              : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
+                          ].join(" ")}
+                        >
+                          عرض التفاصيل
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );
@@ -615,7 +625,7 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_35%_25%,rgba(255,200,80,0.12),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">المعرض</h3>
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">شوف تصوير بالكولتي الكامله</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">شوف تصوير بالكوالتي الكاملة</h2>
 
           <a
             href={externalPortfolioUrl}
@@ -852,6 +862,11 @@ export default function Home() {
         .cta-glow:hover {
           box-shadow: 0 0 0 1px rgba(255, 200, 80, 0.35) inset, 0 24px 80px rgba(255, 200, 80, 0.2);
         }
+        .cta-icon {
+          margin-left: 8px;
+          filter: drop-shadow(0 0 10px rgba(255,210,130,0.55));
+          animation: cta-icon-pulse 2.6s ease-in-out infinite;
+        }
 
         .hero-image { background-image: var(--hero-image); }
         @media (max-width: 640px) {
@@ -886,43 +901,69 @@ export default function Home() {
 
         .package-card {
           background:
-            linear-gradient(160deg, rgba(18,18,24,0.95), rgba(7,7,10,0.98)),
-            radial-gradient(circle at 15% 10%, rgba(255,210,120,0.08), transparent 50%);
-          box-shadow: 0 25px 80px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,210,120,0.18) inset;
-          border-color: rgba(255,210,120,0.22);
-          backdrop-filter: blur(16px) saturate(120%);
-          -webkit-backdrop-filter: blur(16px) saturate(120%);
+            linear-gradient(150deg, rgba(22,22,30,0.96), rgba(8,8,12,0.98)),
+            radial-gradient(circle at 20% 15%, rgba(255,245,220,0.10), transparent 55%);
+          box-shadow: 0 28px 90px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,220,170,0.2) inset;
+          border-color: rgba(255,225,190,0.2);
+          backdrop-filter: blur(18px) saturate(130%);
+          -webkit-backdrop-filter: blur(18px) saturate(130%);
         }
         .package-card .card-glow {
           animation: glow-drift 6s ease-in-out infinite;
         }
 
-        .card-meta {
+        .card-title-chip {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          padding: 6px 14px;
+          gap: 10px;
+          padding: 10px 18px;
           border-radius: 999px;
-          border: 1px solid rgba(255,210,120,0.25);
+          border: 1px solid rgba(255,225,190,0.35);
           background: rgba(12,12,16,0.6);
-          color: rgba(255,230,190,0.9);
-          font-size: 11px;
-          letter-spacing: 0.18em;
+          color: #fff2d6;
+          font-size: 18px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           margin-bottom: 14px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+          box-shadow: 0 14px 40px rgba(0,0,0,0.4), inset 0 0 18px rgba(255,230,190,0.15);
+          position: relative;
+          overflow: hidden;
         }
-        .card-meta-icon {
-          width: 22px;
-          height: 22px;
+        .card-title-chip::after {
+          content: "";
+          position: absolute;
+          inset: -40% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 72%);
+          transform: translateX(-120%);
+          animation: social-shine 6s ease-in-out infinite;
+          opacity: 0.35;
+          pointer-events: none;
+        }
+        .title-icon {
+          width: 26px;
+          height: 26px;
           border-radius: 999px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid rgba(255,210,120,0.3);
-          background: rgba(255,210,120,0.12);
-          color: #f8e5bf;
-          box-shadow: inset 0 0 12px rgba(255,210,120,0.2);
+          border: 1px solid rgba(255,225,190,0.4);
+          background: rgba(255,225,190,0.12);
+          color: #fff3d6;
+          box-shadow: inset 0 0 14px rgba(255,225,190,0.2);
+        }
+        .card-desc--glow {
+          color: rgba(255,245,220,0.92);
+          text-shadow: 0 0 14px rgba(255,220,170,0.35);
+          font-weight: 600;
+        }
+        .card-note {
+          font-size: 11px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(255,235,200,0.85);
+          text-shadow: 0 0 12px rgba(255,220,170,0.35);
+          margin-bottom: 12px;
         }
 
         .about-subtitle {
@@ -987,13 +1028,13 @@ export default function Home() {
 
         .card-fade {
           position: relative;
-          max-height: 240px;
+          max-height: 280px;
           overflow: hidden;
           mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0));
           -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0));
         }
         @media (min-width: 768px) {
-          .card-fade { max-height: 260px; }
+          .card-fade { max-height: 300px; }
         }
 
         .vip-label {
@@ -1244,6 +1285,10 @@ export default function Home() {
           0% { transform: translateX(-120%); }
           60% { transform: translateX(120%); }
           100% { transform: translateX(120%); }
+        }
+        @keyframes cta-icon-pulse {
+          0%, 100% { transform: translateY(0); opacity: 0.7; }
+          50% { transform: translateY(2px); opacity: 1; }
         }
 
         @keyframes social-shine {

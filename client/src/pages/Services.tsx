@@ -85,16 +85,18 @@ function SectionHeader({
   title,
   subtitle,
   icon,
+  subtitleClassName,
 }: {
   title: string;
   subtitle?: string;
   icon?: React.ReactNode;
+  subtitleClassName?: string;
 }) {
   return (
     <div className="text-center mb-10">
       <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/10 bg-black/20 backdrop-blur-md mb-4">
         {icon}
-        <span className="text-xs md:text-sm text-foreground/80">
+        <span className={["text-xs md:text-sm text-foreground/80", subtitleClassName ?? ""].join(" ")}>
           {subtitle ?? "تفاصيل واضحة • جودة ثابتة • ستايل فاخر"}
         </span>
       </div>
@@ -131,6 +133,8 @@ function PackageCard({
   const vip = kind === "wedding" && isVipPlus(pkg);
   const popular = !!pkg.popular;
   const isCustom = pkg.id === "special-montage-design";
+  const isPro = pkg.id === "session-2";
+  const customDescription = (pkg.description ?? "").trim();
 
   const Icon =
     kind === "wedding" || kind === "prints" ? (
@@ -150,15 +154,15 @@ function PackageCard({
         isCustom ? "custom-package" : "",
         vip
           ? "border-primary/45 shadow-[0_0_70px_rgba(255,200,80,0.12)] hover:shadow-[0_0_95px_rgba(255,200,80,0.18)] hover:-translate-y-2"
-          : popular
-          ? "border-primary/25 shadow-lg shadow-primary/10 hover:-translate-y-2"
+          : popular || isPro
+          ? "border-primary/30 shadow-lg shadow-primary/15 hover:-translate-y-2"
           : "border-white/10 hover:border-primary/35 hover:-translate-y-2 hover:shadow-[0_25px_80px_rgba(0,0,0,0.55)]",
       ].join(" ")}
     >
       <div
         className={[
           "absolute inset-0 pointer-events-none transition-opacity duration-300",
-          vip || popular ? "opacity-40" : "opacity-0 group-hover:opacity-100",
+          vip || popular || isPro ? "opacity-40" : "opacity-0 group-hover:opacity-100",
           "bg-[radial-gradient(circle_at_30%_20%,rgba(255,200,80,0.14),transparent_60%)]",
         ].join(" ")}
       />
@@ -179,14 +183,17 @@ function PackageCard({
                     VIP PLUS
                   </span>
                 )}
-                {popular && !vip && (
+                {pkg.badge && !vip ? (
+                  <span className="pro-badge">{pkg.badge}</span>
+                ) : null}
+                {popular && !vip && !pkg.badge ? (
                   <span className="inline-flex items-center justify-center px-2.5 py-1 text-[10px] md:text-xs font-semibold rounded-full border border-white/15 text-foreground/90 bg-white/5 shadow-[0_10px_24px_rgba(0,0,0,0.25)] backdrop-blur-sm relative md:-translate-y-[1px]">
                     الأكثر طلباً
                   </span>
-                )}
+                ) : null}
               </div>
               {isCustom ? (
-                <div className="custom-line">{pkg.description}</div>
+                customDescription ? <div className="custom-line">{customDescription}</div> : null
               ) : (
                 <p className="text-xs md:text-sm text-muted-foreground mt-1">{pkg.description}</p>
               )}
@@ -214,6 +221,10 @@ function PackageCard({
           </ul>
         ) : null}
 
+        {isPro ? (
+          <div className="pro-note">MEDIA COVERAGE REELS & TIKTOK (مصور خاص)</div>
+        ) : null}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <PrimaryCTA whatsappNumber={whatsappNumber} />
 
@@ -228,8 +239,8 @@ function PackageCard({
         </div>
 
         {vip && (
-          <div className="mt-5 text-xs text-muted-foreground/80">
-            * VIP Plus يتم تسعيره حسب تفاصيل اليوم والمكان وعدد ساعات التغطية.
+          <div className="mt-5 text-xs vip-note">
+            * تسعير VIP Plus بيتم تحديده حسب تفاصيل اليوم والمكان وعدد ساعات التغطية.
           </div>
         )}
       </div>
@@ -245,7 +256,7 @@ function QuickNav({
   onJump: (id: string) => void;
 }) {
   const items = [
-    { id: "sessions", label: "جلسات" },
+    { id: "sessions", label: "سيشن" },
     { id: "prints", label: "جلسات + مطبوعات" },
     { id: "wedding", label: "Full Day" },
     { id: "addons", label: "إضافات" },
@@ -399,7 +410,7 @@ export default function Services() {
         </div>
       </div>
 
-      <header className="pt-28 md:pt-36 pb-16 relative overflow-hidden">
+      <header className="pt-28 md:pt-32 pb-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-background/35 to-background" />
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="absolute inset-0 pointer-events-none hero-grain opacity-[0.10]" />
@@ -415,13 +426,9 @@ export default function Services() {
           <h1 className="text-4xl md:text-7xl font-bold mb-5 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {pageTexts.services.title}
           </h1>
-          <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed">
+          <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed services-subtitle-glow">
             {pageTexts.services.subtitle}
           </p>
-
-          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-            <PrimaryCTA whatsappNumber={contactInfo.whatsappNumber} />
-          </div>
         </div>
       </header>
 
@@ -431,7 +438,8 @@ export default function Services() {
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.sessionsTitle}
-            subtitle="جلسات رايقة • إضاءة حلوة • تفاصيل متظبطة"
+            subtitle="اختيار موفق - نفس الجودة"
+            subtitleClassName="section-subtitle-glow"
             icon={<Camera className="w-4 h-4 text-primary" />}
           />
 
@@ -536,6 +544,7 @@ export default function Services() {
           </div>
 
           <div className="text-center text-muted-foreground mt-10 text-sm leading-relaxed space-y-2">
+            <div>اطمئن التزامي في المواعيد وجودة التسليم جزء من شغلي، مش ميزة إضافية.</div>
             <div>* الأسعار قد تختلف حسب الموقع والتفاصيل الإضافية. غير شامل رسوم اللوكيشن.</div>
             <div>حجز اليوم بالأسبقية — Full Day لو اليوم محجوز لعريس تاني قبلك بنعتذر.</div>
             <div>الحجز يتم بتأكيد على واتساب + ديبوزيت تأكيد.</div>
@@ -574,6 +583,45 @@ export default function Services() {
           pointer-events: none;
         }
         .premium-border:hover::after { opacity: 1; }
+
+        .services-subtitle-glow {
+          color: rgba(255,245,220,0.9);
+          text-shadow: 0 0 16px rgba(255,210,130,0.45);
+        }
+        .section-subtitle-glow {
+          color: rgba(255,235,200,0.95);
+          text-shadow: 0 0 14px rgba(255,210,130,0.45);
+          letter-spacing: 0.08em;
+        }
+        .pro-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,210,120,0.6);
+          background: linear-gradient(120deg, rgba(255,210,120,0.4), rgba(255,255,255,0.08));
+          color: #fff4d5;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          text-shadow: 0 0 14px rgba(255,210,130,0.7);
+          box-shadow: 0 10px 30px rgba(255,200,80,0.2);
+        }
+        .pro-note {
+          margin-top: -8px;
+          margin-bottom: 18px;
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: rgba(255,235,200,0.9);
+          text-shadow: 0 0 14px rgba(255,210,130,0.45);
+        }
+        .vip-note {
+          color: rgba(255,235,200,0.95);
+          text-shadow: 0 0 14px rgba(255,210,130,0.5);
+        }
 
         .custom-package {
           background:

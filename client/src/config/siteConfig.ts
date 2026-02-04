@@ -11,11 +11,11 @@ export const externalPortfolioUrl = "https://badrabdoph.pixells.co";
 // =====================================================
 export const photographerInfo = {
   name: "Badr Bado",
-  brandName: "BADR.PH",
-  title: "Wedding Photography",
+  brandName: "BADR ABDO PH",
+  title: "صديقك بدر",
   taglineAr: "توثيق المشاعر واللحظات الحقيقية",
   descriptionAr:
-    "أسلوب سينمائي فاخر يخلد ذكرياتكم للأبد. نروي قصة حبكم من خلال عدسة فنية تلتقط أدق التفاصيل.",
+    "النتيجة اللي بسلمها دايمًا أعلى من المتوقع.",
 };
 
 // =====================================================
@@ -59,7 +59,7 @@ export const homeHero = {
   },
   subTextAr: photographerInfo.descriptionAr,
   primaryCta: "احجز جلستك",
-  secondaryCta: "عرض التفاصيل والأسعار",
+  secondaryCta: "شوف الباقات",
 };
 
 // =====================================================
@@ -68,15 +68,15 @@ export const homeHero = {
 export const homeServicesPreview = [
   {
     id: "home-service-sessions",
-    title: "جلسات التصوير",
+    title: "جلسات تصوير",
     description:
-      "جلسات تصوير خارجية للعروسين في أماكن مميزة، مع التركيز على الإضاءة الطبيعية والمشاعر العفوية.",
+      "كل صورة ليها توقيع خاص",
+    note: "مصور يعكس شخصيتك",
     bullets: [
       "عدد غير محدود من الصور",
-      "MEDIA COVERAGE REELS & TIKTOK",
       "تنظيم ريلز واستوريهات السوشيال ميديا",
-      "PROMO VIDEO [مصور خاص]",
-      "تصوير حفل الزفاف",
+      "تصوير حفل الزفاف في القاعة",
+      "أولوية تسليم سريع",
       "وقت مفتوح",
     ],
     featured: false,
@@ -86,6 +86,7 @@ export const homeServicesPreview = [
     title: "باقات زفاف",
     description:
       "مطبوعات متنوعة وألبومات فاخرة مطبوعة مع فريق مصورين احترافي.",
+    note: "",
     bullets: [
       "مطبوعات متنوعة",
       "ألبومات فاخرة مطبوعة",
@@ -99,6 +100,7 @@ export const homeServicesPreview = [
     title: "تصوير اليوم الكامل (VIP Plus)",
     description:
       "تجربة أقوى وتغطية أوسع + مفاجآت أثناء الفرح.",
+    note: "",
     bullets: [
       "فريق محترف (4–5 مصورين) لتغطية كاملة",
       "تصوير فوتوغرافي غير محدود + وقت مفتوح",
@@ -187,24 +189,24 @@ export const sessionPackages = [
     id: "session-1",
     name: "باكدج 1",
     price: "1500",
-    description: "جلسة تصوير فقط",
+    description: "سيشن1",
     features: ["عدد غير محدود من الصور", "شامل REELS & TIKTOK", "وقت محدد"],
     popular: false,
   },
   {
     id: "session-2",
-    name: "باكدج 2",
-    price: "VIP",
-    description: "جلسة تصوير VIP",
+    name: "سيشن برو",
+    price: "4000",
+    description: "سيشن PRO",
+    badge: "PRO",
     features: [
       "عدد غير محدود من الصور",
-      "MEDIA COVERAGE REELS & TIKTOK",
       "تنظيم ريلز واستوريهات السوشيال ميديا",
-      "PROMO VIDEO [مصور خاص]",
-      "تصوير حفل الزفاف",
+      "تصوير حفل الزفاف في القاعة",
+      "أولوية تسليم سريع",
       "وقت مفتوح",
     ],
-    popular: true,
+    popular: false,
   },
 ];
 
@@ -242,9 +244,9 @@ export const sessionPackagesWithPrints = [
   },
   {
     id: "special-montage-design",
-    name: "تصميم بامدج متنوع خاص",
-    price: "اتصل للسعر",
-    description: "خصص باقتك حسب زوقك واختار ال يناسبك وحنا نجمعه",
+    name: "خصص باقتك حسب ذوقك واختار اللي يناسبك",
+    price: "أنت من تحدد السعر لنفسك",
+    description: "",
     features: [],
     popular: false,
   },
@@ -336,8 +338,8 @@ export const pageTexts = {
   },
   services: {
     title: "الخدمات والباقات",
-    subtitle: "باقات تصوير متنوعة تناسب جميع المناسبات",
-    sessionsTitle: "جلسات التصوير",
+    subtitle: "اختار الباقة المناسبة… وكلها بتتعمل بنفس الجودة والاهتمام بالتفاصيل",
+    sessionsTitle: "سيشن",
     sessionsWithPrintsTitle: "جلسات التصوير شامل المطبوعات",
     weddingTitle: "Full Day",
     addonsTitle: "خدمات إضافية (اختياري)",
