@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,117 +24,15 @@ import {
   Loader2,
   LayoutGrid,
   Home,
-  LogOut,
-  Lock,
   Monitor,
 } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Admin() {
-  const { user, loading: authLoading, isAuthenticated, logout, refresh } = useAuth();
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const loginMutation = trpc.auth.passwordLogin.useMutation({
-    onSuccess: async () => {
-      toast.success("تم تسجيل الدخول");
-      await refresh();
-    },
-    onError: (error) => toast.error(error.message),
-  });
-  
-  // Check if user is admin
-  const isAdmin = user?.role === "admin";
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4" dir="rtl">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">لوحة التحكم</CardTitle>
-            <CardDescription>أدخل كلمة المرور للوصول إلى لوحة التحكم</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form
-              className="space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!password) {
-                  toast.error("أدخل كلمة المرور");
-                  return;
-                }
-                loginMutation.mutate({ password });
-              }}
-            >
-              <div className="space-y-2">
-                <Label>كلمة المرور</Label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
-                    aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-              <Button className="w-full" size="lg" disabled={loginMutation.isPending}>
-                {loginMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin ml-2" />
-                ) : (
-                  <Lock className="w-4 h-4 ml-2" />
-                )}
-                دخول لوحة التحكم
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4" dir="rtl">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-destructive">غير مصرح</CardTitle>
-            <CardDescription>ليس لديك صلاحية للوصول إلى لوحة التحكم</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-center text-muted-foreground">
-              هذه الصفحة متاحة فقط لصاحب الموقع.
-            </p>
-            <Link href="/">
-              <Button variant="outline" className="w-full">
-                العودة للصفحة الرئيسية
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  return <AdminDashboard user={user} logout={logout} />;
+  return <AdminDashboard />;
 }
 
-function AdminDashboard({ user, logout }: { user: any; logout: () => void }) {
+function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("portfolio");
 
   return (
@@ -145,7 +42,7 @@ function AdminDashboard({ user, logout }: { user: any; logout: () => void }) {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-bold">لوحة التحكم</h1>
-            <span className="text-sm text-muted-foreground">مرحباً، {user?.name || "المسؤول"}</span>
+            <span className="text-sm text-muted-foreground">مرحباً، المدير</span>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/">
@@ -154,10 +51,6 @@ function AdminDashboard({ user, logout }: { user: any; logout: () => void }) {
                 الموقع
               </Button>
             </Link>
-            <Button variant="ghost" size="sm" onClick={logout}>
-              <LogOut className="w-4 h-4 ml-2" />
-              خروج
-            </Button>
           </div>
         </div>
       </header>
