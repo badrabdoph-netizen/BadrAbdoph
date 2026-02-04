@@ -348,11 +348,19 @@ export default function Home() {
                   </div>
 
                   <h3 className="text-2xl font-bold mb-4">{card.title}</h3>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">{card.description}</p>
+                  <p className="text-muted-foreground mb-5 md:mb-6 leading-relaxed text-sm md:text-base line-clamp-3 md:line-clamp-none">
+                    {card.description}
+                  </p>
 
-                  <ul className="text-sm text-muted-foreground space-y-2 mb-8">
+                  <ul className="text-sm text-muted-foreground space-y-2 mb-6 md:mb-8">
                     {card.bullets.map((b, idx) => (
-                      <li key={`${card.id}-b-${idx}`} className="flex items-center">
+                      <li
+                        key={`${card.id}-b-${idx}`}
+                        className={[
+                          "items-center",
+                          idx > 1 ? "hidden md:flex" : "flex",
+                        ].join(" ")}
+                      >
                         <Star size={14} className="ml-2 text-primary" />
                         {b}
                       </li>
