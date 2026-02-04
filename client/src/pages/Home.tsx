@@ -225,7 +225,7 @@ export default function Home() {
       <Navbar />
 
       {/* HERO */}
-      <header className="relative min-h-[86vh] md:h-screen w-full overflow-hidden flex items-center justify-center">
+      <header className="relative min-h-[86vh] md:h-screen w-full overflow-hidden flex items-center justify-center pt-[calc(var(--nav-offset,96px)+12px)]">
         <div
           ref={heroRef}
           className="absolute inset-0 w-full h-[120%] bg-cover bg-center z-0 will-change-transform hero-image"
