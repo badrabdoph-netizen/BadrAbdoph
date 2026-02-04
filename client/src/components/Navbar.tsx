@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, Instagram, Facebook, Sparkles, Phone, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { navLinks, socialLinks, ctaTexts, contactInfo } from "@/config/siteConfig";
+import { navLinks, socialLinks, photographerInfo, ctaTexts, contactInfo } from "@/config/siteConfig";
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
