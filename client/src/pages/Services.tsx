@@ -11,6 +11,7 @@ import {
   PlusCircle,
   ArrowLeft,
   Phone,
+  Gift,
 } from "lucide-react";
 import {
   sessionPackages,
@@ -352,6 +353,18 @@ export default function Services() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
+      <div className="border-y border-primary/20 bg-[linear-gradient(90deg,rgba(255,200,80,0.16),rgba(255,200,80,0.05),transparent)]">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-center gap-2 text-sm text-foreground/90">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 px-3 py-1 text-[11px] font-semibold tracking-wide text-primary">
+              <Gift className="w-4 h-4" />
+              هديّة
+            </span>
+            <span>عند الحجز اسأل عن هديتك</span>
+          </div>
+        </div>
+      </div>
+
       <header className="pt-36 pb-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-background/35 to-background" />
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.10),transparent_60%)]" />
@@ -374,12 +387,6 @@ export default function Services() {
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
             <PrimaryCTA />
-            <button
-              onClick={() => jumpTo("wedding")}
-              className="border border-white/15 text-foreground hover:bg-white hover:text-black transition-colors rounded-none px-10 py-4 font-semibold"
-            >
-              شوف باقات الزفاف
-            </button>
           </div>
         </div>
       </header>

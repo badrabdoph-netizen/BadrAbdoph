@@ -281,7 +281,7 @@ export default function Home() {
               </Button>
             </a>
 
-            <Link href="/services#sessions">
+            <Link href="/services">
               <Button
                 variant="outline"
                 size="lg"
@@ -365,7 +365,7 @@ export default function Home() {
                   <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6" />
 
                   <div className="flex items-center justify-between gap-4">
-                    <Link href="/services#sessions">
+                    <Link href="/services">
                       <Button
                         variant={featured ? "default" : "outline"}
                         className={[
@@ -570,7 +570,7 @@ export default function Home() {
               </Button>
             </a>
 
-            <Link href="/services#sessions">
+            <Link href="/services">
               <Button
                 variant="outline"
                 className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto"
@@ -647,6 +647,23 @@ export default function Home() {
         }
         .gallery-rail::-webkit-scrollbar { display: none; }
         .gallery-slide { scroll-snap-align: center; }
+        .gallery-rail .mosaic-card {
+          animation: rail-float 6.2s ease-in-out infinite;
+        }
+        .gallery-rail .mosaic-card:nth-child(2n) {
+          animation-delay: -1.6s;
+        }
+        .gallery-rail .mosaic-card::after {
+          content: "";
+          position: absolute;
+          inset: -35%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.28) 45%, transparent 70%);
+          transform: translateX(-120%);
+          animation: rail-shine 3.8s ease-in-out infinite;
+          mix-blend-mode: screen;
+          opacity: 0.7;
+          pointer-events: none;
+        }
         .gallery-hint {
           text-align: center;
           font-size: 11px;
@@ -716,6 +733,10 @@ export default function Home() {
           opacity: 0;
           transition: opacity 220ms ease;
         }
+        .gallery-rail .mosaic-img {
+          transform: scale(1.03);
+          transition: opacity 220ms ease, transform 800ms ease;
+        }
         .mosaic-card.is-loaded .mosaic-img { opacity: 1; }
         .mosaic-overlay {
           background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.05), transparent);
@@ -729,6 +750,16 @@ export default function Home() {
         .gallery-collage .gallery-card {
           border-radius: 26px;
           box-shadow: 0 28px 90px rgba(0,0,0,0.48);
+        }
+
+        @keyframes rail-float {
+          0%, 100% { transform: translateY(0) scale(1) rotate(var(--tilt, 0deg)); }
+          50% { transform: translateY(-4px) scale(1.02) rotate(var(--tilt, 0deg)); }
+        }
+        @keyframes rail-shine {
+          0% { transform: translateX(-120%); }
+          60% { transform: translateX(120%); }
+          100% { transform: translateX(120%); }
         }
       `}</style>
 

@@ -53,7 +53,7 @@ export default function About() {
               </Button>
             </a>
 
-            <Link href="/services#sessions">
+            <Link href="/services">
               <Button
                 variant="outline"
                 className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto"
@@ -201,7 +201,7 @@ export default function About() {
                 {ctaTexts.contactNow ?? "تواصل الآن"}
               </Button>
             </a>
-            <Link href="/services#sessions">
+            <Link href="/services">
               <Button
                 variant="outline"
                 className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto"
