@@ -3,7 +3,8 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, Instagram, Facebook, Sparkles, Phone, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { navLinks, socialLinks, photographerInfo, ctaTexts, contactInfo } from "@/config/siteConfig";
+import { navLinks, photographerInfo, ctaTexts } from "@/config/siteConfig";
+import { useContactData } from "@/hooks/useSiteData";
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
@@ -18,14 +19,15 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-function buildWhatsAppHref(text: string) {
-  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
+  const phone = (whatsappNumber ?? "").replace(/[^\d]/g, "");
   if (!phone) return "";
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
 
 export default function Navbar() {
   const navRef = useRef<HTMLElement | null>(null);
+  const { contactInfo, socialLinks } = useContactData();
 
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -79,7 +81,10 @@ export default function Navbar() {
 
   const telHref = `tel:${(contactInfo?.phone ?? "").replace(/\s/g, "")}`;
 
-  const waInquiryHref = useMemo(() => buildWhatsAppHref("حابب استفسر ❤️"), []);
+  const waInquiryHref = useMemo(
+    () => buildWhatsAppHref("حابب استفسر ❤️", contactInfo.whatsappNumber),
+    [contactInfo.whatsappNumber]
+  );
 
   return (
     <nav

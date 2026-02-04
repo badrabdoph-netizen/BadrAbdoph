@@ -2,7 +2,8 @@ import { Link, useLocation } from "wouter";
 import { Instagram, Facebook, Phone, Mail, MapPin, ArrowLeft, Sparkles, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { photographerInfo, contactInfo, socialLinks, navLinks, ctaTexts, externalPortfolioUrl } from "@/config/siteConfig";
+import { photographerInfo, navLinks, ctaTexts, externalPortfolioUrl } from "@/config/siteConfig";
+import { useContactData } from "@/hooks/useSiteData";
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
@@ -17,20 +18,21 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-function buildWhatsAppHref(text: string) {
-  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
+  const phone = (whatsappNumber ?? "").replace(/[^\d]/g, "");
   if (!phone) return "";
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
 
 export default function Footer() {
   const [location] = useLocation();
+  const { contactInfo, socialLinks } = useContactData();
 
   const phoneClean = (contactInfo.phone ?? "").replace(/\s/g, "");
   const telHref = phoneClean ? `tel:${phoneClean}` : "";
   const mailHref = contactInfo.email ? `mailto:${contactInfo.email}` : "";
 
-  const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️");
+  const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️", contactInfo.whatsappNumber);
 
   return (
     <footer className="relative border-t border-white/10 bg-card/30 overflow-hidden">

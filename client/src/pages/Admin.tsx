@@ -25,13 +25,23 @@ import {
   Loader2,
   LayoutGrid,
   Home,
-  LogOut
+  LogOut,
+  Lock,
+  Monitor,
 } from "lucide-react";
 import { Link } from "wouter";
-import { getLoginUrl } from "@/const";
 
 export default function Admin() {
-  const { user, loading: authLoading, isAuthenticated, logout } = useAuth();
+  const { user, loading: authLoading, isAuthenticated, logout, refresh } = useAuth();
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const loginMutation = trpc.auth.passwordLogin.useMutation({
+    onSuccess: async () => {
+      toast.success("تم تسجيل الدخول");
+      await refresh();
+    },
+    onError: (error) => toast.error(error.message),
+  });
   
   // Check if user is admin
   const isAdmin = user?.role === "admin";
@@ -50,14 +60,49 @@ export default function Admin() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">لوحة التحكم</CardTitle>
-            <CardDescription>يرجى تسجيل الدخول للوصول إلى لوحة التحكم</CardDescription>
+            <CardDescription>أدخل كلمة المرور للوصول إلى لوحة التحكم</CardDescription>
           </CardHeader>
           <CardContent>
-            <a href={getLoginUrl()}>
-              <Button className="w-full" size="lg">
-                تسجيل الدخول
+            <form
+              className="space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!password) {
+                  toast.error("أدخل كلمة المرور");
+                  return;
+                }
+                loginMutation.mutate({ password });
+              }}
+            >
+              <div className="space-y-2">
+                <Label>كلمة المرور</Label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
+                    aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <Button className="w-full" size="lg" disabled={loginMutation.isPending}>
+                {loginMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                ) : (
+                  <Lock className="w-4 h-4 ml-2" />
+                )}
+                دخول لوحة التحكم
               </Button>
-            </a>
+            </form>
           </CardContent>
         </Card>
       </div>
@@ -120,7 +165,7 @@ function AdminDashboard({ user, logout }: { user: any; logout: () => void }) {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-6 w-full max-w-4xl mx-auto">
+          <TabsList className="grid grid-cols-7 w-full max-w-5xl mx-auto">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
               <span className="hidden sm:inline">المعرض</span>
@@ -144,6 +189,10 @@ function AdminDashboard({ user, logout }: { user: any; logout: () => void }) {
             <TabsTrigger value="sections" className="flex items-center gap-2">
               <LayoutGrid className="w-4 h-4" />
               <span className="hidden sm:inline">الأقسام</span>
+            </TabsTrigger>
+            <TabsTrigger value="preview" className="flex items-center gap-2">
+              <Monitor className="w-4 h-4" />
+              <span className="hidden sm:inline">المعاينة</span>
             </TabsTrigger>
           </TabsList>
 
@@ -169,6 +218,10 @@ function AdminDashboard({ user, logout }: { user: any; logout: () => void }) {
           
           <TabsContent value="sections">
             <SectionsManager />
+          </TabsContent>
+
+          <TabsContent value="preview">
+            <PreviewPane />
           </TabsContent>
         </Tabs>
       </main>
@@ -475,6 +528,21 @@ function PackagesManager() {
               onChange={(e) => setNewPackage({ ...newPackage, price: e.target.value })}
             />
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>تصنيف الباقة</Label>
+              <select
+                value={newPackage.category}
+                onChange={(e) => setNewPackage({ ...newPackage, category: e.target.value })}
+                className="w-full h-10 rounded-md border border-border bg-background px-3 text-sm"
+              >
+                <option value="session">جلسات التصوير</option>
+                <option value="prints">جلسات + مطبوعات</option>
+                <option value="wedding">Full Day</option>
+                <option value="addon">إضافات</option>
+              </select>
+            </div>
+          </div>
           <Textarea
             placeholder="وصف الباقة"
             value={newPackage.description}
@@ -501,6 +569,9 @@ function PackagesManager() {
                 <div>
                   <CardTitle className="text-lg">{pkg.name}</CardTitle>
                   <p className="text-2xl font-bold text-primary mt-2">{pkg.price}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    التصنيف: {pkg.category ?? "session"}
+                  </p>
                 </div>
                 <div className="flex gap-1">
                   <Button
@@ -807,5 +878,31 @@ function SectionsManager() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// ============================================
+// Preview Pane Component
+// ============================================
+function PreviewPane() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>معاينة الموقع</CardTitle>
+        <CardDescription>شاهد الموقع كما يظهر للزوار بعد أي تعديل</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-lg border border-border overflow-hidden">
+          <iframe
+            src="/"
+            title="Site Preview"
+            className="w-full h-[70vh] bg-background"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          لو عايز معاينة كاملة بملء الشاشة، افتح الموقع في تبويب جديد.
+        </p>
+      </CardContent>
+    </Card>
   );
 }

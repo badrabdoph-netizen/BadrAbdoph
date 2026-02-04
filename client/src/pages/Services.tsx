@@ -16,14 +16,10 @@ import {
   ArrowDown,
 } from "lucide-react";
 import {
-  sessionPackages,
-  sessionPackagesWithPrints,
-  weddingPackages,
-  additionalServices,
   pageTexts,
   ctaTexts,
-  contactInfo,
 } from "@/config/siteConfig";
+import { useContactData, usePackagesData } from "@/hooks/useSiteData";
 
 type Pkg = {
   id: string;
@@ -69,8 +65,8 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-function buildWhatsAppHref(text: string) {
-  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
+  const phone = (whatsappNumber ?? "").replace(/[^\d]/g, "");
   if (!phone) return "";
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
@@ -108,7 +104,8 @@ function SectionHeader({
   );
 }
 
-function PrimaryCTA() {
+function PrimaryCTA({ whatsappNumber }: { whatsappNumber: string | undefined }) {
+  void whatsappNumber;
   return (
     <Link href="/contact">
       <Button
@@ -124,9 +121,11 @@ function PrimaryCTA() {
 function PackageCard({
   pkg,
   kind,
+  whatsappNumber,
 }: {
   pkg: Pkg;
   kind: "session" | "prints" | "wedding" | "addon";
+  whatsappNumber: string | undefined;
 }) {
   const isVipPlus = (p: any) => p?.id === "full-day-vip-plus" || p?.featured === true;
   const vip = kind === "wedding" && isVipPlus(pkg);
@@ -141,7 +140,7 @@ function PackageCard({
       <Camera className="w-9 h-9 text-primary" />
     );
 
-  const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️");
+  const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️", whatsappNumber);
 
   return (
     <div
@@ -208,7 +207,7 @@ function PackageCard({
         </ul>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <PrimaryCTA />
+          <PrimaryCTA whatsappNumber={contactInfo.whatsappNumber} />
 
           <a
             href={waInquiryHref}
@@ -274,8 +273,8 @@ function QuickNav({
   );
 }
 
-function MobileStickyBar({ show }: { show: boolean }) {
-  const telHref = `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`;
+function MobileStickyBar({ show, phone }: { show: boolean; phone: string }) {
+  const telHref = `tel:${(phone ?? "").replace(/\s/g, "")}`;
 
   return (
     <div
@@ -310,6 +309,13 @@ function MobileStickyBar({ show }: { show: boolean }) {
 }
 
 export default function Services() {
+  const { contactInfo } = useContactData();
+  const {
+    sessionPackages,
+    sessionPackagesWithPrints,
+    weddingPackages,
+    additionalServices,
+  } = usePackagesData();
   const [activeSection, setActiveSection] = useState("sessions");
   const [showSticky, setShowSticky] = useState(false);
 
@@ -406,7 +412,7 @@ export default function Services() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-            <PrimaryCTA />
+            <PrimaryCTA whatsappNumber={contactInfo.whatsappNumber} />
           </div>
         </div>
       </header>
@@ -423,7 +429,12 @@ export default function Services() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-5xl mx-auto">
             {sessionPackages.map((pkg) => (
-              <PackageCard key={pkg.id} pkg={pkg as any} kind="session" />
+              <PackageCard
+                key={pkg.id}
+                pkg={pkg as any}
+                kind="session"
+                whatsappNumber={contactInfo.whatsappNumber}
+              />
             ))}
           </div>
         </div>
@@ -439,7 +450,12 @@ export default function Services() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-5xl mx-auto">
             {sessionPackagesWithPrints.map((pkg) => (
-              <PackageCard key={pkg.id} pkg={pkg as any} kind="prints" />
+              <PackageCard
+                key={pkg.id}
+                pkg={pkg as any}
+                kind="prints"
+                whatsappNumber={contactInfo.whatsappNumber}
+              />
             ))}
           </div>
         </div>
@@ -455,7 +471,12 @@ export default function Services() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-5xl mx-auto">
             {weddingPackages.map((pkg) => (
-              <PackageCard key={pkg.id} pkg={pkg as any} kind="wedding" />
+              <PackageCard
+                key={pkg.id}
+                pkg={pkg as any}
+                kind="wedding"
+                whatsappNumber={contactInfo.whatsappNumber}
+              />
             ))}
           </div>
         </div>
@@ -499,7 +520,7 @@ export default function Services() {
                   </ul>
 
                   <div className="mt-7">
-                    <PrimaryCTA />
+                    <PrimaryCTA whatsappNumber={contactInfo.whatsappNumber} />
                   </div>
                 </div>
               </div>
@@ -513,7 +534,7 @@ export default function Services() {
       </section>
 
       <div className="md:hidden" style={{ height: "92px" }} />
-      <MobileStickyBar show={showSticky} />
+      <MobileStickyBar show={showSticky} phone={contactInfo.phone ?? ""} />
 
       <style>{`
         .hero-grain {

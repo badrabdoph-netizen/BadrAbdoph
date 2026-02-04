@@ -21,14 +21,9 @@ import { Phone, Mail, MapPin, Instagram, Facebook, Send, Sparkles, Copy, Chevron
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  contactInfo,
-  socialLinks,
   pageTexts,
-  sessionPackages,
-  sessionPackagesWithPrints,
-  weddingPackages,
-  additionalServices,
 } from "@/config/siteConfig";
+import { useContactData, usePackagesData } from "@/hooks/useSiteData";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" }),
@@ -75,13 +70,20 @@ function WhatsAppIcon({ size = 22 }: { size?: number }) {
   );
 }
 
-function buildWhatsAppHref(text: string) {
-  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
+  const phone = (whatsappNumber ?? "").replace(/[^\d]/g, "");
   if (!phone) return "";
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
 
 export default function Contact() {
+  const { contactInfo, socialLinks } = useContactData();
+  const {
+    sessionPackages,
+    sessionPackagesWithPrints,
+    weddingPackages,
+    additionalServices,
+  } = usePackagesData();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: "", phone: "", date: "", packageId: "", addonIds: [] },
@@ -96,7 +98,7 @@ export default function Contact() {
       ...map(sessionPackagesWithPrints as any),
       ...map(weddingPackages as any),
     ];
-  }, []);
+  }, [sessionPackages, sessionPackagesWithPrints, weddingPackages]);
 
   const addonOptions = useMemo(() => {
     const list = (additionalServices ?? []) as Array<{
@@ -113,7 +115,7 @@ export default function Contact() {
       emoji: a.emoji,
       priceNote: a.priceNote,
     }));
-  }, []);
+  }, [additionalServices]);
 
   const watchedName = useWatch({ control: form.control, name: "name" }) ?? "";
   const watchedPhone = useWatch({ control: form.control, name: "phone" }) ?? "";
@@ -153,10 +155,19 @@ export default function Contact() {
     return lines.join("\n");
   }, [watchedName, watchedPhone, watchedDate, selectedPackage, addonsText, priceValue]);
 
-  const whatsappReceiptHref = useMemo(() => buildWhatsAppHref(receiptText), [receiptText]);
+  const whatsappReceiptHref = useMemo(
+    () => buildWhatsAppHref(receiptText, contactInfo.whatsappNumber),
+    [receiptText, contactInfo.whatsappNumber]
+  );
 
-  const whatsappBookingHref = useMemo(() => buildWhatsAppHref("عايز احجز اوردر ❤️"), []);
-  const telHref = useMemo(() => `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`, []);
+  const whatsappBookingHref = useMemo(
+    () => buildWhatsAppHref("عايز احجز اوردر ❤️", contactInfo.whatsappNumber),
+    [contactInfo.whatsappNumber]
+  );
+  const telHref = useMemo(
+    () => `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`,
+    [contactInfo.phone]
+  );
 
   const fieldClass =
     "h-12 bg-background/70 border-white/10 text-foreground placeholder:text-muted-foreground/70 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-colors";

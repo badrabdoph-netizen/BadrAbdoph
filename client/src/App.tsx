@@ -5,7 +5,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { contactInfo } from "@/config/siteConfig";
+import { useContactData } from "@/hooks/useSiteData";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Portfolio from "./pages/Portfolio";
@@ -49,8 +49,8 @@ function ScrollToTop() {
   return null;
 }
 
-function buildWhatsAppHref(text: string) {
-  const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
+  const phone = (whatsappNumber ?? "").replace(/[^\d]/g, "");
   if (!phone) return "";
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
@@ -67,7 +67,8 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
 }
 
 function FloatingWhatsApp() {
-  const href = buildWhatsAppHref("❤️");
+  const { contactInfo } = useContactData();
+  const href = buildWhatsAppHref("❤️", contactInfo.whatsappNumber);
   if (!href) return null;
 
   return (

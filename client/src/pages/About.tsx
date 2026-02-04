@@ -3,11 +3,14 @@ import Footer from "@/components/Footer";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Camera, Sparkles, Heart, Star, ArrowLeft } from "lucide-react";
-import { aboutContent, photographerInfo, siteImages, testimonials, ctaTexts, externalPortfolioUrl } from "@/config/siteConfig";
+import { aboutContent, photographerInfo, siteImages, ctaTexts, externalPortfolioUrl } from "@/config/siteConfig";
+import { useContentData, useTestimonialsData } from "@/hooks/useSiteData";
 import SmartImage from "@/components/SmartImage";
 
 export default function About() {
   const aboutImg = siteImages.aboutImage ?? siteImages.heroImage;
+  const content = useContentData();
+  const testimonials = useTestimonialsData();
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -31,11 +34,14 @@ export default function About() {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {aboutContent.title ?? "عن بدر"}
+            {content.aboutTitle || aboutContent.title || "عن بدر"}
           </h1>
 
           <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed">
-            {aboutContent.description ?? photographerInfo.descriptionAr ?? "تصوير يركز على اللحظة… ويطلعها بأفضل شكل."}
+            {content.aboutDescription ||
+              aboutContent.description ||
+              photographerInfo.descriptionAr ||
+              "تصوير يركز على اللحظة… ويطلعها بأفضل شكل."}
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
@@ -84,7 +90,8 @@ export default function About() {
               </h2>
 
               <p className="text-muted-foreground leading-relaxed mb-8 text-base md:text-lg">
-                {aboutContent.description ??
+                {content.aboutDescription ||
+                  aboutContent.description ||
                   "بحب أصوّر اللحظات الطبيعية من غير مبالغة… مع اهتمام بالتفاصيل والإضاءة واللون. الهدف إن الصور تحسّها حقيقية وفخمة في نفس الوقت."}
               </p>
 

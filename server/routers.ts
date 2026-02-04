@@ -1,4 +1,4 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, adminProcedure } from "./_core/trpc";
@@ -7,11 +7,43 @@ import { z } from "zod";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import * as db from "./db";
+import { sdk } from "./_core/sdk";
+import { ENV } from "./_core/env";
+import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    passwordLogin: publicProcedure
+      .input(z.object({ password: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        const expected = ENV.adminPassword;
+        if (!expected || input.password !== expected) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "كلمة المرور غير صحيحة" });
+        }
+
+        const openId = "local-admin";
+        const now = new Date();
+
+        await db.upsertUser({
+          openId,
+          name: "Admin",
+          loginMethod: "password",
+          role: "admin",
+          lastSignedIn: now,
+        });
+
+        const sessionToken = await sdk.createSessionToken(openId, {
+          name: "Admin",
+          expiresInMs: ONE_YEAR_MS,
+        });
+
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+        return { success: true } as const;
+      }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });

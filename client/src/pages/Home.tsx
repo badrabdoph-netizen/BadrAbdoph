@@ -19,14 +19,12 @@ import {
   photographerInfo,
   siteImages,
   aboutContent,
-  testimonials,
   ctaTexts,
   homeHero,
   homeServicesPreview,
   externalPortfolioUrl,
-  contactInfo,
-  socialLinks,
 } from "@/config/siteConfig";
+import { useContactData, useContentData, usePortfolioData, useTestimonialsData } from "@/hooks/useSiteData";
 
 function ServiceIcon({ title }: { title: string }) {
   const t = title.toLowerCase();
@@ -105,8 +103,8 @@ function MosaicCard({
   );
 }
 
-function MobileStickyBar({ show }: { show: boolean }) {
-  const telHref = `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`;
+function MobileStickyBar({ show, phone }: { show: boolean; phone: string }) {
+  const telHref = `tel:${(phone ?? "").replace(/\s/g, "")}`;
 
   return (
     <div
@@ -143,10 +141,15 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const portfolioRef = useRef<HTMLElement | null>(null);
   const [showSticky, setShowSticky] = useState(false);
+  const { contactInfo, socialLinks } = useContactData();
+  const content = useContentData();
+  const testimonials = useTestimonialsData();
+  const { gallery } = usePortfolioData();
+
   const waSocialHref = useMemo(() => {
     const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
     return phone ? `https://wa.me/${phone}` : "";
-  }, []);
+  }, [contactInfo.whatsappNumber]);
 
   useEffect(() => {
     let raf = 0;
@@ -170,6 +173,20 @@ export default function Home() {
   }, []);
 
   const heroHeadline = useMemo(() => {
+    if (content.heroTitle) {
+      const lines = content.heroTitle.split("\n").filter(Boolean);
+      if (!lines.length) return null;
+      return (
+        <>
+          {lines.map((line, idx) => (
+            <span key={`${line}-${idx}`}>
+              {line}
+              {idx < lines.length - 1 ? <br /> : null}
+            </span>
+          ))}
+        </>
+      );
+    }
     const h = homeHero?.headlineAr;
     if (!h) return null;
     return (
@@ -179,11 +196,7 @@ export default function Home() {
         {h.line2}
       </>
     );
-  }, []);
-
-  const gallery = useMemo(() => {
-    return (siteImages.portfolioGallery ?? []) as Array<{ src: string; title: string; category?: string }>;
-  }, []);
+  }, [content.heroTitle]);
 
   const safeGallery = useMemo(() => {
     if (!gallery.length) return [];
@@ -214,7 +227,7 @@ export default function Home() {
     "gallery-stack-2",
   ];
 
-  const topTestimonials = useMemo(() => (testimonials ?? []).slice(0, 3), []);
+  const topTestimonials = useMemo(() => (testimonials ?? []).slice(0, 3), [testimonials]);
 
   const goPortfolio = () => {
     window.location.href = externalPortfolioUrl;
@@ -278,7 +291,7 @@ export default function Home() {
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mb-10 font-light leading-relaxed">
-            {homeHero?.subTextAr ?? photographerInfo.descriptionAr}
+            {content.heroDescription || homeHero?.subTextAr ?? photographerInfo.descriptionAr}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -572,8 +585,12 @@ export default function Home() {
               <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
                 {aboutContent.subtitle}
               </h3>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">{aboutContent.title}</h2>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-8">{aboutContent.description}</p>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                {content.aboutTitle || aboutContent.title}
+              </h2>
+              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
+                {content.aboutDescription || aboutContent.description}
+              </p>
 
               <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-10">
                 {aboutContent.stats.map((s) => (
@@ -628,9 +645,11 @@ export default function Home() {
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.12),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-5">جاهز نثبت يومك بصور تفضل معاك؟</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-5">
+            {content.ctaTitle || "جاهز نثبت يومك بصور تفضل معاك؟"}
+          </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            ابعت التفاصيل بسرعة… وهنرتب كل حاجة بشكل مريح وواضح.
+            {content.ctaDescription || "ابعت التفاصيل بسرعة… وهنرتب كل حاجة بشكل مريح وواضح."}
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -924,7 +943,7 @@ export default function Home() {
       `}</style>
 
       <div className="md:hidden" style={{ height: "86px" }} />
-      <MobileStickyBar show={showSticky} />
+      <MobileStickyBar show={showSticky} phone={contactInfo.phone ?? ""} />
 
       <Footer />
     </div>
