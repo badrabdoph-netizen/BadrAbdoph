@@ -292,7 +292,7 @@ function QuickNav({
 
   return (
     <div
-      className="fixed z-40 bg-background/80 backdrop-blur-md border-y border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.35)] left-0 right-0"
+      className="sticky z-40 quicknav-glass border-y border-white/10"
       style={{ top: "var(--nav-offset, 96px)" }}
     >
       <div className="container mx-auto px-4 py-3">
@@ -306,7 +306,7 @@ function QuickNav({
                 className={[
                   "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border",
                   isActive
-                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_24px_rgba(255,200,80,0.45)] ring-1 ring-primary/30"
+                    ? "bg-primary text-primary-foreground border-primary nav-active"
                     : "bg-black/15 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
                 ].join(" ")}
               >
@@ -424,7 +424,6 @@ export default function Services() {
       </header>
 
       <QuickNav active={activeSection} onJump={jumpTo} />
-      <div className="h-14 md:h-16" aria-hidden="true" />
 
       <section id="sessions" className="py-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
@@ -582,6 +581,29 @@ export default function Services() {
           animation: services-shine 6s ease-in-out infinite;
           opacity: 0.3;
           pointer-events: none;
+        }
+
+        .quicknav-glass {
+          background: linear-gradient(135deg, rgba(18,18,24,0.82), rgba(10,10,14,0.9));
+          backdrop-filter: blur(16px) saturate(140%);
+          -webkit-backdrop-filter: blur(16px) saturate(140%);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05);
+          position: sticky;
+        }
+        .quicknav-glass::after {
+          content: "";
+          position: absolute;
+          inset: -40% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.25) 48%, transparent 72%);
+          transform: translateX(-120%);
+          animation: services-shine 6s ease-in-out infinite;
+          opacity: 0.35;
+          pointer-events: none;
+        }
+        .nav-active {
+          box-shadow:
+            0 0 24px rgba(255,200,80,0.55),
+            inset 0 0 14px rgba(255,220,150,0.35);
         }
 
         .services-subtitle-glow {

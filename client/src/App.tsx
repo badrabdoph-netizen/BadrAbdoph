@@ -228,14 +228,21 @@ function App() {
               gap: 8px;
               font-weight: 700;
               letter-spacing: 0.02em;
-              color: #0b2014;
-              background: linear-gradient(135deg, #1ab055 0%, #25d366 55%, #42e08c 100%);
-              border: 1px solid rgba(255,255,255,0.25);
-              box-shadow: 0 14px 40px rgba(37, 211, 102, 0.38), inset 0 0 0 1px rgba(255,255,255,0.25);
+              color: #eafff1;
+              background:
+                linear-gradient(135deg, rgba(20, 160, 90, 0.55), rgba(30, 200, 120, 0.45)),
+                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
+              border: 1px solid rgba(255,255,255,0.22);
+              box-shadow:
+                0 16px 45px rgba(37, 211, 102, 0.25),
+                inset 0 0 0 1px rgba(255,255,255,0.28),
+                inset 0 0 18px rgba(255,255,255,0.08);
               position: relative;
               overflow: hidden;
               transition: transform 200ms ease, box-shadow 200ms ease;
               animation: wa-float 3.4s ease-in-out infinite, wa-pulse 2.8s ease-out infinite;
+              backdrop-filter: blur(14px) saturate(140%);
+              -webkit-backdrop-filter: blur(14px) saturate(140%);
             }
             .sticky-btn::after {
               content: "";
@@ -248,12 +255,14 @@ function App() {
               pointer-events: none;
             }
             .sticky-btn--call {
-              background: linear-gradient(135deg, #1fbf6b 0%, #22c55e 55%, #4ade80 100%);
-              color: #082012;
+              background:
+                linear-gradient(135deg, rgba(18, 150, 85, 0.55), rgba(45, 220, 120, 0.45)),
+                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
+              color: #eafff1;
             }
             .sticky-btn:hover {
               transform: translateY(-2px) scale(1.02);
-              box-shadow: 0 22px 60px rgba(37, 211, 102, 0.55);
+              box-shadow: 0 22px 60px rgba(37, 211, 102, 0.35);
             }
           `}</style>
         </div>
