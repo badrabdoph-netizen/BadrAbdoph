@@ -163,9 +163,7 @@ function PackageCard({
                   </span>
                 )}
               </div>
-              <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2 md:line-clamp-none">
-                {pkg.description}
-              </p>
+              <p className="text-xs md:text-sm text-muted-foreground mt-1">{pkg.description}</p>
             </div>
           </div>
 
@@ -181,23 +179,12 @@ function PackageCard({
 
         <ul className="space-y-3 mb-6 md:mb-7">
           {pkg.features.map((feature, i) => (
-            <li
-              key={i}
-              className={[
-                "items-start text-sm",
-                i > 3 ? "hidden md:flex" : "flex",
-              ].join(" ")}
-            >
+            <li key={i} className="flex items-start text-sm">
               <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
               <span className="text-gray-300 leading-relaxed">{feature}</span>
             </li>
           ))}
         </ul>
-        {pkg.features.length > 4 && (
-          <div className="text-xs text-muted-foreground/80 md:hidden mb-6">
-            + تفاصيل أكتر جوه الباقة
-          </div>
-        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <PrimaryCTA />
