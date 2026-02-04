@@ -87,17 +87,17 @@ function GlobalStickyBar() {
   if (!telHref && !waHref) return null;
 
   return (
-    <div className="sticky-bar md:hidden">
+    <div className="glass-bar md:hidden">
       <div className="container mx-auto px-4">
-        <div className="sticky-bar-inner">
+        <div className="glass-bar-inner">
           {telHref ? (
-            <a href={telHref} className="sticky-btn sticky-btn--call" aria-label="Call">
+            <a href={telHref} className="glass-btn" aria-label="Call">
               <Phone className="w-4 h-4" />
               اتصل
             </a>
           ) : null}
           {waHref ? (
-            <a href={waHref} className="sticky-btn sticky-btn--wa" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+            <a href={waHref} className="glass-btn" target="_blank" rel="noreferrer" aria-label="WhatsApp">
               <WhatsAppIcon size={16} />
               واتساب
             </a>
@@ -205,74 +205,64 @@ function App() {
               }
             }
 
-            .sticky-bar {
+            .glass-bar {
               position: fixed;
               left: 0;
               right: 0;
-              bottom: calc(env(safe-area-inset-bottom) + 22px);
+              bottom: calc(env(safe-area-inset-bottom) + 16px);
               z-index: 65;
               pointer-events: none;
             }
-            .sticky-bar-inner {
+            .glass-bar-inner {
               display: grid;
               grid-template-columns: repeat(2, minmax(0, 1fr));
               gap: 10px;
               pointer-events: auto;
             }
-            .sticky-btn {
-              height: 48px;
-              border-radius: 18px;
+            .glass-btn {
+              height: 44px;
+              border-radius: 14px;
               display: inline-flex;
               align-items: center;
               justify-content: center;
               gap: 8px;
-              font-weight: 700;
+              font-weight: 600;
               letter-spacing: 0.02em;
-              color: #f6ddb0;
+              color: rgba(247,228,191,0.95);
               background:
-                linear-gradient(135deg, rgba(255, 210, 120, 0.16), rgba(255, 185, 85, 0.12)),
-                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
-              border: 1px solid rgba(255,210,120,0.45);
+                linear-gradient(135deg, rgba(255,215,140,0.12), rgba(255,200,120,0.08)),
+                linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+              border: 1px solid rgba(255,220,170,0.28);
               box-shadow:
-                0 18px 45px rgba(255, 200, 80, 0.18),
-                inset 0 0 0 1px rgba(255,255,255,0.35),
-                inset 0 0 18px rgba(255,255,255,0.12);
+                0 16px 40px rgba(0,0,0,0.35),
+                inset 0 0 0 1px rgba(255,255,255,0.18);
               position: relative;
               overflow: hidden;
-              transition: transform 200ms ease, box-shadow 200ms ease;
-              animation: wa-float 3.4s ease-in-out infinite, wa-pulse 2.8s ease-out infinite;
-              backdrop-filter: blur(14px) saturate(140%);
-              -webkit-backdrop-filter: blur(14px) saturate(140%);
+              backdrop-filter: blur(12px) saturate(130%);
+              -webkit-backdrop-filter: blur(12px) saturate(130%);
+              transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
             }
-            .sticky-btn::before {
-              content: "";
-              position: absolute;
-              inset: 0;
-              border-radius: inherit;
-              background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.22), transparent 55%);
-              opacity: 0.6;
-              pointer-events: none;
-            }
-            .sticky-btn::after {
+            .glass-btn::after {
               content: "";
               position: absolute;
               inset: -40% -10%;
-              background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 48%, transparent 70%);
+              background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.30) 48%, transparent 72%);
               transform: translateX(-120%);
-              animation: wa-shine 3.6s ease-in-out infinite;
-              opacity: 0.5;
+              animation: glass-shine 9s ease-in-out infinite;
+              opacity: 0.22;
               pointer-events: none;
             }
-            .sticky-btn--call {
-              background:
-                linear-gradient(135deg, rgba(255, 210, 120, 0.16), rgba(255, 185, 85, 0.12)),
-                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
-              color: #f6ddb0;
+            .glass-btn:hover {
+              transform: translateY(-1px);
+              border-color: rgba(255,220,170,0.45);
+              box-shadow: 0 18px 50px rgba(0,0,0,0.45);
             }
-            .sticky-btn:hover {
-              transform: translateY(-2px) scale(1.02);
-              box-shadow: 0 22px 60px rgba(255, 200, 80, 0.25);
+            @keyframes glass-shine {
+              0% { transform: translateX(-120%); }
+              75% { transform: translateX(120%); }
+              100% { transform: translateX(120%); }
             }
+
           `}</style>
         </div>
       </ThemeProvider>
