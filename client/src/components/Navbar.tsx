@@ -163,19 +163,19 @@ export default function Navbar() {
               href={socialLinks.instagram}
               target="_blank"
               rel="noreferrer"
-              className="text-foreground/70 hover:text-primary transition-colors tap-target inline-flex items-center justify-center"
+              className="social-orb tap-target"
               aria-label="Instagram"
             >
-              <Instagram size={20} />
+              <Instagram size={18} />
             </a>
             <a
               href={socialLinks.facebook}
               target="_blank"
               rel="noreferrer"
-              className="text-foreground/70 hover:text-primary transition-colors tap-target inline-flex items-center justify-center"
+              className="social-orb tap-target"
               aria-label="Facebook"
             >
-              <Facebook size={20} />
+              <Facebook size={18} />
             </a>
 
             <a href={waBookingHref} target="_blank" rel="noreferrer">
@@ -205,10 +205,10 @@ export default function Navbar() {
                 href={waInquiryHref}
                 target="_blank"
                 rel="noreferrer"
-                className="w-11 h-11 border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-foreground hover:text-primary transition-colors tap-target"
+                className="social-orb social-orb--wa tap-target"
                 aria-label="WhatsApp"
               >
-                <WhatsAppIcon size={20} />
+                <WhatsAppIcon size={18} />
               </a>
             ) : null}
 

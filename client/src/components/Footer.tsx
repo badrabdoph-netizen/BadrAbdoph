@@ -94,10 +94,10 @@ export default function Footer() {
                   href={socialLinks.instagram}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-12 h-12 rounded-full border border-white/10 bg-black/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                  className="social-orb"
                   aria-label="Instagram"
                 >
-                  <Instagram size={20} />
+                  <Instagram size={18} />
                 </a>
               ) : null}
 
@@ -106,10 +106,10 @@ export default function Footer() {
                   href={socialLinks.facebook}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-12 h-12 rounded-full border border-white/10 bg-black/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                  className="social-orb"
                   aria-label="Facebook"
                 >
-                  <Facebook size={20} />
+                  <Facebook size={18} />
                 </a>
               ) : null}
 
@@ -118,10 +118,10 @@ export default function Footer() {
                   href={waInquiryHref}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-12 h-12 rounded-full border border-white/10 bg-black/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                  className="social-orb social-orb--wa"
                   aria-label="WhatsApp"
                 >
-                  <WhatsAppIcon size={20} />
+                  <WhatsAppIcon size={18} />
                 </a>
               ) : null}
             </div>
