@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { Phone, Mail, MapPin, Instagram, Facebook, Send, Sparkles, Copy, ChevronDown } from "lucide-react";
+import { Phone, Mail, MapPin, Instagram, Facebook, Send, Sparkles, Copy, ChevronDown, Receipt } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -158,6 +158,9 @@ export default function Contact() {
   const whatsappBookingHref = useMemo(() => buildWhatsAppHref("عايز احجز اوردر ❤️"), []);
   const telHref = useMemo(() => `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`, []);
 
+  const fieldClass =
+    "h-12 bg-background/70 border-white/10 text-foreground placeholder:text-muted-foreground/70 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-colors";
+
   const onSendReceipt = () => {
     if (!whatsappReceiptHref) {
       toast.error("أدخل البيانات كاملة أولاً.");
@@ -248,11 +251,7 @@ export default function Contact() {
                       <FormItem>
                         <FormLabel>الاسم بالكامل</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="أدخل اسمك"
-                            {...field}
-                            className="bg-background border-white/10 focus:border-primary h-12"
-                          />
+                          <Input placeholder="أدخل اسمك" {...field} className={fieldClass} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -266,11 +265,7 @@ export default function Contact() {
                       <FormItem>
                         <FormLabel>تاريخ المناسبة</FormLabel>
                         <FormControl>
-                          <Input
-                            type="date"
-                            {...field}
-                            className="bg-background border-white/10 focus:border-primary h-12"
-                          />
+                          <Input type="date" {...field} className={fieldClass} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -285,7 +280,7 @@ export default function Contact() {
                         <FormLabel>اختر الباقة</FormLabel>
                         <FormControl>
                           <Select value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger className="w-full bg-background border-white/10 focus:border-primary h-12">
+                            <SelectTrigger className={`w-full ${fieldClass}`}>
                               <SelectValue placeholder="اختر الباقة المناسبة" />
                             </SelectTrigger>
                             <SelectContent>
@@ -316,7 +311,7 @@ export default function Contact() {
                             placeholder="01xxxxxxxxx"
                             value={field.value}
                             onChange={(e) => field.onChange(normalizePhone(e.target.value))}
-                            className="bg-background border-white/10 focus:border-primary h-12 text-right"
+                            className={`${fieldClass} text-right`}
                             dir="ltr"
                             inputMode="tel"
                             autoComplete="tel"
@@ -333,7 +328,7 @@ export default function Contact() {
                       value={priceValue}
                       readOnly
                       placeholder="سيظهر السعر تلقائياً"
-                      className="bg-background border-white/10 focus:border-primary h-12 text-right"
+                      className={`${fieldClass} text-right font-semibold text-primary/90`}
                     />
                   </div>
 
@@ -348,7 +343,7 @@ export default function Contact() {
                             <PopoverTrigger asChild>
                               <button
                                 type="button"
-                                className="w-full h-12 px-3 rounded-md border border-white/10 bg-background flex items-center justify-between text-sm text-foreground hover:border-primary/40 transition-colors"
+                                className={`w-full h-12 px-3 rounded-md flex items-center justify-between text-sm hover:border-primary/40 ${fieldClass}`}
                               >
                                 <span className={selectedAddons.length ? "text-foreground" : "text-muted-foreground"}>
                                   {addonsPreview}
@@ -356,10 +351,10 @@ export default function Contact() {
                                 <ChevronDown className="w-4 h-4 text-muted-foreground" />
                               </button>
                             </PopoverTrigger>
-                            <PopoverContent
-                              align="start"
-                              className="w-[min(92vw,360px)] border border-white/10 bg-background/95 backdrop-blur-md p-3"
-                            >
+                          <PopoverContent
+                            align="start"
+                            className="w-[min(92vw,360px)] border border-white/10 bg-background/95 backdrop-blur-md p-3"
+                          >
                               <div className="space-y-3">
                                 {addonOptions.length ? (
                                   addonOptions.map((opt) => {
@@ -408,19 +403,23 @@ export default function Contact() {
                     )}
                   />
 
-                  <div className="rounded-md border border-white/10 bg-background/60 p-4 relative">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-sm font-semibold">الإيصال</div>
+                  <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-black/35 via-background/80 to-black/40 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+                    <div className="absolute inset-0 pointer-events-none opacity-50 [background:radial-gradient(circle_at_20%_0%,rgba(255,200,80,0.18),transparent_55%)]" />
+                    <div className="relative flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2 text-sm font-semibold">
+                        <Receipt className="w-4 h-4 text-primary" />
+                        الإيصال
+                      </div>
                       <button
                         type="button"
                         onClick={onCopyReceipt}
-                        className="inline-flex items-center gap-2 text-xs text-primary hover:text-primary/80 transition-colors"
+                        className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                       >
                         <Copy size={14} />
                         نسخ
                       </button>
                     </div>
-                    <pre className="whitespace-pre-line text-sm text-muted-foreground leading-relaxed">
+                    <pre className="relative whitespace-pre-line text-sm md:text-base text-foreground/85 leading-relaxed font-medium">
                       {receiptText}
                     </pre>
                   </div>
