@@ -587,6 +587,11 @@ export default function Home() {
       </section>
 
       <style>{`
+        .hero-image { background-image: var(--hero-image); }
+        @media (max-width: 640px) {
+          .hero-image { background-image: var(--hero-image-mobile); }
+        }
+
         .hero-grain {
           background-image:
             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
@@ -613,50 +618,6 @@ export default function Home() {
         }
         .premium-border:hover::after { opacity: 1; }
 
-        .marquee { overflow: hidden; position: relative; width: 100%; }
-        .marquee:hover .marquee__track { animation-play-state: paused; }
-
-        .marquee__track {
-          display: flex;
-          gap: 12px;
-          width: max-content;
-          will-change: transform;
-        }
-
-        /* ✅ Smaller on mobile to show more frames */
-        .marquee__item {
-          position: relative;
-          flex: 0 0 auto;
-          width: min(52vw, 290px);
-          aspect-ratio: 3 / 4;
-          transition: transform 250ms ease;
-          background-size: cover;
-          background-position: center;
-          background-color: rgba(255,255,255,0.02);
-        }
-        .marquee__item:hover { transform: translateY(-4px) scale(1.01); }
-
-        @media (min-width: 640px) { .marquee__item { width: min(34vw, 320px); } }
-        @media (min-width: 1024px) { .marquee__item { width: 230px; } }
-
-        .marquee__track--left {
-          animation: marqueeLeft linear infinite;
-          animation-duration: calc(22s - var(--marquee-boost, 0s));
-        }
-        .marquee__track--right {
-          animation: marqueeRight linear infinite;
-          animation-duration: calc(26s - var(--marquee-boost, 0s));
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .marquee__track--left,
-          .marquee__track--right { animation: none !important; }
-          .marquee { overflow-x: auto; }
-        }
-
-        @keyframes marqueeLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        @keyframes marqueeRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
-
         .spotlight-layer {
           background: radial-gradient(
             circle at var(--spot-x, 50%) var(--spot-y, 35%),
@@ -666,70 +627,73 @@ export default function Home() {
           opacity: 0.9;
         }
 
-        .film-frame {
+        .gallery-frame {
           background:
-            linear-gradient(to bottom, rgba(255,255,255,0.08), transparent 18%),
-            linear-gradient(to top, rgba(255,255,255,0.08), transparent 18%);
-          opacity: 0.22;
-          mix-blend-mode: overlay;
+            radial-gradient(circle at 20% 20%, rgba(255,200,80,0.12), transparent 45%),
+            repeating-linear-gradient(
+              135deg,
+              rgba(255,255,255,0.05) 0 2px,
+              transparent 2px 14px
+            );
+          opacity: 0.32;
+          mix-blend-mode: screen;
         }
 
-        /* ✅ Film look */
-        .film-card {
-          border-radius: 14px;
-          box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+        .gallery-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+        }
+        @media (min-width: 768px) {
+          .gallery-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-auto-rows: 150px;
+          }
+        }
+        @media (min-width: 1024px) {
+          .gallery-grid { grid-auto-rows: 180px; }
         }
 
-        /* perforations top/bottom */
-        .film-card::before {
+        .gallery-card {
+          border-radius: 22px;
+          box-shadow: 0 28px 90px rgba(0,0,0,0.48);
+          background: rgba(10,10,10,0.55);
+        }
+        .gallery-card::before {
           content:"";
           position:absolute;
-          left:0; right:0; top:0;
-          height: 18px;
-          background:
-            repeating-linear-gradient(
-              to right,
-              rgba(0,0,0,0.85) 0px,
-              rgba(0,0,0,0.85) 10px,
-              rgba(255,255,255,0.08) 10px,
-              rgba(255,255,255,0.08) 14px
-            );
-          opacity: .55;
+          inset: 12px;
+          border: 1px solid rgba(255,255,255,0.08);
           pointer-events:none;
         }
-        .film-card::after {
-          content:"";
-          position:absolute;
-          left:0; right:0; bottom:0;
-          height: 18px;
-          background:
-            repeating-linear-gradient(
-              to right,
-              rgba(0,0,0,0.85) 0px,
-              rgba(0,0,0,0.85) 10px,
-              rgba(255,255,255,0.08) 10px,
-              rgba(255,255,255,0.08) 14px
-            );
-          opacity: .55;
-          pointer-events:none;
-        }
+        .gallery-grid .mosaic-card:nth-child(3n) { transform: rotate(-0.4deg); }
+        .gallery-grid .mosaic-card:nth-child(4n) { transform: rotate(0.5deg); }
 
-        .film-img {
+        .mosaic-card {
+          position: relative;
+          width: 100%;
+          border-radius: 18px;
+          background-size: cover;
+          background-position: center;
+          background-color: rgba(255,255,255,0.02);
+          box-shadow: 0 22px 70px rgba(0,0,0,0.45);
+          transition: transform 240ms ease;
+        }
+        .mosaic-card:hover { transform: translateY(-3px) scale(1.01); }
+        .mosaic-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           opacity: 0;
-          transition: opacity 240ms ease;
+          transition: opacity 220ms ease;
         }
-        .film-card.is-loaded .film-img { opacity: 1; }
-
-        .film-overlay {
-          background: linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.10), transparent);
-          opacity: 0.9;
+        .mosaic-card.is-loaded .mosaic-img { opacity: 1; }
+        .mosaic-overlay {
+          background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.05), transparent);
+          opacity: 0.95;
         }
-
-        .glow-hover {
-          background: radial-gradient(circle at 30% 20%, rgba(255,200,80,0.18), transparent 55%);
+        .mosaic-glow {
+          background: radial-gradient(circle at 30% 20%, rgba(255,200,80,0.22), transparent 60%);
           mix-blend-mode: screen;
         }
       `}</style>
