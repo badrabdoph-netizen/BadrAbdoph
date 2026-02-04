@@ -6,8 +6,6 @@ import {
   Check,
   Sparkles,
   Camera,
-  Heart,
-  Receipt,
   PlusCircle,
   ArrowLeft,
   Phone,
@@ -35,6 +33,27 @@ type Pkg = {
   badge?: string;
   priceNote?: string;
 };
+
+function CoupleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="8" cy="8" r="2.5" />
+      <circle cx="16" cy="8.5" r="2.2" />
+      <path d="M4 20c.5-3 2.2-4.8 4-4.8s3.5 1.8 4 4.8" />
+      <path d="M12.5 20c.4-2.2 1.8-3.8 3.5-3.8 1.6 0 3 1.6 3.4 3.8" />
+      <path d="M4.8 6.2l3.2-3.2 3.2 3.2" />
+    </svg>
+  );
+}
 
 function WhatsAppIcon({ size = 18 }: { size?: number }) {
   return (
@@ -112,10 +131,8 @@ function PackageCard({
   const popular = !!pkg.popular;
 
   const Icon =
-    kind === "wedding" ? (
-      <Heart className="w-9 h-9 text-primary" />
-    ) : kind === "prints" ? (
-      <Receipt className="w-9 h-9 text-primary" />
+    kind === "wedding" || kind === "prints" ? (
+      <CoupleIcon className="w-9 h-9 text-primary" />
     ) : kind === "addon" ? (
       <PlusCircle className="w-9 h-9 text-primary" />
     ) : (
@@ -221,7 +238,7 @@ function QuickNav({
   const items = [
     { id: "sessions", label: "جلسات" },
     { id: "prints", label: "جلسات + مطبوعات" },
-    { id: "wedding", label: "زفاف" },
+    { id: "wedding", label: "Full Day" },
     { id: "addons", label: "إضافات" },
   ];
 
