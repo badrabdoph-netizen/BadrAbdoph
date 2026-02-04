@@ -6,7 +6,6 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { useContactData } from "@/hooks/useSiteData";
-import { Phone } from "lucide-react";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Portfolio from "./pages/Portfolio";
@@ -73,38 +72,9 @@ function FloatingWhatsApp() {
   if (!href) return null;
 
   return (
-    <a href={href} className="wa-float hidden md:inline-flex" target="_blank" rel="noreferrer" aria-label="WhatsApp">
-      <WhatsAppIcon size={16} />
-      <span className="wa-text">واتساب</span>
+    <a href={href} className="wa-float" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+      <WhatsAppIcon size={18} />
     </a>
-  );
-}
-
-function GlobalStickyBar() {
-  const { contactInfo } = useContactData();
-  const telHref = contactInfo.phone ? `tel:${contactInfo.phone.replace(/\s/g, "")}` : "";
-  const waHref = buildWhatsAppHref("❤️", contactInfo.whatsappNumber);
-  if (!telHref && !waHref) return null;
-
-  return (
-    <div className="glass-bar md:hidden">
-      <div className="container mx-auto px-4">
-        <div className="glass-bar-inner">
-          {telHref ? (
-            <a href={telHref} className="glass-btn" aria-label="Call">
-              <Phone className="w-4 h-4" />
-              اتصل
-            </a>
-          ) : null}
-          {waHref ? (
-            <a href={waHref} className="glass-btn" target="_blank" rel="noreferrer" aria-label="WhatsApp">
-              <WhatsAppIcon size={16} />
-              واتساب
-            </a>
-          ) : null}
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -134,135 +104,52 @@ function App() {
             <Toaster position="top-center" />
             <Router />
             <FloatingWhatsApp />
-            <GlobalStickyBar />
           </TooltipProvider>
           <style>{`
             .wa-float {
               position: fixed;
-              right: 22px;
-              bottom: 22px;
+              right: 16px;
+              bottom: 16px;
               z-index: 70;
               display: inline-flex;
               align-items: center;
-              gap: 6px;
-              padding: 9px 12px;
-              border-radius: 999px;
-              background: linear-gradient(135deg, #1ab055 0%, #25d366 55%, #42e08c 100%);
-              color: #0b2014;
-              font-weight: 600;
-              letter-spacing: 0.01em;
-              box-shadow: 0 14px 40px rgba(37, 211, 102, 0.38);
-              border: 1px solid rgba(255,255,255,0.26);
-              isolation: isolate;
-              overflow: hidden;
-              position: relative;
-              transition: transform 200ms ease, box-shadow 200ms ease;
-              animation: wa-float 3.2s ease-in-out infinite, wa-pulse 2.8s ease-out infinite;
-            }
-            .wa-float::before {
-              content: "";
-              position: absolute;
-              inset: 0;
-              border-radius: inherit;
-              background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 45%, transparent 70%);
-              transform: translateX(-120%);
-              animation: wa-shine 3.6s ease-in-out infinite;
-              opacity: 0.45;
-              pointer-events: none;
-            }
-            .wa-float:hover {
-              transform: translateY(-2px) scale(1.02);
-              box-shadow: 0 22px 60px rgba(37, 211, 102, 0.55);
-            }
-            .wa-text { font-size: 12px; }
-            @media (max-width: 768px) {
-              .wa-float {
-                left: 14px;
-                right: auto;
-                bottom: 92px;
-                padding: 8px 10px;
-              }
-              .wa-text { font-size: 11px; }
-            }
-            @keyframes wa-shine {
-              0% { transform: translateX(-120%); }
-              55% { transform: translateX(120%); }
-              100% { transform: translateX(120%); }
-            }
-            @keyframes wa-float {
-              0%, 100% { transform: translateY(0); }
-              50% { transform: translateY(-4px); }
-            }
-            @keyframes wa-pulse {
-              0% {
-                box-shadow: 0 14px 40px rgba(37, 211, 102, 0.38), 0 0 0 0 rgba(37,211,102,0.45);
-              }
-              70% {
-                box-shadow: 0 14px 40px rgba(37, 211, 102, 0.38), 0 0 0 16px rgba(37,211,102,0);
-              }
-              100% {
-                box-shadow: 0 14px 40px rgba(37, 211, 102, 0.38), 0 0 0 0 rgba(37,211,102,0);
-              }
-            }
-
-            .glass-bar {
-              position: fixed;
-              left: 0;
-              right: 0;
-              bottom: calc(env(safe-area-inset-bottom) + 16px);
-              z-index: 65;
-              pointer-events: none;
-            }
-            .glass-bar-inner {
-              display: grid;
-              grid-template-columns: repeat(2, minmax(0, 1fr));
-              gap: 10px;
-              pointer-events: auto;
-            }
-            .glass-btn {
-              height: 44px;
-              border-radius: 14px;
-              display: inline-flex;
-              align-items: center;
               justify-content: center;
-              gap: 8px;
-              font-weight: 600;
-              letter-spacing: 0.02em;
-              color: rgba(247,228,191,0.95);
+              width: 46px;
+              height: 46px;
+              border-radius: 16px;
               background:
                 linear-gradient(135deg, rgba(255,215,140,0.12), rgba(255,200,120,0.08)),
-                linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
+              color: rgba(247,228,191,0.95);
               border: 1px solid rgba(255,220,170,0.28);
-              box-shadow:
-                0 16px 40px rgba(0,0,0,0.35),
-                inset 0 0 0 1px rgba(255,255,255,0.18);
+              box-shadow: 0 16px 40px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.18);
               position: relative;
               overflow: hidden;
               backdrop-filter: blur(12px) saturate(130%);
               -webkit-backdrop-filter: blur(12px) saturate(130%);
               transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
             }
-            .glass-btn::after {
+            .wa-float::before {
               content: "";
               position: absolute;
-              inset: -40% -10%;
-              background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.30) 48%, transparent 72%);
+              inset: 0;
+              border-radius: inherit;
+              background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 45%, transparent 70%);
               transform: translateX(-120%);
-              animation: glass-shine 9s ease-in-out infinite;
-              opacity: 0.22;
+              animation: wa-shine 7.5s ease-in-out infinite;
+              opacity: 0.25;
               pointer-events: none;
             }
-            .glass-btn:hover {
+            .wa-float:hover {
               transform: translateY(-1px);
               border-color: rgba(255,220,170,0.45);
               box-shadow: 0 18px 50px rgba(0,0,0,0.45);
             }
-            @keyframes glass-shine {
+            @keyframes wa-shine {
               0% { transform: translateX(-120%); }
-              75% { transform: translateX(120%); }
+              70% { transform: translateX(120%); }
               100% { transform: translateX(120%); }
             }
-
           `}</style>
         </div>
       </ThemeProvider>

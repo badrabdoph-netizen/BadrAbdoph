@@ -124,11 +124,6 @@
     position: relative;
   }
 
-  @media (max-width: 768px) {
-    body {
-      padding-bottom: 84px;
-    }
-  }
 
   /* ✨ Modern cinematic grain + subtle glow (premium look) */
   body::before {

@@ -660,7 +660,7 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-20 bg-card border-y border-white/5 relative overflow-hidden">
+      <section className="pt-12 pb-16 md:pt-16 md:pb-20 bg-card border-y border-white/5 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_20%_30%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
@@ -671,7 +671,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               {
                 name: "Mohamed & Heba",
@@ -696,11 +696,11 @@ export default function Home() {
             ].map((t, i) => (
               <div
                 key={i}
-                className="bg-background/45 border border-white/10 p-7 premium-border testimonial-card hover:border-primary/25 transition-colors"
+                className="bg-background/45 border border-white/10 p-5 md:p-6 premium-border testimonial-card hover:border-primary/25 transition-colors"
               >
                 <StarsRow />
-                <p className="text-muted-foreground italic leading-relaxed mt-4 mb-5">"{t.quote}"</p>
-                <div className="font-bold">{t.name}</div>
+                <p className="text-sm md:text-base text-muted-foreground italic leading-relaxed mt-3 mb-4">"{t.quote}"</p>
+                <div className="text-sm md:text-base font-bold">{t.name}</div>
               </div>
             ))}
           </div>

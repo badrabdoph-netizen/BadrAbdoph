@@ -307,7 +307,7 @@ function QuickNav({
                   "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border",
                   isActive
                     ? "bg-primary text-primary-foreground border-primary nav-active"
-                    : "bg-black/15 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
+                    : "bg-black/20 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
                 ].join(" ")}
               >
                 {it.label}
@@ -584,10 +584,12 @@ export default function Services() {
         }
 
         .quicknav-glass {
-          background: linear-gradient(135deg, rgba(18,18,24,0.82), rgba(10,10,14,0.9));
+          background:
+            linear-gradient(135deg, rgba(18,18,24,0.82), rgba(10,10,14,0.92)),
+            radial-gradient(circle at 50% 0%, rgba(255,215,140,0.12), transparent 60%);
           backdrop-filter: blur(16px) saturate(140%);
           -webkit-backdrop-filter: blur(16px) saturate(140%);
-          box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.06);
           position: sticky;
         }
         .quicknav-glass::after {
