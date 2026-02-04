@@ -135,11 +135,21 @@ export default function Contact() {
   const watchedPhone = useWatch({ control: form.control, name: "phone" }) ?? "";
   const watchedDate = useWatch({ control: form.control, name: "date" }) ?? "";
   const watchedPackageId = useWatch({ control: form.control, name: "packageId" }) ?? "";
+  const watchedAddonIds = useWatch({ control: form.control, name: "addonIds" }) ?? [];
 
   const selectedPackage = useMemo(
     () => packageOptions.find((p) => p.id === watchedPackageId),
     [packageOptions, watchedPackageId]
   );
+
+  const selectedAddons = useMemo(
+    () => addonOptions.filter((a) => watchedAddonIds.includes(a.id)),
+    [addonOptions, watchedAddonIds]
+  );
+
+  const addonsText = selectedAddons.length
+    ? selectedAddons.map((a) => a.label).join("، ")
+    : "—";
 
   const priceValue = selectedPackage?.price ?? "";
   const receiptText = useMemo(() => {
@@ -149,10 +159,11 @@ export default function Contact() {
       `الهاتف: ${watchedPhone || "—"}`,
       `التاريخ: ${watchedDate || "—"}`,
       `الباقة: ${selectedPackage?.label || "—"}`,
+      `الإضافات: ${addonsText}`,
       `السعر: ${priceValue || "—"}`,
     ];
     return lines.join("\n");
-  }, [watchedName, watchedPhone, watchedDate, selectedPackage, priceValue]);
+  }, [watchedName, watchedPhone, watchedDate, selectedPackage, addonsText, priceValue]);
 
   const whatsappReceiptHref = useMemo(() => buildWhatsAppHref(receiptText), [receiptText]);
 
