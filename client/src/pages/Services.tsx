@@ -6,6 +6,8 @@ import {
   Check,
   Sparkles,
   Camera,
+  Heart,
+  Receipt,
   PlusCircle,
   ArrowLeft,
   Phone,
