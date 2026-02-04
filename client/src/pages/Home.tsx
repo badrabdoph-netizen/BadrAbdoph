@@ -735,7 +735,8 @@ export default function Home() {
         }
         .gallery-rail .mosaic-img {
           transform: scale(1.03);
-          transition: opacity 220ms ease, transform 800ms ease;
+          transition: opacity 220ms ease, transform 800ms ease, filter 800ms ease;
+          filter: saturate(1.08) contrast(1.04);
         }
         .mosaic-card.is-loaded .mosaic-img { opacity: 1; }
         .mosaic-overlay {
