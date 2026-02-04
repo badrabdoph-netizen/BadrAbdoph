@@ -391,7 +391,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ✅ أعمالنا (Film-strip preview) */}
+      {/* ✅ أعمالنا (Editorial preview) */}
       <section
         ref={(el) => (portfolioRef.current = el)}
         className="py-20 relative overflow-hidden"
@@ -408,7 +408,7 @@ export default function Home() {
       >
         <div className="absolute inset-0 pointer-events-none opacity-45 [background:radial-gradient(circle_at_85%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
         <div className="absolute inset-0 pointer-events-none spotlight-layer" />
-        <div className="absolute inset-0 pointer-events-none film-frame" />
+        <div className="absolute inset-0 pointer-events-none gallery-frame" />
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col items-center text-center gap-3 mb-9">
@@ -426,34 +426,54 @@ export default function Home() {
           </div>
 
           <div className="relative">
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-20" />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-20" />
-
-            <div className="marquee">
-              <div className="marquee__track marquee__track--left" aria-hidden="true">
-                {loop1.map((img, i) => (
-                  <FilmCard key={`r1-${img.src}-${i}`} img={img} idx={i} onClick={goPortfolio} />
+            <div className="md:hidden">
+              <div className="grid grid-cols-2 gap-3">
+                {mobileGallery.map((img, i) => (
+                  <MosaicCard
+                    key={`m-${img.src}-${i}`}
+                    img={img}
+                    onClick={goPortfolio}
+                    eager={i < 2}
+                    className={i % 5 === 0 ? "col-span-2 aspect-[16/9]" : "aspect-[4/5]"}
+                  />
                 ))}
+              </div>
+
+              <div className="mt-5 flex justify-center">
+                <a
+                  href={externalPortfolioUrl}
+                  className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none px-10 py-4 inline-flex items-center gap-2"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  عرض المعرض كامل <ZoomIn className="w-4 h-4" />
+                </a>
               </div>
             </div>
 
-            <div className="marquee mt-3">
-              <div className="marquee__track marquee__track--right" aria-hidden="true">
-                {loop2.map((img, i) => (
-                  <FilmCard key={`r2-${img.src}-${i}`} img={img} idx={i} onClick={goPortfolio} />
+            <div className="hidden md:block">
+              <div className="gallery-grid">
+                {desktopGallery.map((img, i) => (
+                  <MosaicCard
+                    key={`d-${img.src}-${i}`}
+                    img={img}
+                    onClick={goPortfolio}
+                    eager={i < 2}
+                    className={["gallery-card h-full", desktopLayout[i] ?? ""].join(" ")}
+                  />
                 ))}
               </div>
-            </div>
 
-            <div className="mt-7 flex justify-center">
-              <a
-                href={externalPortfolioUrl}
-                className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none px-10 py-4 inline-flex items-center gap-2"
-                target="_blank"
-                rel="noreferrer"
-              >
-                عرض المعرض كامل <ZoomIn className="w-4 h-4" />
-              </a>
+              <div className="mt-7 flex justify-center">
+                <a
+                  href={externalPortfolioUrl}
+                  className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none px-10 py-4 inline-flex items-center gap-2"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  عرض المعرض كامل <ZoomIn className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -713,6 +733,9 @@ export default function Home() {
           mix-blend-mode: screen;
         }
       `}</style>
+
+      <div className="md:hidden" style={{ height: "86px" }} />
+      <MobileStickyBar show={showSticky} bookingHref={waBookingHref} />
 
       <Footer />
     </div>
