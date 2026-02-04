@@ -5,6 +5,7 @@ import { z } from "zod";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -36,6 +37,7 @@ const formSchema = z.object({
     .regex(/^[0-9+\s()-]+$/, { message: "اكتب رقم صحيح (أرقام فقط)" }),
   date: z.string().min(1, { message: "يرجى اختيار التاريخ" }),
   packageId: z.string().min(1, { message: "اختر الباقة" }),
+  addonIds: z.array(z.string()).optional(),
 });
 
 function toEnglishDigits(input: string) {
@@ -81,7 +83,7 @@ function buildWhatsAppHref(text: string) {
 export default function Contact() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", phone: "", date: "", packageId: "" },
+    defaultValues: { name: "", phone: "", date: "", packageId: "", addonIds: [] },
     mode: "onBlur",
   });
 
@@ -93,6 +95,23 @@ export default function Contact() {
       ...map(sessionPackagesWithPrints as any),
       ...map(weddingPackages as any),
     ];
+  }, []);
+
+  const addonOptions = useMemo(() => {
+    const list = (additionalServices ?? []) as Array<{
+      id: string;
+      name: string;
+      price: string;
+      emoji?: string;
+      priceNote?: string;
+    }>;
+    return list.map((a) => ({
+      id: a.id,
+      label: a.name,
+      price: a.price,
+      emoji: a.emoji,
+      priceNote: a.priceNote,
+    }));
   }, []);
 
   const addonOptions = useMemo(() => {
