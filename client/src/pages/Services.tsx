@@ -297,7 +297,7 @@ function QuickNav({
   return (
     <div
       className={[
-        "sticky z-40 quicknav-float border-y border-white/10",
+        "z-40 quicknav-float border-y border-white/10",
         stuck ? "quicknav-stuck" : "",
       ].join(" ")}
       style={{ top: "var(--nav-offset, 96px)" }}
@@ -339,7 +339,8 @@ export default function Services() {
   const [activeSection, setActiveSection] = useState("sessions");
   const [isNavStuck, setIsNavStuck] = useState(false);
   const navRef = useRef<HTMLDivElement | null>(null);
-  const navTopRef = useRef<number | null>(null);
+  const navAnchorRef = useRef<HTMLDivElement | null>(null);
+  const [navHeight, setNavHeight] = useState(0);
 
   const ids = useMemo(() => ["sessions", "prints", "wedding", "addons"], []);
 
@@ -357,6 +358,13 @@ export default function Services() {
   useEffect(() => {
     let raf = 0;
 
+    const updateMetrics = () => {
+      const navEl = navRef.current;
+      if (navEl) setNavHeight(navEl.offsetHeight);
+    };
+
+    updateMetrics();
+
     const computeActiveByScroll = () => {
       const offset = getSectionScrollMarginPx() + 8;
       const y = window.scrollY + offset;
@@ -370,38 +378,29 @@ export default function Services() {
       setActiveSection(current);
     };
 
-    const updateNavTop = () => {
-      const navEl = navRef.current;
-      if (!navEl) return;
-      navTopRef.current = navEl.offsetTop;
-    };
-
-    updateNavTop();
-
     const onScroll = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         computeActiveByScroll();
-        const navEl = navRef.current;
-        if (navEl) {
+        const anchor = navAnchorRef.current;
+        if (anchor) {
           const offset = getNavOffsetPx();
-          const navTop = navTopRef.current ?? navEl.offsetTop;
-          const stuck = window.scrollY + offset >= navTop;
-          setIsNavStuck(stuck);
+          const top = anchor.getBoundingClientRect().top;
+          setIsNavStuck(top <= offset);
         }
       });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    window.addEventListener("resize", updateNavTop);
+    window.addEventListener("resize", updateMetrics);
     onScroll();
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
-      window.removeEventListener("resize", updateNavTop);
+      window.removeEventListener("resize", updateMetrics);
     };
   }, [ids]);
 
@@ -451,6 +450,8 @@ export default function Services() {
         </div>
       </header>
 
+      <div ref={navAnchorRef} className="h-px" aria-hidden="true" />
+      {isNavStuck ? <div style={{ height: navHeight }} aria-hidden="true" /> : null}
       <QuickNav active={activeSection} onJump={jumpTo} stuck={isNavStuck} navRef={navRef} />
 
       <section id="sessions" className="py-16" style={sectionStyle}>
@@ -612,14 +613,15 @@ export default function Services() {
         }
 
         .quicknav-float {
+          position: relative;
           background: rgba(12,12,16,0.78);
           backdrop-filter: blur(12px) saturate(130%);
           -webkit-backdrop-filter: blur(12px) saturate(130%);
           box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05);
           overflow: hidden;
-          transform: translateY(10px);
-          opacity: 0.96;
-          transition: transform 260ms ease, box-shadow 260ms ease, background 260ms ease, opacity 260ms ease;
+          transform: translateY(0);
+          opacity: 1;
+          transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease, opacity 240ms ease;
           will-change: transform;
         }
         .quicknav-float::after {
@@ -633,6 +635,9 @@ export default function Services() {
           pointer-events: none;
         }
         .quicknav-stuck {
+          position: fixed;
+          left: 0;
+          right: 0;
           background: rgba(10,10,14,0.86);
           box-shadow:
             0 16px 50px rgba(0,0,0,0.45),
