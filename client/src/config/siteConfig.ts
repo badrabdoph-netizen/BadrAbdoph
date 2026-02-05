@@ -22,7 +22,7 @@ export const photographerInfo = {
 // معلومات التواصل
 // =====================================================
 export const contactInfo = {
-  phone: "+20 101 151 1561",
+  phone: "+2 01011511561",
   whatsappNumber: "201011511561",
   email: "Badrabdoph@icloud.com",
   location: "مصر (متاح للسفر للمحافظات)",
@@ -160,7 +160,7 @@ export const aboutContent = {
 
   stats: [
     { number: "+1750", label: "عميل" },
-    { number: "+6", label: "سنوات خبرة" },
+    { number: "+7", label: "سنوات خبرة" },
     { number: "+2500", label: "جلسة" },
   ],
 };
