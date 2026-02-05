@@ -297,10 +297,10 @@ function QuickNav({
   return (
     <div
       className={[
-        "z-40 quicknav-float border-y border-white/10",
+        "sticky z-40 quicknav-float border-y border-white/10",
         stuck ? "quicknav-stuck" : "",
       ].join(" ")}
-      style={{ top: "var(--nav-offset, 96px)" }}
+      style={{ top: "calc(var(--nav-offset, 96px) - 6px)" }}
       ref={navRef}
     >
       <div className="container mx-auto px-4 py-3">
