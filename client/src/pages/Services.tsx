@@ -279,9 +279,11 @@ function PackageCard({
 function QuickNav({
   active,
   onJump,
+  stuck,
 }: {
   active: string;
   onJump: (id: string) => void;
+  stuck: boolean;
 }) {
   const items = [
     { id: "sessions", label: "سيشن" },
@@ -291,35 +293,35 @@ function QuickNav({
   ];
 
   return (
-    <>
-      <div
-        className="left-0 right-0 z-40 quicknav-float border-y border-white/10"
-        style={{ top: "var(--nav-offset, 96px)" }}
-      >
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {items.map((it) => {
-              const isActive = active === it.id;
-              return (
-                <button
-                  key={it.id}
-                  onClick={() => onJump(it.id)}
-                  className={[
-                    "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border",
-                    isActive
-                      ? "bg-primary text-primary-foreground border-primary shadow-[0_0_24px_rgba(255,200,80,0.45)] ring-1 ring-primary/30"
-                      : "bg-black/15 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
-                  ].join(" ")}
-                >
-                  {it.label}
-                </button>
-              );
-            })}
-          </div>
+    <div
+      className={[
+        "sticky z-40 quicknav-float border-y border-white/10",
+        stuck ? "quicknav-stuck" : "",
+      ].join(" ")}
+      style={{ top: "var(--nav-offset, 96px)" }}
+    >
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {items.map((it) => {
+            const isActive = active === it.id;
+            return (
+              <button
+                key={it.id}
+                onClick={() => onJump(it.id)}
+                className={[
+                  "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border",
+                  isActive
+                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_24px_rgba(255,200,80,0.45)] ring-1 ring-primary/30"
+                    : "bg-black/15 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
+                ].join(" ")}
+              >
+                {it.label}
+              </button>
+            );
+          })}
         </div>
       </div>
-      <div className="h-[60px] md:h-[64px]" aria-hidden="true" />
-    </>
+    </div>
   );
 }
 
@@ -332,6 +334,8 @@ export default function Services() {
     additionalServices,
   } = usePackagesData();
   const [activeSection, setActiveSection] = useState("sessions");
+  const [isNavStuck, setIsNavStuck] = useState(false);
+  const navSentinelRef = useRef<HTMLDivElement | null>(null);
 
   const ids = useMemo(() => ["sessions", "prints", "wedding", "addons"], []);
 
@@ -380,6 +384,31 @@ export default function Services() {
     };
   }, [ids]);
 
+  useEffect(() => {
+    const sentinel = navSentinelRef.current;
+    if (!sentinel) return;
+
+    let observer: IntersectionObserver | null = null;
+
+    const startObserver = () => {
+      if (observer) observer.disconnect();
+      const offset = getSectionScrollMarginPx();
+      observer = new IntersectionObserver(
+        ([entry]) => setIsNavStuck(!entry.isIntersecting),
+        { rootMargin: `-${offset}px 0px 0px 0px`, threshold: [0, 1] }
+      );
+      observer.observe(sentinel);
+    };
+
+    startObserver();
+    window.addEventListener("resize", startObserver);
+
+    return () => {
+      if (observer) observer.disconnect();
+      window.removeEventListener("resize", startObserver);
+    };
+  }, []);
+
   const sectionStyle = useMemo(() => {
     return { scrollMarginTop: `${getSectionScrollMarginPx()}px` } as React.CSSProperties;
   }, []);
@@ -426,7 +455,8 @@ export default function Services() {
         </div>
       </header>
 
-      <QuickNav active={activeSection} onJump={jumpTo} />
+      <div ref={navSentinelRef} className="h-px" aria-hidden="true" />
+      <QuickNav active={activeSection} onJump={jumpTo} stuck={isNavStuck} />
 
       <section id="sessions" className="py-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
@@ -587,12 +617,12 @@ export default function Services() {
         }
 
         .quicknav-float {
-          position: fixed;
           background: rgba(12,12,16,0.78);
           backdrop-filter: blur(12px) saturate(130%);
           -webkit-backdrop-filter: blur(12px) saturate(130%);
-          box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05);
           overflow: hidden;
+          transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
         }
         .quicknav-float::after {
           content: "";
@@ -603,6 +633,17 @@ export default function Services() {
           animation: services-shine 6s ease-in-out infinite;
           opacity: 0.3;
           pointer-events: none;
+        }
+        .quicknav-stuck {
+          background: rgba(10,10,14,0.86);
+          box-shadow:
+            0 16px 50px rgba(0,0,0,0.45),
+            0 0 24px rgba(255,210,130,0.2);
+          animation: nav-float 3.6s ease-in-out infinite;
+        }
+        @keyframes nav-float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-2px); }
         }
 
         .services-subtitle-glow {
