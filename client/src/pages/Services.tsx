@@ -280,10 +280,12 @@ function QuickNav({
   active,
   onJump,
   stuck,
+  navRef,
 }: {
   active: string;
   onJump: (id: string) => void;
   stuck: boolean;
+  navRef: React.Ref<HTMLDivElement>;
 }) {
   const items = [
     { id: "sessions", label: "سيشن" },
@@ -299,6 +301,7 @@ function QuickNav({
         stuck ? "quicknav-stuck" : "",
       ].join(" ")}
       style={{ top: "var(--nav-offset, 96px)" }}
+      ref={navRef}
     >
       <div className="container mx-auto px-4 py-3">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -335,7 +338,7 @@ export default function Services() {
   } = usePackagesData();
   const [activeSection, setActiveSection] = useState("sessions");
   const [isNavStuck, setIsNavStuck] = useState(false);
-  const navSentinelRef = useRef<HTMLDivElement | null>(null);
+  const navRef = useRef<HTMLDivElement | null>(null);
 
   const ids = useMemo(() => ["sessions", "prints", "wedding", "addons"], []);
 
@@ -370,6 +373,13 @@ export default function Services() {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         computeActiveByScroll();
+        const navEl = navRef.current;
+        if (navEl) {
+          const offset = getNavOffsetPx();
+          const top = navEl.getBoundingClientRect().top;
+          const stuck = top <= offset + 1;
+          setIsNavStuck(stuck);
+        }
       });
     };
 
@@ -383,31 +393,6 @@ export default function Services() {
       window.removeEventListener("resize", onScroll);
     };
   }, [ids]);
-
-  useEffect(() => {
-    const sentinel = navSentinelRef.current;
-    if (!sentinel) return;
-
-    let observer: IntersectionObserver | null = null;
-
-    const startObserver = () => {
-      if (observer) observer.disconnect();
-      const offset = getSectionScrollMarginPx();
-      observer = new IntersectionObserver(
-        ([entry]) => setIsNavStuck(!entry.isIntersecting),
-        { rootMargin: `-${offset}px 0px 0px 0px`, threshold: [0, 1] }
-      );
-      observer.observe(sentinel);
-    };
-
-    startObserver();
-    window.addEventListener("resize", startObserver);
-
-    return () => {
-      if (observer) observer.disconnect();
-      window.removeEventListener("resize", startObserver);
-    };
-  }, []);
 
   const sectionStyle = useMemo(() => {
     return { scrollMarginTop: `${getSectionScrollMarginPx()}px` } as React.CSSProperties;
@@ -455,8 +440,7 @@ export default function Services() {
         </div>
       </header>
 
-      <div ref={navSentinelRef} className="h-px" aria-hidden="true" />
-      <QuickNav active={activeSection} onJump={jumpTo} stuck={isNavStuck} />
+      <QuickNav active={activeSection} onJump={jumpTo} stuck={isNavStuck} navRef={navRef} />
 
       <section id="sessions" className="py-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
