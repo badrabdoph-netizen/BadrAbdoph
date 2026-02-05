@@ -291,32 +291,35 @@ function QuickNav({
   ];
 
   return (
-    <div
-      className="sticky z-30 bg-background/75 backdrop-blur-md border-y border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
-      style={{ top: "var(--nav-offset, 96px)" }}
-    >
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-          {items.map((it) => {
-            const isActive = active === it.id;
-            return (
-              <button
-                key={it.id}
-                onClick={() => onJump(it.id)}
-                className={[
-                  "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border",
-                  isActive
-                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_24px_rgba(255,200,80,0.45)] ring-1 ring-primary/30"
-                    : "bg-black/15 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
-                ].join(" ")}
-              >
-                {it.label}
-              </button>
-            );
-          })}
+    <>
+      <div
+        className="fixed left-0 right-0 z-40 quicknav-float border-y border-white/10"
+        style={{ top: "var(--nav-offset, 96px)" }}
+      >
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            {items.map((it) => {
+              const isActive = active === it.id;
+              return (
+                <button
+                  key={it.id}
+                  onClick={() => onJump(it.id)}
+                  className={[
+                    "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border",
+                    isActive
+                      ? "bg-primary text-primary-foreground border-primary shadow-[0_0_24px_rgba(255,200,80,0.45)] ring-1 ring-primary/30"
+                      : "bg-black/15 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
+                  ].join(" ")}
+                >
+                  {it.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
+      <div className="h-[60px] md:h-[64px]" aria-hidden="true" />
+    </>
   );
 }
 
@@ -577,6 +580,25 @@ export default function Services() {
           position: absolute;
           inset: -40% -10%;
           background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.28) 48%, transparent 72%);
+          transform: translateX(-120%);
+          animation: services-shine 6s ease-in-out infinite;
+          opacity: 0.3;
+          pointer-events: none;
+        }
+
+        .quicknav-float {
+          background: rgba(12,12,16,0.78);
+          backdrop-filter: blur(12px) saturate(130%);
+          -webkit-backdrop-filter: blur(12px) saturate(130%);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05);
+          position: relative;
+          overflow: hidden;
+        }
+        .quicknav-float::after {
+          content: "";
+          position: absolute;
+          inset: -40% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.2) 48%, transparent 72%);
           transform: translateX(-120%);
           animation: services-shine 6s ease-in-out infinite;
           opacity: 0.3;
