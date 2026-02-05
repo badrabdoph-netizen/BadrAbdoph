@@ -297,7 +297,7 @@ function QuickNav({
   return (
     <div
       className={[
-        "sticky z-40 quicknav-float border-y border-white/10",
+        "z-40 quicknav-float border-y border-white/10",
         stuck ? "quicknav-stuck" : "",
       ].join(" ")}
       style={{ top: "calc(var(--nav-offset, 96px) - 6px)" }}
@@ -339,6 +339,8 @@ export default function Services() {
   const [activeSection, setActiveSection] = useState("sessions");
   const [isNavStuck, setIsNavStuck] = useState(false);
   const navRef = useRef<HTMLDivElement | null>(null);
+  const navAnchorRef = useRef<HTMLDivElement | null>(null);
+  const [navHeight, setNavHeight] = useState(0);
 
   const ids = useMemo(() => ["sessions", "prints", "wedding", "addons"], []);
 
@@ -355,6 +357,13 @@ export default function Services() {
 
   useEffect(() => {
     let raf = 0;
+
+    const updateMetrics = () => {
+      const navEl = navRef.current;
+      if (navEl) setNavHeight(navEl.offsetHeight);
+    };
+
+    updateMetrics();
 
     const computeActiveByScroll = () => {
       const offset = getSectionScrollMarginPx() + 8;
@@ -374,22 +383,25 @@ export default function Services() {
       raf = requestAnimationFrame(() => {
         computeActiveByScroll();
         const navEl = navRef.current;
-        if (navEl) {
+        const anchor = navAnchorRef.current;
+        if (navEl && anchor) {
           const offset = getNavOffsetPx() - 2;
-          const top = navEl.getBoundingClientRect().top;
-          setIsNavStuck(top <= offset);
+          const anchorTop = anchor.getBoundingClientRect().top;
+          setIsNavStuck(anchorTop <= offset);
         }
       });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", updateMetrics);
     onScroll();
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", updateMetrics);
     };
   }, [ids]);
 
@@ -439,6 +451,8 @@ export default function Services() {
         </div>
       </header>
 
+      <div ref={navAnchorRef} className="h-px" aria-hidden="true" />
+      {isNavStuck ? <div style={{ height: navHeight }} aria-hidden="true" /> : null}
       <QuickNav active={activeSection} onJump={jumpTo} stuck={isNavStuck} navRef={navRef} />
 
       <section id="sessions" className="py-16" style={sectionStyle}>
