@@ -339,8 +339,6 @@ export default function Services() {
   const [activeSection, setActiveSection] = useState("sessions");
   const [isNavStuck, setIsNavStuck] = useState(false);
   const navRef = useRef<HTMLDivElement | null>(null);
-  const navAnchorRef = useRef<HTMLDivElement | null>(null);
-  const [navHeight, setNavHeight] = useState(0);
 
   const ids = useMemo(() => ["sessions", "prints", "wedding", "addons"], []);
 
@@ -357,13 +355,6 @@ export default function Services() {
 
   useEffect(() => {
     let raf = 0;
-
-    const updateMetrics = () => {
-      const navEl = navRef.current;
-      if (navEl) setNavHeight(navEl.offsetHeight);
-    };
-
-    updateMetrics();
 
     const computeActiveByScroll = () => {
       const offset = getSectionScrollMarginPx() + 8;
@@ -382,10 +373,10 @@ export default function Services() {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         computeActiveByScroll();
-        const anchor = navAnchorRef.current;
-        if (anchor) {
-          const offset = getNavOffsetPx();
-          const top = anchor.getBoundingClientRect().top;
+        const navEl = navRef.current;
+        if (navEl) {
+          const offset = getNavOffsetPx() - 2;
+          const top = navEl.getBoundingClientRect().top;
           setIsNavStuck(top <= offset);
         }
       });
@@ -393,14 +384,12 @@ export default function Services() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    window.addEventListener("resize", updateMetrics);
     onScroll();
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
-      window.removeEventListener("resize", updateMetrics);
     };
   }, [ids]);
 
@@ -450,8 +439,6 @@ export default function Services() {
         </div>
       </header>
 
-      <div ref={navAnchorRef} className="h-px" aria-hidden="true" />
-      {isNavStuck ? <div style={{ height: navHeight }} aria-hidden="true" /> : null}
       <QuickNav active={activeSection} onJump={jumpTo} stuck={isNavStuck} navRef={navRef} />
 
       <section id="sessions" className="py-16" style={sectionStyle}>
