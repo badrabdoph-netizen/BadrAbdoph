@@ -589,14 +589,11 @@ export default function Home() {
           <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">المعرض</h3>
           <h2 className="text-3xl md:text-5xl font-bold mb-6">شوف جزء من تصويري بالكوالتي الكاملة</h2>
 
-          <a
-            href={externalPortfolioUrl}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-4 inline-flex items-center gap-2 cta-glow"
-            target="_blank"
-            rel="noreferrer"
-          >
-            عرض المعرض كامل <ZoomIn className="w-4 h-4" />
-          </a>
+          <Link href="/services">
+            <a className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-4 inline-flex items-center gap-2 cta-glow">
+              اعرف الأسعار والباقات المتاحة <ArrowDownRight className="w-4 h-4" />
+            </a>
+          </Link>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             {socialLinks.instagram ? (
