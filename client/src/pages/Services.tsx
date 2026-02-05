@@ -339,6 +339,7 @@ export default function Services() {
   const [activeSection, setActiveSection] = useState("sessions");
   const [isNavStuck, setIsNavStuck] = useState(false);
   const navRef = useRef<HTMLDivElement | null>(null);
+  const navTopRef = useRef<number | null>(null);
 
   const ids = useMemo(() => ["sessions", "prints", "wedding", "addons"], []);
 
@@ -369,6 +370,14 @@ export default function Services() {
       setActiveSection(current);
     };
 
+    const updateNavTop = () => {
+      const navEl = navRef.current;
+      if (!navEl) return;
+      navTopRef.current = navEl.offsetTop;
+    };
+
+    updateNavTop();
+
     const onScroll = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
@@ -376,8 +385,8 @@ export default function Services() {
         const navEl = navRef.current;
         if (navEl) {
           const offset = getNavOffsetPx();
-          const top = navEl.getBoundingClientRect().top;
-          const stuck = top <= offset + 1;
+          const navTop = navTopRef.current ?? navEl.offsetTop;
+          const stuck = window.scrollY + offset >= navTop;
           setIsNavStuck(stuck);
         }
       });
@@ -385,12 +394,14 @@ export default function Services() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", updateNavTop);
     onScroll();
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", updateNavTop);
     };
   }, [ids]);
 
@@ -606,7 +617,10 @@ export default function Services() {
           -webkit-backdrop-filter: blur(12px) saturate(130%);
           box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05);
           overflow: hidden;
-          transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+          transform: translateY(10px);
+          opacity: 0.96;
+          transition: transform 260ms ease, box-shadow 260ms ease, background 260ms ease, opacity 260ms ease;
+          will-change: transform;
         }
         .quicknav-float::after {
           content: "";
@@ -623,6 +637,8 @@ export default function Services() {
           box-shadow:
             0 16px 50px rgba(0,0,0,0.45),
             0 0 24px rgba(255,210,130,0.2);
+          transform: translateY(0);
+          opacity: 1;
           animation: nav-float 3.6s ease-in-out infinite;
         }
         @keyframes nav-float {
