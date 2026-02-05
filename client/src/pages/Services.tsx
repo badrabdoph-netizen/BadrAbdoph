@@ -621,9 +621,10 @@ export default function Services() {
           -webkit-backdrop-filter: blur(12px) saturate(130%);
           box-shadow: 0 8px 28px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.06);
           overflow: hidden;
-          transform: translateY(4px);
+          transform: translateY(0);
           transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease;
           will-change: transform;
+          position: relative;
         }
         .quicknav-float::after {
           content: "";
@@ -636,6 +637,9 @@ export default function Services() {
           pointer-events: none;
         }
         .quicknav-stuck {
+          position: fixed;
+          left: 0;
+          right: 0;
           background:
             linear-gradient(135deg, rgba(10,10,14,0.94), rgba(7,7,10,0.98)),
             radial-gradient(circle at 50% 0%, rgba(255,215,140,0.12), transparent 60%);
