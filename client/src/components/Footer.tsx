@@ -1,8 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { Instagram, Facebook, Phone, Mail, MapPin, ArrowLeft, Sparkles, ExternalLink } from "lucide-react";
+import { Instagram, Facebook, Phone, Mail, MapPin, ArrowLeft, ArrowDownRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { photographerInfo, navLinks, ctaTexts, externalPortfolioUrl } from "@/config/siteConfig";
+import { photographerInfo, navLinks, ctaTexts } from "@/config/siteConfig";
 import { useContactData } from "@/hooks/useSiteData";
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
@@ -59,15 +59,12 @@ export default function Footer() {
                 </Button>
               </Link>
 
-              <a
-                href={externalPortfolioUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full md:w-auto border border-white/15 bg-black/15 hover:bg-white hover:text-black transition-colors rounded-none px-8 py-6 text-base inline-flex items-center justify-center gap-2"
-              >
-                <ExternalLink className="w-4 h-4 text-primary" />
-                بعض أعمالنا
-              </a>
+              <Link href="/services">
+                <a className="w-full md:w-auto border border-white/15 bg-black/15 hover:bg-white hover:text-black transition-colors rounded-none px-8 py-6 text-base inline-flex items-center justify-center gap-2">
+                  <ArrowDownRight className="w-4 h-4 text-primary" />
+                  اعرف الأسعار والباقات المتاحة
+                </a>
+              </Link>
             </div>
           </div>
         </div>
