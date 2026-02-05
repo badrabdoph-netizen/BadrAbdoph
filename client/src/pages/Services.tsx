@@ -293,7 +293,7 @@ function QuickNav({
   return (
     <>
       <div
-        className="fixed left-0 right-0 z-40 quicknav-float border-y border-white/10"
+        className="left-0 right-0 z-40 quicknav-float border-y border-white/10"
         style={{ top: "var(--nav-offset, 96px)" }}
       >
         <div className="container mx-auto px-4 py-3">
@@ -587,11 +587,11 @@ export default function Services() {
         }
 
         .quicknav-float {
+          position: fixed;
           background: rgba(12,12,16,0.78);
           backdrop-filter: blur(12px) saturate(130%);
           -webkit-backdrop-filter: blur(12px) saturate(130%);
           box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05);
-          position: relative;
           overflow: hidden;
         }
         .quicknav-float::after {
