@@ -54,13 +54,13 @@ export default function Footer() {
 
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
               <Link href="/contact">
-                <Button className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-8 py-6 text-base">
+                <Button className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-8 py-6 text-base cta-glow">
                   {ctaTexts.bookNow}
                 </Button>
               </Link>
 
               <Link href="/services">
-                <a className="w-full md:w-auto border border-white/15 bg-black/15 hover:bg-white hover:text-black transition-colors rounded-none px-8 py-6 text-base inline-flex items-center justify-center gap-2">
+                <a className="w-full md:w-auto border border-white/15 bg-black/15 hover:bg-white hover:text-black transition-colors rounded-none px-8 py-6 text-base inline-flex items-center justify-center gap-2 cta-glow">
                   <ArrowDownRight className="w-4 h-4 text-primary" />
                   اعرف الأسعار والباقات المتاحة
                 </a>

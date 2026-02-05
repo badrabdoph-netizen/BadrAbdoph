@@ -185,7 +185,7 @@ export default function Navbar() {
             <Link href="/contact">
               <Button
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-6"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-6 cta-glow"
               >
                 {ctaTexts.bookNow}
               </Button>
@@ -311,7 +311,7 @@ export default function Navbar() {
 
             <div className="mt-4 grid grid-cols-1 gap-3">
               <Link href="/contact">
-                <a className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target text-center">
+                <a className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target text-center cta-glow">
                   {ctaTexts.bookNow}
                 </a>
               </Link>

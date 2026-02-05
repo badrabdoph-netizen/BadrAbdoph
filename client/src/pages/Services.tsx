@@ -112,7 +112,7 @@ function PrimaryCTA({ whatsappNumber }: { whatsappNumber: string | undefined }) 
     <Link href="/contact">
       <Button
         size="lg"
-        className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-7 text-lg rounded-none w-full sm:w-auto"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-7 text-lg rounded-none w-full sm:w-auto cta-glow"
       >
         {ctaTexts.bookNow}
       </Button>

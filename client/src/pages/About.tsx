@@ -46,7 +46,7 @@ export default function About() {
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/contact">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto cta-glow">
                 {ctaTexts.bookNow ?? "احجز الآن"}
               </Button>
             </Link>
@@ -54,7 +54,7 @@ export default function About() {
             <Link href="/services">
               <Button
                 variant="outline"
-                className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto"
+                className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto cta-glow"
               >
                 الأسعار والباقات
               </Button>
@@ -196,14 +196,14 @@ export default function About() {
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/contact">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto cta-glow">
                 {ctaTexts.contactNow ?? "تواصل الآن"}
               </Button>
             </Link>
             <Link href="/services">
               <Button
                 variant="outline"
-                className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto"
+                className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto cta-glow"
               >
                 شوف الباقات
               </Button>
