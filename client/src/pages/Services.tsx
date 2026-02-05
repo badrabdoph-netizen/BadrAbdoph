@@ -600,15 +600,15 @@ export default function Services() {
         }
 
         .quicknav-float {
-          position: relative;
-          background: rgba(12,12,16,0.78);
+          background:
+            linear-gradient(135deg, rgba(14,14,18,0.88), rgba(8,8,12,0.94)),
+            radial-gradient(circle at 50% 0%, rgba(255,215,140,0.08), transparent 60%);
           backdrop-filter: blur(12px) saturate(130%);
           -webkit-backdrop-filter: blur(12px) saturate(130%);
-          box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05);
+          box-shadow: 0 8px 28px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.06);
           overflow: hidden;
-          transform: translateY(0);
-          opacity: 1;
-          transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease, opacity 240ms ease;
+          transform: translateY(4px);
+          transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease;
           will-change: transform;
         }
         .quicknav-float::after {
@@ -622,15 +622,11 @@ export default function Services() {
           pointer-events: none;
         }
         .quicknav-stuck {
-          position: fixed;
-          left: 0;
-          right: 0;
-          background: rgba(10,10,14,0.86);
-          box-shadow:
-            0 16px 50px rgba(0,0,0,0.45),
-            0 0 24px rgba(255,210,130,0.2);
+          background:
+            linear-gradient(135deg, rgba(10,10,14,0.94), rgba(7,7,10,0.98)),
+            radial-gradient(circle at 50% 0%, rgba(255,215,140,0.12), transparent 60%);
+          box-shadow: 0 14px 44px rgba(0,0,0,0.45), 0 0 24px rgba(255,210,130,0.22);
           transform: translateY(0);
-          opacity: 1;
           animation: nav-float 3.6s ease-in-out infinite;
         }
         @keyframes nav-float {
