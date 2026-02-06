@@ -131,7 +131,9 @@ function PackageCard({
   whatsappNumber: string | undefined;
 }) {
   const isVipPlus = (p: any) => p?.id === "full-day-vip-plus" || p?.featured === true;
-  const vip = kind === "wedding" && isVipPlus(pkg);
+  const isWedding = kind === "wedding";
+  const vip = isWedding && isVipPlus(pkg);
+  const weddingTone = isWedding;
   const popular = !!pkg.popular;
   const isCustom = pkg.id === "special-montage-design";
   const isPro = pkg.id === "session-2";
@@ -153,7 +155,7 @@ function PackageCard({
       className={[
         "relative overflow-hidden bg-card border transition-all duration-300 group premium-border p-7 md:p-8 services-card",
         isCustom ? "custom-package md:col-span-2" : "",
-        vip
+        weddingTone
           ? "border-primary/45 shadow-[0_0_70px_rgba(255,200,80,0.12)] hover:shadow-[0_0_95px_rgba(255,200,80,0.18)] hover:-translate-y-2"
           : popular || isPro
           ? "border-primary/30 shadow-lg shadow-primary/15 hover:-translate-y-2"
@@ -163,7 +165,7 @@ function PackageCard({
       <div
         className={[
           "absolute inset-0 pointer-events-none transition-opacity duration-300",
-          vip || popular || isPro ? "opacity-40" : "opacity-0 group-hover:opacity-100",
+          weddingTone || popular || isPro ? "opacity-40" : "opacity-0 group-hover:opacity-100",
           "bg-[radial-gradient(circle_at_30%_20%,rgba(255,200,80,0.14),transparent_60%)]",
         ].join(" ")}
       />
@@ -250,10 +252,10 @@ function PackageCard({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Link href="/contact">
             <Button
-              variant={vip ? "default" : "outline"}
+              variant={weddingTone ? "default" : "outline"}
               className={[
                 "w-full h-[56px] rounded-none cta-glow",
-                vip
+                weddingTone
                   ? "bg-primary text-primary-foreground hover:bg-primary/90"
                   : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
               ].join(" ")}
