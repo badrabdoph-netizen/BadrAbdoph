@@ -228,17 +228,22 @@ function PackageCard({
 
         {pkg.features.length && !isCustom ? (
           <ul className="space-y-3 mb-6 md:mb-7">
-            {pkg.features.map((feature, i) => (
-              <li key={i} className="flex items-start text-sm">
-                <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
-                <span className="text-gray-300 leading-relaxed">
-                  {feature}
-                  {isPro && feature.includes("تنظيم ريلز") ? (
-                    <span className="pro-note-tag">مصور خاص</span>
-                  ) : null}
-                </span>
-              </li>
-            ))}
+            {pkg.features.map((feature, i) => {
+              const showProTag = isPro && feature.includes("تنظيم ريلز");
+              const showMediaTag = feature.includes("MEDIA COVERAGE REELS");
+              return (
+                <li key={i} className="flex items-start text-sm">
+                  <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
+                  <span className="text-gray-300 leading-relaxed">
+                    {feature}
+                    {showProTag ? <span className="pro-note-tag">مصور خاص</span> : null}
+                    {showMediaTag ? (
+                      <span className="pro-note-tag media-tag-glow">مصور خاص</span>
+                    ) : null}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         ) : null}
 
@@ -298,7 +303,7 @@ function QuickNav({
   return (
     <div
       className={["z-40 quicknav-float", stuck ? "quicknav-stuck" : ""].join(" ")}
-      style={{ top: "calc(var(--nav-offset, 96px) - 6px)" }}
+      style={stuck ? { top: "calc(var(--nav-offset, 96px) - 6px)" } : undefined}
       ref={navRef}
     >
       <div className="container mx-auto px-4 py-3">
@@ -310,10 +315,8 @@ function QuickNav({
                 key={it.id}
                 onClick={() => onJump(it.id)}
                 className={[
-                  "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border",
-                  isActive
-                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_24px_rgba(255,200,80,0.45)] ring-1 ring-primary/30"
-                    : "bg-black/15 border-white/10 text-foreground/80 hover:border-primary/35 hover:text-primary",
+                  "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border quicknav-btn",
+                  isActive ? "quicknav-btn--active" : "quicknav-btn--idle",
                 ].join(" ")}
               >
                 {it.label}
@@ -657,6 +660,38 @@ export default function Services() {
           transform: translateY(0);
           animation: nav-float 3.6s ease-in-out infinite;
         }
+        .quicknav-btn {
+          position: relative;
+          overflow: hidden;
+          background: linear-gradient(140deg, rgba(255,210,120,0.1), rgba(10,10,14,0.65) 70%);
+          border-color: rgba(255,210,120,0.35);
+          color: rgba(255,235,200,0.9);
+          box-shadow: inset 0 0 0 1px rgba(255,210,120,0.1);
+        }
+        .quicknav-btn::after {
+          content: "";
+          position: absolute;
+          inset: -160% -20%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.5) 46%, transparent 72%);
+          transform: translateX(-120%);
+          animation: services-shine 6.2s ease-in-out infinite;
+          opacity: 0.35;
+          pointer-events: none;
+        }
+        .quicknav-btn:hover {
+          border-color: rgba(255,210,120,0.65);
+          color: #fff2dc;
+          box-shadow: 0 0 18px rgba(255,210,130,0.25);
+        }
+        .quicknav-btn--active {
+          background: linear-gradient(140deg, rgba(255,210,120,0.36), rgba(255,255,255,0.08) 70%);
+          border-color: rgba(255,210,120,0.75);
+          color: #fff7e4;
+          box-shadow: 0 0 24px rgba(255,210,130,0.45);
+        }
+        .quicknav-btn--active::after {
+          opacity: 0.6;
+        }
         @keyframes nav-float {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-2px); }
@@ -743,6 +778,10 @@ export default function Services() {
           letter-spacing: 0.18em;
           color: rgba(255,240,205,0.9);
           text-shadow: 0 0 10px rgba(255,210,130,0.4);
+        }
+        .media-tag-glow {
+          color: rgba(255,248,225,0.98);
+          text-shadow: 0 0 12px rgba(255,210,130,0.7), 0 0 22px rgba(255,210,130,0.4);
         }
         .vip-note {
           color: rgba(255,235,200,0.95);
