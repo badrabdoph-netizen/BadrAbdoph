@@ -429,7 +429,7 @@ export default function Services() {
         </div>
       </div>
 
-      <header className="pt-28 md:pt-32 pb-4 relative overflow-hidden">
+      <header className="pt-10 md:pt-12 pb-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-background/35 to-background" />
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="absolute inset-0 pointer-events-none hero-grain opacity-[0.10]" />
