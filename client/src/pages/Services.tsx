@@ -308,7 +308,7 @@ function QuickNav({
       style={stuck ? { top: "calc(var(--nav-offset, 96px) - 6px)" } : undefined}
       ref={navRef}
     >
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-4 py-2 sm:py-3">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
           {items.map((it) => {
             const isActive = active === it.id;
@@ -317,7 +317,7 @@ function QuickNav({
                 key={it.id}
                 onClick={() => onJump(it.id)}
                 className={[
-                  "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border quicknav-btn",
+                  "shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border quicknav-btn",
                   isActive ? "quicknav-btn--active" : "quicknav-btn--idle",
                 ].join(" ")}
               >
@@ -675,13 +675,15 @@ export default function Services() {
           box-shadow: 0 0 18px rgba(255,210,130,0.25);
         }
         .quicknav-btn--active {
-          background: linear-gradient(140deg, rgba(255,210,120,0.36), rgba(255,255,255,0.08) 70%);
-          border-color: rgba(255,210,120,0.75);
+          background: linear-gradient(140deg, rgba(255,210,120,0.48), rgba(255,255,255,0.12) 70%);
+          border-color: rgba(255,210,120,0.9);
           color: #fff7e4;
-          box-shadow: 0 0 24px rgba(255,210,130,0.45);
+          text-shadow: 0 0 16px rgba(255,210,130,0.55);
+          box-shadow: 0 0 32px rgba(255,210,130,0.65), 0 0 64px rgba(255,210,130,0.25);
         }
         .quicknav-btn--active::after {
-          opacity: 0.6;
+          opacity: 0.9;
+          animation-duration: 4.6s;
         }
         @keyframes nav-float {
           0%, 100% { transform: translateY(0); }
