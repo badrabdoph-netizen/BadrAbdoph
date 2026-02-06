@@ -297,10 +297,7 @@ function QuickNav({
 
   return (
     <div
-      className={[
-        "z-40 quicknav-float border-y border-white/10",
-        stuck ? "quicknav-stuck" : "",
-      ].join(" ")}
+      className={["z-40 quicknav-float", stuck ? "quicknav-stuck" : ""].join(" ")}
       style={{ top: "calc(var(--nav-offset, 96px) - 6px)" }}
       ref={navRef}
     >
@@ -430,7 +427,7 @@ export default function Services() {
         </div>
       </div>
 
-      <header className="pt-10 md:pt-12 pb-4 relative overflow-hidden">
+      <header className="pt-10 md:pt-12 pb-0 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-background/35 to-background" />
         <div className="absolute inset-0 pointer-events-none [background:radial-gradient(circle_at_50%_20%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="absolute inset-0 pointer-events-none hero-grain opacity-[0.10]" />
@@ -626,11 +623,12 @@ export default function Services() {
 
         .quicknav-float {
           background:
-            linear-gradient(135deg, rgba(14,14,18,0.88), rgba(8,8,12,0.94)),
-            radial-gradient(circle at 50% 0%, rgba(255,215,140,0.08), transparent 60%);
+            linear-gradient(140deg, rgba(255,210,120,0.14), rgba(10,10,14,0.72) 68%),
+            radial-gradient(circle at 20% 0%, rgba(255,245,210,0.2), transparent 60%);
+          border: 1px solid rgba(255,210,120,0.35);
           backdrop-filter: blur(12px) saturate(130%);
           -webkit-backdrop-filter: blur(12px) saturate(130%);
-          box-shadow: 0 8px 28px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.06);
+          box-shadow: 0 12px 32px rgba(0,0,0,0.4), 0 0 24px rgba(255,210,130,0.18);
           overflow: hidden;
           transform: translateY(0);
           transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease;
@@ -641,10 +639,10 @@ export default function Services() {
           content: "";
           position: absolute;
           inset: -40% -10%;
-          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.2) 48%, transparent 72%);
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 46%, transparent 70%);
           transform: translateX(-120%);
-          animation: services-shine 6s ease-in-out infinite;
-          opacity: 0.3;
+          animation: services-shine 5.8s ease-in-out infinite;
+          opacity: 0.45;
           pointer-events: none;
         }
         .quicknav-stuck {
@@ -652,9 +650,10 @@ export default function Services() {
           left: 0;
           right: 0;
           background:
-            linear-gradient(135deg, rgba(10,10,14,0.94), rgba(7,7,10,0.98)),
-            radial-gradient(circle at 50% 0%, rgba(255,215,140,0.12), transparent 60%);
-          box-shadow: 0 14px 44px rgba(0,0,0,0.45), 0 0 24px rgba(255,210,130,0.22);
+            linear-gradient(140deg, rgba(255,210,120,0.18), rgba(10,10,14,0.82) 68%),
+            radial-gradient(circle at 20% 0%, rgba(255,245,210,0.26), transparent 60%);
+          border: 1px solid rgba(255,210,120,0.45);
+          box-shadow: 0 16px 46px rgba(0,0,0,0.45), 0 0 28px rgba(255,210,130,0.24);
           transform: translateY(0);
           animation: nav-float 3.6s ease-in-out infinite;
         }
