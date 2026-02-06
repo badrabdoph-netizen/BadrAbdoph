@@ -451,7 +451,7 @@ export default function Services() {
           <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed services-subtitle-glow">
             {pageTexts.services.subtitle}
           </p>
-          <div className="mt-4 flex flex-col items-center gap-3">
+          <div className="mt-4 mb-3 flex flex-col items-center gap-3">
             <div className="vip-highlight animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
               <Gem className="w-4 h-4 vip-highlight-icon" />
               <span>- VIP بمجرد حجزك لليوم، مش بيتحجز لغيرك حتى لو سنة.</span>
@@ -468,7 +468,7 @@ export default function Services() {
       {isNavStuck ? <div style={{ height: navHeight }} aria-hidden="true" /> : null}
       <QuickNav active={activeSection} onJump={jumpTo} stuck={isNavStuck} navRef={navRef} />
 
-      <section id="sessions" className="py-16" style={sectionStyle}>
+      <section id="sessions" className="pt-3 pb-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.sessionsTitle}
@@ -490,7 +490,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section id="prints" className="py-16" style={sectionStyle}>
+      <section id="prints" className="pt-3 pb-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.sessionsWithPrintsTitle}
@@ -511,7 +511,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section id="wedding" className="py-16 bg-card border-y border-white/5" style={sectionStyle}>
+      <section id="wedding" className="pt-3 pb-16 bg-card border-y border-white/5" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.weddingTitle}
@@ -533,7 +533,7 @@ export default function Services() {
       </section>
 
       {/* ✅ addons gets extra bottom padding to guarantee activation near end */}
-      <section id="addons" className="py-16 pb-24" style={sectionStyle}>
+      <section id="addons" className="pt-3 pb-24" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={pageTexts.services.addonsTitle}
