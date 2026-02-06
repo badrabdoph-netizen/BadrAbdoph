@@ -14,6 +14,7 @@ import {
   Phone,
   Gift,
   ArrowDown,
+  Gem,
 } from "lucide-react";
 import {
   pageTexts,
@@ -448,6 +449,16 @@ export default function Services() {
           <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed services-subtitle-glow">
             {pageTexts.services.subtitle}
           </p>
+          <div className="mt-4 flex flex-col items-center gap-3">
+            <div className="vip-highlight animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+              <Gem className="w-4 h-4 vip-highlight-icon" />
+              <span>- VIP بمجرد حجزك لليوم، مش بيتحجز لغيرك حتى لو سنة.</span>
+            </div>
+            <div className="vip-highlight animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-400">
+              <Receipt className="w-4 h-4 vip-highlight-icon" />
+              <span>بعد الحجز، تكون الأسعار نهائية كما في إيصال حجزك، بدون أي زيادات أو رسوم إضافية.</span>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -655,6 +666,39 @@ export default function Services() {
         .services-subtitle-glow {
           color: rgba(255,245,220,0.9);
           text-shadow: 0 0 16px rgba(255,210,130,0.45);
+        }
+        .vip-highlight {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 16px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,210,120,0.4);
+          background:
+            linear-gradient(140deg, rgba(255,210,120,0.18), rgba(10,10,14,0.65) 65%),
+            radial-gradient(circle at 20% 20%, rgba(255,245,210,0.25), transparent 60%);
+          color: rgba(255,245,220,0.95);
+          font-size: 13px;
+          line-height: 1.6;
+          text-shadow: 0 0 18px rgba(255,210,130,0.55);
+          box-shadow: 0 12px 30px rgba(0,0,0,0.35), 0 0 22px rgba(255,210,130,0.18);
+          overflow: hidden;
+          isolation: isolate;
+        }
+        .vip-highlight::after {
+          content: "";
+          position: absolute;
+          inset: -120% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.6) 46%, transparent 70%);
+          transform: translateX(-120%);
+          animation: services-shine 5.5s ease-in-out infinite;
+          opacity: 0.55;
+          pointer-events: none;
+        }
+        .vip-highlight-icon {
+          color: rgba(255,220,150,0.95);
+          filter: drop-shadow(0 0 10px rgba(255,210,130,0.6));
         }
         .section-subtitle-glow {
           color: rgba(255,235,200,0.95);
