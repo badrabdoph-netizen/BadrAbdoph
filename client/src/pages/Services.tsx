@@ -317,7 +317,7 @@ function QuickNav({
                 key={it.id}
                 onClick={() => onJump(it.id)}
                 className={[
-                  "shrink-0 px-1.5 py-2 text-sm font-semibold transition-colors duration-200 tap-target quicknav-btn",
+                  "shrink-0 px-4 py-2 text-sm font-semibold transition-all duration-200 rounded-full tap-target border quicknav-btn",
                   isActive ? "quicknav-btn--active" : "quicknav-btn--idle",
                 ].join(" ")}
               >
@@ -627,74 +627,61 @@ export default function Services() {
         }
 
         .quicknav-float {
-          background:
-            linear-gradient(140deg, rgba(255,210,120,0.14), rgba(10,10,14,0.72) 68%),
-            radial-gradient(circle at 20% 0%, rgba(255,245,210,0.2), transparent 60%);
-          border: 1px solid rgba(255,210,120,0.35);
-          backdrop-filter: blur(12px) saturate(130%);
-          -webkit-backdrop-filter: blur(12px) saturate(130%);
-          box-shadow: 0 12px 32px rgba(0,0,0,0.4), 0 0 24px rgba(255,210,130,0.18);
-          overflow: hidden;
+          background: transparent;
+          border: none;
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+          box-shadow: none;
+          overflow: visible;
           transform: translateY(0);
           transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease;
           will-change: transform;
           position: relative;
         }
         .quicknav-float::after {
-          content: "";
-          position: absolute;
-          inset: -40% -10%;
-          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 46%, transparent 70%);
-          transform: translateX(-120%);
-          animation: services-shine 5.8s ease-in-out infinite;
-          opacity: 0.45;
-          pointer-events: none;
+          content: none;
         }
         .quicknav-stuck {
           position: fixed;
           left: 0;
           right: 0;
-          background:
-            linear-gradient(140deg, rgba(255,210,120,0.18), rgba(10,10,14,0.82) 68%),
-            radial-gradient(circle at 20% 0%, rgba(255,245,210,0.26), transparent 60%);
-          border: 1px solid rgba(255,210,120,0.45);
-          box-shadow: 0 16px 46px rgba(0,0,0,0.45), 0 0 28px rgba(255,210,130,0.24);
+          background: transparent;
+          border: none;
+          box-shadow: none;
           transform: translateY(0);
           animation: nav-float 3.6s ease-in-out infinite;
         }
         .quicknav-btn {
           position: relative;
-          background: transparent;
-          border: none;
-          color: rgba(255,235,200,0.78);
-          text-shadow: 0 0 10px rgba(255,210,130,0.2);
+          overflow: hidden;
+          background: linear-gradient(140deg, rgba(255,210,120,0.1), rgba(10,10,14,0.65) 70%);
+          border-color: rgba(255,210,120,0.35);
+          color: rgba(255,235,200,0.9);
+          box-shadow: inset 0 0 0 1px rgba(255,210,120,0.1);
         }
         .quicknav-btn::after {
           content: "";
           position: absolute;
-          left: 0;
-          right: 0;
-          bottom: 2px;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255,220,150,0.9), transparent);
-          opacity: 0;
-          transform: scaleX(0.6);
-          transition: transform 200ms ease, opacity 200ms ease;
+          inset: -160% -20%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.5) 46%, transparent 72%);
+          transform: translateX(-120%);
+          animation: services-shine 6.2s ease-in-out infinite;
+          opacity: 0.35;
           pointer-events: none;
         }
         .quicknav-btn:hover {
+          border-color: rgba(255,210,120,0.65);
           color: #fff2dc;
+          box-shadow: 0 0 18px rgba(255,210,130,0.25);
         }
         .quicknav-btn--active {
+          background: linear-gradient(140deg, rgba(255,210,120,0.36), rgba(255,255,255,0.08) 70%);
+          border-color: rgba(255,210,120,0.75);
           color: #fff7e4;
-          text-shadow: 0 0 16px rgba(255,210,130,0.45);
+          box-shadow: 0 0 24px rgba(255,210,130,0.45);
         }
         .quicknav-btn--active::after {
-          opacity: 1;
-          transform: scaleX(1);
-        }
-        .quicknav-btn--idle {
-          opacity: 0.8;
+          opacity: 0.6;
         }
         @keyframes nav-float {
           0%, 100% { transform: translateY(0); }
