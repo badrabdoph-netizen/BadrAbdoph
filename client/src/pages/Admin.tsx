@@ -847,7 +847,7 @@ function ShareLinksManager() {
         url,
         expiresAt: data.expiresAt,
         createdAt: new Date().toISOString(),
-        note: data.note ?? note.trim() || null,
+        note: data.note ?? (note.trim() || null),
       };
 
       setLinks(prev => [item, ...prev].slice(0, 12));
