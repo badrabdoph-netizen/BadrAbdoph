@@ -319,7 +319,7 @@ export default function Home() {
       <Navbar />
 
       {/* HERO */}
-      <header className="relative min-h-[82vh] md:h-screen w-full overflow-hidden flex items-center justify-center pt-[calc(var(--nav-offset,96px)+8px)]">
+      <header className="relative min-h-[70vh] md:min-h-[80vh] w-full overflow-hidden flex items-center justify-center pt-[calc(var(--nav-offset,96px)+8px)]">
         <div
           ref={heroRef}
           className="absolute inset-0 w-full h-[120%] bg-cover bg-center z-0 will-change-transform hero-image"
@@ -470,7 +470,7 @@ export default function Home() {
       </header>
 
       {/* SERVICES PREVIEW */}
-      <section className="pt-20 pb-12 relative">
+      <section className="pt-12 pb-12 relative">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
