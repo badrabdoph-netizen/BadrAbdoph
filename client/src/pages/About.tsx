@@ -44,7 +44,7 @@ export default function About() {
 
           <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <EditableText
-              value={content.aboutTitle}
+              value={content.aboutTitle?.trim() ? content.aboutTitle : undefined}
               fallback={aboutContent.title || "عن بدر"}
               fieldKey="about_title"
               category="about"

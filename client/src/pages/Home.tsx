@@ -711,7 +711,7 @@ export default function Home() {
               </h3>
               <h2 className="about-name">
                 <EditableText
-                  value={content.aboutTitle}
+                  value={content.aboutTitle?.trim() ? content.aboutTitle : undefined}
                   fallback={aboutContent.title ?? ""}
                   fieldKey="about_title"
                   category="about"

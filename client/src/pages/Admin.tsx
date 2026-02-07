@@ -49,6 +49,7 @@ import {
   Undo2,
   Redo2,
   Pencil,
+  ShieldCheck,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useEditHistory, type EditAction } from "@/lib/editHistory";
