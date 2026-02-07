@@ -221,7 +221,7 @@ export default function Navbar() {
             <Link href="/contact">
               <Button
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-6 cta-glow"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none cta-glow cta-size"
               >
                 <EditableText
                   value={contentMap.cta_book_now}
@@ -390,7 +390,7 @@ export default function Navbar() {
 
             <div className="mt-4 grid grid-cols-1 gap-3">
               <Link href="/contact">
-                <a className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target text-center cta-glow">
+                <a className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-semibold tap-target text-center cta-glow cta-size">
                   <EditableText
                     value={contentMap.cta_book_now}
                     fallback={ctaTexts.bookNow}

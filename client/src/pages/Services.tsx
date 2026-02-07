@@ -359,12 +359,12 @@ function PackageCard({
           </ul>
         ) : null}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Link href="/contact">
             <Button
               variant={weddingTone ? "default" : "outline"}
                           className={[
-                            "w-full h-[56px] rounded-none cta-glow",
+                            "w-full rounded-none cta-glow cta-size",
                 weddingTone
                   ? "bg-primary text-primary-foreground hover:bg-primary/90"
                   : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
@@ -383,7 +383,7 @@ function PackageCard({
           <Link href="/package-details">
             <Button
               variant="outline"
-              className="w-full h-[56px] border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none cta-glow"
+              className="w-full border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none cta-glow cta-size"
             >
               <EditableText
                 value={contentMap.services_secondary_cta}
@@ -690,7 +690,7 @@ export default function Services() {
             icon={<Camera className="w-4 h-4 text-primary" />}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {sessionPackages.map((pkg) => (
               <PackageCard
                 key={pkg.id}
@@ -728,7 +728,7 @@ export default function Services() {
             icon={<Receipt className="w-4 h-4 text-primary" />}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {sessionPackagesWithPrints.map((pkg) => (
               <PackageCard
                 key={pkg.id}
@@ -766,7 +766,7 @@ export default function Services() {
             icon={<Heart className="w-4 h-4 text-primary" />}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {weddingPackages.map((pkg) => (
               <PackageCard
                 key={pkg.id}
@@ -805,7 +805,7 @@ export default function Services() {
             icon={<PlusCircle className="w-4 h-4 text-primary" />}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {additionalServices.map((service) => (
               <div
                 key={service.id}

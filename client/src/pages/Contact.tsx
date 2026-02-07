@@ -256,7 +256,7 @@ export default function Contact() {
       {/* Quick Actions */}
       <section className="border-y border-white/10 bg-background/70 backdrop-blur-md">
         <div className="container mx-auto px-4 py-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <a
               href={whatsappBookingHref}
               target="_blank"
@@ -595,7 +595,7 @@ export default function Contact() {
                     >
                       <Button
                         type="button"
-                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 text-lg rounded-none"
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-none cta-glow cta-size"
                         onClick={form.handleSubmit(onSendReceipt)}
                       >
                         <EditableText
