@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import {
   additionalServices,
@@ -158,9 +158,20 @@ export function usePortfolioData() {
 }
 
 export function useContentData() {
-  const { data } = trpc.siteContent.getAll.useQuery(undefined, {
+  const { data, refetch } = trpc.siteContent.getAll.useQuery(undefined, {
     staleTime: 60_000,
   });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "siteContentUpdatedAt") {
+        refetch();
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [refetch]);
 
   const map = useMemo(() => {
     const out: Record<string, string> = {};

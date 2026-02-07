@@ -194,6 +194,9 @@ export function EditableText({
       }
       toast.success("تم حفظ النص");
       utils.siteContent.getAll.invalidate();
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("siteContentUpdatedAt", String(Date.now()));
+      }
       setIsEditing(false);
     },
     onError: (error) => toast.error(error.message),

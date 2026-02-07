@@ -29,6 +29,12 @@ import {
   revokeLocalShareLink,
   extendLocalShareLink,
 } from "./_core/shareLinkStore";
+import {
+  getLocalSiteContentByKey,
+  listLocalSiteContent,
+  upsertLocalSiteContent,
+  deleteLocalSiteContent,
+} from "./_core/siteContentStore";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 let _pool: mysql.Pool | null = null;
@@ -126,20 +132,20 @@ export async function getUserByOpenId(openId: string) {
 
 export async function getAllSiteContent() {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) return await listLocalSiteContent();
   return await db.select().from(siteContent);
 }
 
 export async function getSiteContentByKey(key: string) {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) return await getLocalSiteContentByKey(key);
   const result = await db.select().from(siteContent).where(eq(siteContent.key, key)).limit(1);
   return result.length > 0 ? result[0] : null;
 }
 
 export async function upsertSiteContent(data: InsertSiteContent) {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) return await upsertLocalSiteContent(data);
   
   await db.insert(siteContent).values(data).onDuplicateKeyUpdate({
     set: { value: data.value, label: data.label, category: data.category },
@@ -150,7 +156,7 @@ export async function upsertSiteContent(data: InsertSiteContent) {
 
 export async function deleteSiteContent(key: string) {
   const db = await getDb();
-  if (!db) return false;
+  if (!db) return await deleteLocalSiteContent(key);
   await db.delete(siteContent).where(eq(siteContent.key, key));
   return true;
 }
