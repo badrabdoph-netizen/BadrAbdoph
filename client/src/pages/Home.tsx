@@ -649,7 +649,7 @@ export default function Home() {
                         <Button
                           variant={featured ? "default" : "outline"}
                           className={[
-                            "rounded-none cta-glow",
+                            "rounded-none cta-glow cta-size",
                             featured
                               ? "bg-primary text-primary-foreground hover:bg-primary/90"
                               : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",

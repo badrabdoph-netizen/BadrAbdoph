@@ -115,7 +115,7 @@ function PrimaryCTA({ whatsappNumber, label }: { whatsappNumber: string | undefi
     <Link href="/contact">
       <Button
         size="lg"
-        className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-7 text-lg rounded-none w-full sm:w-auto cta-glow"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none w-full sm:w-auto cta-glow cta-size"
       >
         {label}
       </Button>
@@ -363,8 +363,8 @@ function PackageCard({
           <Link href="/contact">
             <Button
               variant={weddingTone ? "default" : "outline"}
-              className={[
-                "w-full h-[56px] rounded-none cta-glow",
+                          className={[
+                            "w-full h-[56px] rounded-none cta-glow",
                 weddingTone
                   ? "bg-primary text-primary-foreground hover:bg-primary/90"
                   : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
