@@ -14,6 +14,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -910,6 +917,110 @@ function ContentManager({ onRefresh }: ManagerProps) {
 }
 
 // ============================================
+// Backstage (Internal) Settings
+// ============================================
+function BackstageManager({ onRefresh }: ManagerProps) {
+  const { data: content, refetch, isLoading } = trpc.siteContent.getAll.useQuery();
+  const upsertMutation = trpc.siteContent.upsert.useMutation({
+    onSuccess: () => {
+      toast.success("تم حفظ الإعدادات الداخلية");
+      refetch();
+      onRefresh?.();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const [editingContent, setEditingContent] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (content) {
+      const contentMap: Record<string, string> = {};
+      content.forEach((item) => {
+        contentMap[item.key] = item.value;
+      });
+      setEditingContent(contentMap);
+    }
+  }, [content]);
+
+  const backstageFields = [
+    {
+      key: "backstage_packages_rules",
+      label: "قواعد الباقات (داخلي)",
+      placeholder: "مثال: ملاحظات داخلية على الباقات، الاستثناءات، إلخ",
+      category: "backstage",
+    },
+    {
+      key: "backstage_booking_flow",
+      label: "خطوات الحجز (داخلي)",
+      placeholder: "مثال: تأكيد الحجز، العربون، التذكير قبل المناسبة",
+      category: "backstage",
+    },
+    {
+      key: "backstage_booking_deposit",
+      label: "تفاصيل العربون/الدفع (داخلي)",
+      placeholder: "مثال: قيمة العربون، سياسة الدفع، مواعيد التحصيل",
+      category: "backstage",
+    },
+    {
+      key: "backstage_booking_policy",
+      label: "سياسة التأجيل/الإلغاء (داخلي)",
+      placeholder: "مثال: شروط التأجيل، الإلغاء، الاسترجاع",
+      category: "backstage",
+    },
+    {
+      key: "backstage_booking_notes",
+      label: "ملاحظات خاصة بالحجوزات (داخلي)",
+      placeholder: "أي ملاحظات إضافية خاصة بالحجوزات",
+      category: "backstage",
+    },
+  ];
+
+  const handleSave = async (field: (typeof backstageFields)[number]) => {
+    await upsertMutation.mutateAsync({
+      key: field.key,
+      value: editingContent[field.key] || "",
+      category: field.category,
+      label: field.label,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-10">
+        <Loader2 className="w-6 h-6 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      {backstageFields.map((field) => (
+        <div key={field.key} className="space-y-2">
+          <Label>{field.label}</Label>
+          <div className="flex gap-2">
+            <Textarea
+              value={editingContent[field.key] || ""}
+              onChange={(e) =>
+                setEditingContent({ ...editingContent, [field.key]: e.target.value })
+              }
+              placeholder={field.placeholder}
+              rows={3}
+            />
+            <Button
+              size="icon"
+              onClick={() => handleSave(field)}
+              disabled={upsertMutation.isPending}
+            >
+              <Save className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ============================================
 // Packages Manager Component
 // ============================================
 function PackagesManager({ onRefresh }: ManagerProps) {
@@ -1749,6 +1860,8 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
   const [ttlHours, setTtlHours] = useState(24);
   const [note, setNote] = useState("");
   const [latestLinkUrl, setLatestLinkUrl] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const { data: links = [], isLoading } = trpc.shareLinks.list.useQuery();
   const [confirmState, setConfirmState] = useState<{
     open: boolean;
@@ -1776,6 +1889,15 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
         if (url) setLatestLinkUrl(url);
       }
       toast.success("تم إنشاء الرابط المؤقت");
+      utils.shareLinks.list.invalidate();
+      onRefresh?.();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const extendMutation = trpc.shareLinks.extend.useMutation({
+    onSuccess: () => {
+      toast.success("تم تمديد الرابط");
       utils.shareLinks.list.invalidate();
       onRefresh?.();
     },
@@ -1830,10 +1952,22 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
     });
   };
 
+
   const now = Date.now();
   const sortedLinks = [...links].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredLinks = sortedLinks.filter((link) => {
+    const expiresAtMs = new Date(link.expiresAt).getTime();
+    const isExpired = Number.isNaN(expiresAtMs) ? false : expiresAtMs <= now;
+    const isRevoked = Boolean(link.revokedAt);
+    const status = isRevoked ? "revoked" : isExpired ? "expired" : "active";
+    const matchesStatus = statusFilter === "all" || statusFilter === status;
+    if (!normalizedSearch) return matchesStatus;
+    const haystack = `${link.code} ${link.note ?? ""}`.toLowerCase();
+    return matchesStatus && haystack.includes(normalizedSearch);
+  });
 
   return (
     <div className="space-y-6">
@@ -1981,7 +2115,40 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
             </div>
           )}
 
-          {sortedLinks.map((link) => {
+          {sortedLinks.length > 0 && (
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="ابحث بالكود أو الملاحظة..."
+                className="sm:max-w-sm"
+              />
+              <div className="flex items-center gap-2">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="فلترة الحالة" />
+                  </SelectTrigger>
+                  <SelectContent align="start">
+                    <SelectItem value="all">الكل</SelectItem>
+                    <SelectItem value="active">سارية</SelectItem>
+                    <SelectItem value="expired">منتهية</SelectItem>
+                    <SelectItem value="revoked">ملغية</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Badge variant="secondary" className="text-xs">
+                  {filteredLinks.length} نتيجة
+                </Badge>
+              </div>
+            </div>
+          )}
+
+          {sortedLinks.length > 0 && filteredLinks.length === 0 && (
+            <div className="text-sm text-muted-foreground">
+              لا توجد روابط مطابقة لبحثك.
+            </div>
+          )}
+
+          {filteredLinks.map((link) => {
             const expiresAtMs = new Date(link.expiresAt).getTime();
             const isExpired = Number.isNaN(expiresAtMs)
               ? false
@@ -2041,6 +2208,34 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
                       </Button>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="text-muted-foreground">تمديد سريع:</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => extendMutation.mutate({ code: link.code, hours: 1 })}
+                    disabled={isRevoked || extendMutation.isPending}
+                  >
+                    +1 ساعة
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => extendMutation.mutate({ code: link.code, hours: 24 })}
+                    disabled={isRevoked || extendMutation.isPending}
+                  >
+                    +24 ساعة
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => extendMutation.mutate({ code: link.code, hours: 72 })}
+                    disabled={isRevoked || extendMutation.isPending}
+                  >
+                    +3 أيام
+                  </Button>
                 </div>
               </div>
             );
@@ -2194,22 +2389,46 @@ function LiveEditor() {
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div
+        className={[
+          "grid gap-6",
+          panelOpen ? "lg:grid-cols-[0.95fr_1.35fr]" : "",
+        ].join(" ")}
+      >
         {panelOpen && (
-          <Card className="overflow-hidden">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Link2 className="w-5 h-5" />
-                روابط مؤقتة
-              </CardTitle>
-              <CardDescription>
-                أنشئ وادِر روابط المعاينة المؤقتة من هنا.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <ShareLinksManager onRefresh={refreshPreview} />
-            </CardContent>
-          </Card>
+          <div className="lg:sticky lg:top-24 h-fit">
+            <div className="space-y-6">
+              <Card className="overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Link2 className="w-5 h-5" />
+                    روابط مؤقتة
+                  </CardTitle>
+                  <CardDescription>
+                    أنشئ وادِر روابط المعاينة المؤقتة من هنا.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-2 lg:max-h-[60vh] lg:overflow-y-auto">
+                  <ShareLinksManager onRefresh={refreshPreview} />
+                </CardContent>
+              </Card>
+
+              <Card className="overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5" />
+                    وراء الستار
+                  </CardTitle>
+                  <CardDescription>
+                    إعدادات داخلية للباقات والحجوزات لا تظهر للزوار.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-2 lg:max-h-[42vh] lg:overflow-y-auto">
+                  <BackstageManager onRefresh={refreshPreview} />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         )}
 
         <Card className="overflow-hidden">

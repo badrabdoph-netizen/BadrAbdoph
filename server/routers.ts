@@ -135,6 +135,31 @@ export const appRouter = router({
         await db.revokeShareLink(input.code);
         return { success: true };
       }),
+    extend: adminProcedure
+      .input(
+        z.object({
+          code: z.string().min(8),
+          hours: z.number().int().min(1).max(168),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const record = await db.getShareLinkByCode(input.code);
+        if (!record) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "الرابط غير موجود" });
+        }
+        if (record.revokedAt) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "لا يمكن تمديد رابط ملغي" });
+        }
+
+        const updated = await db.extendShareLink(input.code, input.hours);
+        if (!updated) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "تعذر تمديد الرابط" });
+        }
+
+        return {
+          expiresAt: updated.expiresAt.toISOString(),
+        };
+      }),
     validate: publicProcedure
       .input(z.object({ token: z.string().min(10) }))
       .query(async ({ input }) => {
@@ -159,7 +184,7 @@ export const appRouter = router({
         const record = await db.getShareLinkByCode(input.code);
         if (!record) {
           return {
-            valid: false,
+            valid: !result.expired,
             expiresAt: result.expiresAt ? result.expiresAt.toISOString() : null,
           };
         }

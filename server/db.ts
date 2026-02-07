@@ -27,6 +27,7 @@ import {
   getLocalShareLinkByCode,
   listLocalShareLinks,
   revokeLocalShareLink,
+  extendLocalShareLink,
 } from "./_core/shareLinkStore";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -243,6 +244,27 @@ export async function revokeShareLink(code: string) {
   const now = new Date();
   await db.update(shareLinks).set({ revokedAt: now }).where(eq(shareLinks.code, code));
   return true;
+}
+
+export async function extendShareLink(code: string, hours: number): Promise<ShareLinkRecord | null> {
+  const record = await getShareLinkByCode(code);
+  if (!record) return null;
+  const now = new Date();
+  const base = record.expiresAt && record.expiresAt.getTime() > now.getTime()
+    ? record.expiresAt
+    : now;
+  const newExpiresAt = new Date(base.getTime() + hours * 60 * 60 * 1000);
+
+  const db = await getDb();
+  if (!db) {
+    return await extendLocalShareLink(code, newExpiresAt);
+  }
+
+  await db.update(shareLinks).set({ expiresAt: newExpiresAt }).where(eq(shareLinks.code, code));
+  return {
+    ...record,
+    expiresAt: newExpiresAt,
+  };
 }
 
 // ============================================

@@ -114,8 +114,8 @@ export function verifyShortShareCode(code: string) {
   }
 
   if (expiresAt.getTime() <= Date.now()) {
-    return { valid: false, expiresAt };
+    return { valid: true, expiresAt, expired: true };
   }
 
-  return { valid: true, expiresAt };
+  return { valid: true, expiresAt, expired: false };
 }

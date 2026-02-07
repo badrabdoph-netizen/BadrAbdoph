@@ -129,3 +129,17 @@ export async function revokeLocalShareLink(code: string) {
   await persistStore();
   return true;
 }
+
+export async function extendLocalShareLink(
+  code: string,
+  newExpiresAt: Date
+): Promise<LocalShareLink | null> {
+  await ensureStoreLoaded();
+  const record = store?.get(code);
+  if (!record) return null;
+  record.expiresAt = newExpiresAt;
+  record.updatedAt = new Date();
+  store?.set(code, record);
+  await persistStore();
+  return record;
+}
