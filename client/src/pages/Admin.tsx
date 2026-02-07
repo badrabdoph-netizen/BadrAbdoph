@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { 
   Image, 
@@ -25,6 +26,9 @@ import {
   LayoutGrid,
   Home,
   Monitor,
+  Link2,
+  Clock,
+  Copy,
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -58,7 +62,7 @@ function AdminDashboard() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-7 w-full max-w-5xl mx-auto">
+          <TabsList className="grid grid-cols-4 md:grid-cols-8 w-full max-w-6xl mx-auto">
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
               <span className="hidden sm:inline">المعرض</span>
@@ -82,6 +86,10 @@ function AdminDashboard() {
             <TabsTrigger value="sections" className="flex items-center gap-2">
               <LayoutGrid className="w-4 h-4" />
               <span className="hidden sm:inline">الأقسام</span>
+            </TabsTrigger>
+            <TabsTrigger value="share" className="flex items-center gap-2">
+              <Link2 className="w-4 h-4" />
+              <span className="hidden sm:inline">روابط مؤقتة</span>
             </TabsTrigger>
             <TabsTrigger value="preview" className="flex items-center gap-2">
               <Monitor className="w-4 h-4" />
@@ -111,6 +119,10 @@ function AdminDashboard() {
           
           <TabsContent value="sections">
             <SectionsManager />
+          </TabsContent>
+
+          <TabsContent value="share">
+            <ShareLinksManager />
           </TabsContent>
 
           <TabsContent value="preview">
@@ -768,6 +780,248 @@ function SectionsManager() {
               </div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ============================================
+// Share Links Manager Component
+// ============================================
+type ShareLinkItem = {
+  token: string;
+  url: string;
+  expiresAt: string;
+  createdAt: string;
+  note?: string | null;
+};
+
+const SHARE_LINKS_STORAGE_KEY = "badr_share_links_cache";
+
+function loadCachedShareLinks(): ShareLinkItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(SHARE_LINKS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as ShareLinkItem[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistShareLinks(links: ShareLinkItem[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(SHARE_LINKS_STORAGE_KEY, JSON.stringify(links));
+  } catch {
+    // ignore storage errors
+  }
+}
+
+function formatShareDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "غير محدد";
+  return new Intl.DateTimeFormat("ar-EG", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
+function ShareLinksManager() {
+  const [ttlHours, setTtlHours] = useState(24);
+  const [note, setNote] = useState("");
+  const [links, setLinks] = useState<ShareLinkItem[]>(() => loadCachedShareLinks());
+
+  useEffect(() => {
+    persistShareLinks(links);
+  }, [links]);
+
+  const createMutation = trpc.shareLinks.create.useMutation({
+    onSuccess: (data) => {
+      const origin = window.location.origin;
+      const url = `${origin}/share/${data.token}`;
+      const item: ShareLinkItem = {
+        token: data.token,
+        url,
+        expiresAt: data.expiresAt,
+        createdAt: new Date().toISOString(),
+        note: data.note ?? note.trim() || null,
+      };
+
+      setLinks(prev => [item, ...prev].slice(0, 12));
+      setNote("");
+      toast.success("تم إنشاء الرابط المؤقت");
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const handleCreate = () => {
+    if (!Number.isFinite(ttlHours) || ttlHours < 1) {
+      toast.error("يرجى إدخال مدة صحيحة بالساعات");
+      return;
+    }
+    createMutation.mutate({ ttlHours, note: note.trim() || undefined });
+  };
+
+  const handleCopy = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("تم نسخ الرابط");
+    } catch {
+      toast.error("تعذر نسخ الرابط");
+    }
+  };
+
+  const handleRemove = (token: string) => {
+    setLinks(prev => prev.filter(link => link.token !== token));
+  };
+
+  const now = Date.now();
+  const sortedLinks = [...links].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Link2 className="w-5 h-5" />
+            إنشاء رابط مؤقت
+          </CardTitle>
+          <CardDescription>
+            أنشئ رابط مشاركة ينتهي تلقائياً بعد مدة محددة.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div className="space-y-2">
+              <Label htmlFor="share-ttl">المدة (بالساعات)</Label>
+              <Input
+                id="share-ttl"
+                type="number"
+                min={1}
+                max={168}
+                value={ttlHours}
+                onChange={(e) => setTtlHours(Number(e.target.value))}
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="share-note">ملاحظة (اختياري)</Label>
+              <Input
+                id="share-note"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="مثال: لينك لمعاينة جلسة جديدة"
+              />
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setTtlHours(1)}
+            >
+              ساعة واحدة
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setTtlHours(24)}
+            >
+              24 ساعة
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setTtlHours(72)}
+            >
+              3 أيام
+            </Button>
+          </div>
+          <Button onClick={handleCreate} disabled={createMutation.isPending}>
+            {createMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin ml-2" />
+            ) : (
+              <Link2 className="w-4 h-4 ml-2" />
+            )}
+            إنشاء الرابط
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="w-5 h-5" />
+            الروابط التي أنشأتها
+          </CardTitle>
+          <CardDescription>
+            هذه القائمة محفوظة على المتصفح الحالي فقط.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {sortedLinks.length === 0 && (
+            <div className="text-sm text-muted-foreground">
+              لم يتم إنشاء أي روابط بعد.
+            </div>
+          )}
+
+          {sortedLinks.map((link) => {
+            const expiresAtMs = new Date(link.expiresAt).getTime();
+            const isExpired = Number.isNaN(expiresAtMs)
+              ? false
+              : expiresAtMs <= now;
+
+            return (
+              <div
+                key={link.token}
+                className="flex flex-col gap-3 rounded-lg border border-border p-4 md:flex-row md:items-center md:justify-between"
+              >
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant={isExpired ? "destructive" : "secondary"}>
+                      {isExpired ? "منتهي" : "ساري"}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      ينتهي في {formatShareDate(link.expiresAt)}
+                    </span>
+                  </div>
+                  {link.note && (
+                    <div className="text-sm text-muted-foreground">
+                      {link.note}
+                    </div>
+                  )}
+                  <div className="text-xs text-muted-foreground dir-ltr break-all">
+                    {link.url}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handleCopy(link.url)}
+                  >
+                    <Copy className="w-4 h-4 ml-2" />
+                    نسخ
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleRemove(link.token)}
+                  >
+                    <Trash2 className="w-4 h-4 ml-2" />
+                    حذف
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
     </div>

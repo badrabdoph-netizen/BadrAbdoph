@@ -7,6 +7,7 @@ import { z } from "zod";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import * as db from "./db";
+import { createShareLink, verifyShareLink } from "./_core/shareLinks";
 
 export const appRouter = router({
   system: systemRouter,
@@ -19,6 +20,37 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+  }),
+
+  // Temporary Share Links
+  shareLinks: router({
+    create: adminProcedure
+      .input(
+        z.object({
+          ttlHours: z.number().int().min(1).max(168),
+          note: z.string().max(200).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const expiresInMs = input.ttlHours * 60 * 60 * 1000;
+        const { token, expiresAt } = await createShareLink(expiresInMs);
+
+        return {
+          token,
+          expiresAt: expiresAt.toISOString(),
+          note: input.note ?? null,
+        };
+      }),
+    validate: publicProcedure
+      .input(z.object({ token: z.string().min(10) }))
+      .query(async ({ input }) => {
+        const result = await verifyShareLink(input.token);
+
+        return {
+          valid: result.valid,
+          expiresAt: result.expiresAt ? result.expiresAt.toISOString() : null,
+        };
+      }),
   }),
 
   // Contact form submission with owner notification

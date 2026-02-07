@@ -12,6 +12,7 @@ import Portfolio from "./pages/Portfolio";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
+import Share from "./pages/Share";
 
 function getNavOffsetPx() {
   const v = getComputedStyle(document.documentElement).getPropertyValue("--nav-offset").trim();
@@ -84,6 +85,9 @@ function Router() {
       <ScrollToTop />
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/share/:token">
+          {(params) => <Share token={params.token} />}
+        </Route>
         <Route path="/about" component={About} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/services" component={Services} />
