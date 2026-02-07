@@ -1862,7 +1862,30 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
   const [latestLinkUrl, setLatestLinkUrl] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const { data: links = [], isLoading } = trpc.shareLinks.list.useQuery();
+  const cacheKey = "admin_share_links_cache";
+  const [cachedLinks, setCachedLinks] = useState<ShareLinkItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = window.sessionStorage.getItem(cacheKey);
+      return raw ? (JSON.parse(raw) as ShareLinkItem[]) : [];
+    } catch {
+      return [];
+    }
+  });
+  const updateCache = (updater: (prev: ShareLinkItem[]) => ShareLinkItem[]) => {
+    setCachedLinks((prev) => {
+      const next = updater(prev);
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(cacheKey, JSON.stringify(next));
+      }
+      return next;
+    });
+  };
+  const listQuery = trpc.shareLinks.list.useQuery(undefined, {
+    onSuccess: (data) => {
+      updateCache(() => data);
+    },
+  });
   const [confirmState, setConfirmState] = useState<{
     open: boolean;
     title: string;
@@ -1875,6 +1898,8 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
     description: "",
     confirmLabel: "تأكيد",
   });
+  const links = listQuery.data ?? cachedLinks;
+  const isLoading = listQuery.isLoading && cachedLinks.length === 0;
 
   const buildShareUrl = (code: string) => {
     if (typeof window === "undefined") return "";
@@ -1887,6 +1912,17 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
       if (data?.code) {
         const url = buildShareUrl(data.code);
         if (url) setLatestLinkUrl(url);
+        const createdAt = new Date().toISOString();
+        updateCache((prev) => {
+          const next: ShareLinkItem = {
+            code: data.code,
+            note: data.note ?? null,
+            expiresAt: data.expiresAt,
+            createdAt,
+            revokedAt: null,
+          };
+          return [next, ...prev.filter((item) => item.code !== data.code)];
+        });
       }
       toast.success("تم إنشاء الرابط المؤقت");
       utils.shareLinks.list.invalidate();
@@ -1896,8 +1932,17 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
   });
 
   const extendMutation = trpc.shareLinks.extend.useMutation({
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       toast.success("تم تمديد الرابط");
+      if (data?.expiresAt) {
+        updateCache((prev) =>
+          prev.map((item) =>
+            item.code === variables.code
+              ? { ...item, expiresAt: data.expiresAt }
+              : item
+          )
+        );
+      }
       utils.shareLinks.list.invalidate();
       onRefresh?.();
     },
@@ -1947,6 +1992,13 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
       description: "هل تريد تعطيل هذا الرابط المؤقت؟",
       confirmLabel: "تعطيل",
       onConfirm: () => {
+        updateCache((prev) =>
+          prev.map((item) =>
+            item.code === code
+              ? { ...item, revokedAt: new Date().toISOString() }
+              : item
+          )
+        );
         revokeMutation.mutate({ code });
       },
     });
