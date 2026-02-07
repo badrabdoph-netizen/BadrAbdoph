@@ -24,7 +24,7 @@ import {
   pageTexts,
 } from "@/config/siteConfig";
 import { useContactData, usePackagesData, useContentData } from "@/hooks/useSiteData";
-import { EditableContactText, EditableText } from "@/components/InlineEdit";
+import { EditableContactText, EditableLinkIcon, EditableText } from "@/components/InlineEdit";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" }),
