@@ -3,6 +3,7 @@ import { Facebook, Instagram, MessageCircle, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { EditableText } from "@/components/InlineEdit";
+import { Button } from "@/components/ui/button";
 import { useContactData, useContentData } from "@/hooks/useSiteData";
 
 function WhatsAppIcon({ size = 22 }: { size?: number }) {
@@ -147,45 +148,47 @@ export default function PackageDetails() {
                 : "/contact";
               const isExternal = whatsappHref.length > 0;
               const contentNode = (
-                <>
-                  <div className="w-12 h-12 rounded-full border border-white/10 bg-black/20 flex items-center justify-center text-primary">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <div className="text-right">
-                    <div className="text-base md:text-lg font-semibold">
-                      <EditableText
-                        value={contentMap[option.key]}
-                        fallback={option.fallback}
-                        fieldKey={option.key}
-                        category="services"
-                        label={`خيار الباقة: ${option.fallback}`}
-                        multiline
-                      />
-                    </div>
-                  </div>
-                </>
+                <span className="inline-flex items-center gap-3 text-base md:text-lg font-semibold">
+                  <Icon className="w-4 h-4" />
+                  <EditableText
+                    value={contentMap[option.key]}
+                    fallback={option.fallback}
+                    fieldKey={option.key}
+                    category="services"
+                    label={`خيار الباقة: ${option.fallback}`}
+                    multiline
+                  />
+                </span>
               );
 
               if (optionHref.startsWith("/") && !isExternal) {
                 return (
                   <Link key={option.key} href={optionHref}>
-                    <a className="premium-border border border-white/10 bg-card/50 p-5 flex items-center justify-between gap-4 hover:border-primary/40 hover:bg-primary/5 transition-colors">
+                    <Button
+                      variant="outline"
+                      className="w-full min-h-[56px] rounded-none px-6 cta-glow border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    >
                       {contentNode}
-                    </a>
+                    </Button>
                   </Link>
                 );
               }
 
               return (
-                <a
+                <Button
                   key={option.key}
-                  href={optionHref}
-                  target={isExternal ? "_blank" : undefined}
-                  rel={isExternal ? "noreferrer" : undefined}
-                  className="premium-border border border-white/10 bg-card/50 p-5 flex items-center justify-between gap-4 hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                  asChild
+                  variant="outline"
+                  className="w-full min-h-[56px] rounded-none px-6 cta-glow border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                 >
-                  {contentNode}
-                </a>
+                  <a
+                    href={optionHref}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noreferrer" : undefined}
+                  >
+                    {contentNode}
+                  </a>
+                </Button>
               );
             })}
           </div>
@@ -311,9 +314,39 @@ export default function PackageDetails() {
             border-radius: 16px;
           }
         }
+        .cta-glow {
+          position: relative;
+          overflow: hidden;
+          isolation: isolate;
+          box-shadow: 0 0 0 1px rgba(255, 200, 80, 0.18) inset, 0 18px 50px rgba(255, 200, 80, 0.12);
+        }
+        .cta-glow::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: linear-gradient(135deg, rgba(255, 220, 150, 0.18), transparent 60%);
+          opacity: 0.8;
+          pointer-events: none;
+        }
+        .cta-glow::after {
+          content: "";
+          position: absolute;
+          inset: -120% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 45%, transparent 70%);
+          transform: translateX(-120%);
+          animation: cta-shine 3.6s ease-in-out infinite;
+          pointer-events: none;
+          opacity: 0.6;
+        }
         @keyframes social-shine {
           0% { transform: translateX(-120%); }
           70% { transform: translateX(120%); }
+          100% { transform: translateX(120%); }
+        }
+        @keyframes cta-shine {
+          0% { transform: translateX(-120%); }
+          60% { transform: translateX(120%); }
           100% { transform: translateX(120%); }
         }
         @keyframes glow-pulse {
@@ -322,7 +355,8 @@ export default function PackageDetails() {
         }
         @media (prefers-reduced-motion: reduce) {
           .hero-follow-glow,
-          .hero-social-btn::after { animation: none !important; }
+          .hero-social-btn::after,
+          .cta-glow::after { animation: none !important; }
         }
       `}</style>
 
