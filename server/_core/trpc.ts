@@ -41,6 +41,15 @@ export const adminProcedure = t.procedure.use(
       });
     }
 
+    if (ctx.adminAccess) {
+      return next({
+        ctx: {
+          ...ctx,
+          user: ctx.user,
+        },
+      });
+    }
+
     if (!ctx.user || ctx.user.role !== 'admin') {
       throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
     }

@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Loader2, Link2, Clock, XCircle } from "lucide-react";
 
 type ShareProps = {
-  token: string;
+  token?: string;
+  code?: string;
 };
 
 function formatDateTime(value: string | null | undefined) {
@@ -17,15 +18,19 @@ function formatDateTime(value: string | null | undefined) {
   }).format(date);
 }
 
-export default function Share({ token }: ShareProps) {
-  const {
-    data,
-    isLoading,
-    isError,
-  } = trpc.shareLinks.validate.useQuery(
-    { token },
-    { enabled: Boolean(token) }
+export default function Share({ token, code }: ShareProps) {
+  const shortQuery = trpc.shareLinks.validateShort.useQuery(
+    { code: code ?? "" },
+    { enabled: Boolean(code) }
   );
+  const tokenQuery = trpc.shareLinks.validate.useQuery(
+    { token: token ?? "" },
+    { enabled: !code && Boolean(token) }
+  );
+
+  const data = code ? shortQuery.data : tokenQuery.data;
+  const isLoading = code ? shortQuery.isLoading : tokenQuery.isLoading;
+  const isError = code ? shortQuery.isError : tokenQuery.isError;
 
   const isValid = Boolean(data?.valid);
   const expiresAt = data?.expiresAt ?? null;

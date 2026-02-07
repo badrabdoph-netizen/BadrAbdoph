@@ -29,14 +29,63 @@ import {
   Link2,
   Clock,
   Copy,
+  Lock,
+  LogOut,
 } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Admin() {
-  return <AdminDashboard />;
+  const utils = trpc.useUtils();
+  const statusQuery = trpc.adminAccess.status.useQuery();
+  const loginMutation = trpc.adminAccess.login.useMutation({
+    onSuccess: () => {
+      utils.adminAccess.status.invalidate();
+      toast.success("تم تسجيل الدخول");
+    },
+    onError: (error) => toast.error(error.message),
+  });
+  const logoutMutation = trpc.adminAccess.logout.useMutation({
+    onSuccess: () => {
+      utils.adminAccess.status.invalidate();
+      toast.success("تم تسجيل الخروج");
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  if (statusQuery.isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!statusQuery.data?.authenticated) {
+    return (
+      <AdminLogin
+        isLoading={loginMutation.isPending}
+        onSubmit={(username, password) => {
+          loginMutation.mutate({ username, password });
+        }}
+      />
+    );
+  }
+
+  return (
+    <AdminDashboard
+      onLogout={() => logoutMutation.mutate()}
+      logoutPending={logoutMutation.isPending}
+    />
+  );
 }
 
-function AdminDashboard() {
+function AdminDashboard({
+  onLogout,
+  logoutPending,
+}: {
+  onLogout: () => void;
+  logoutPending: boolean;
+}) {
   const [activeTab, setActiveTab] = useState("portfolio");
 
   return (
@@ -55,6 +104,19 @@ function AdminDashboard() {
                 الموقع
               </Button>
             </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onLogout}
+              disabled={logoutPending}
+            >
+              {logoutPending ? (
+                <Loader2 className="w-4 h-4 animate-spin ml-2" />
+              ) : (
+                <LogOut className="w-4 h-4 ml-2" />
+              )}
+              خروج
+            </Button>
           </div>
         </div>
       </header>
@@ -130,6 +192,68 @@ function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+    </div>
+  );
+}
+
+function AdminLogin({
+  onSubmit,
+  isLoading,
+}: {
+  onSubmit: (username: string, password: string) => void;
+  isLoading: boolean;
+}) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center px-4" dir="rtl">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-2">
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5" />
+            تسجيل دخول لوحة التحكم
+          </CardTitle>
+          <CardDescription>
+            أدخل اسم المستخدم وكلمة المرور للمتابعة.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="admin-user">اسم المستخدم</Label>
+            <Input
+              id="admin-user"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="اسم المستخدم"
+              autoComplete="username"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="admin-pass">كلمة المرور</Label>
+            <Input
+              id="admin-pass"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="كلمة المرور"
+              autoComplete="current-password"
+            />
+          </div>
+          <Button
+            className="w-full"
+            onClick={() => onSubmit(username.trim(), password)}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin ml-2" />
+            ) : (
+              <Lock className="w-4 h-4 ml-2" />
+            )}
+            دخول
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -790,7 +914,7 @@ function SectionsManager() {
 // Share Links Manager Component
 // ============================================
 type ShareLinkItem = {
-  token: string;
+  code: string;
   url: string;
   expiresAt: string;
   createdAt: string;
@@ -804,8 +928,17 @@ function loadCachedShareLinks(): ShareLinkItem[] {
   try {
     const raw = window.localStorage.getItem(SHARE_LINKS_STORAGE_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw) as ShareLinkItem[];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(raw) as Array<ShareLinkItem & { token?: string }>;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item) => ({
+        code: item.code ?? item.token ?? "",
+        url: item.url,
+        expiresAt: item.expiresAt,
+        createdAt: item.createdAt,
+        note: item.note ?? null,
+      }))
+      .filter((item) => item.code && item.url);
   } catch {
     return [];
   }
@@ -841,9 +974,9 @@ function ShareLinksManager() {
   const createMutation = trpc.shareLinks.create.useMutation({
     onSuccess: (data) => {
       const origin = window.location.origin;
-      const url = `${origin}/share/${data.token}`;
+      const url = `${origin}/s/${data.code}`;
       const item: ShareLinkItem = {
-        token: data.token,
+        code: data.code,
         url,
         expiresAt: data.expiresAt,
         createdAt: new Date().toISOString(),
@@ -874,8 +1007,8 @@ function ShareLinksManager() {
     }
   };
 
-  const handleRemove = (token: string) => {
-    setLinks(prev => prev.filter(link => link.token !== token));
+  const handleRemove = (code: string) => {
+    setLinks(prev => prev.filter(link => link.code !== code));
   };
 
   const now = Date.now();
@@ -980,7 +1113,7 @@ function ShareLinksManager() {
 
             return (
               <div
-                key={link.token}
+              key={link.code}
                 className="flex flex-col gap-3 rounded-lg border border-border p-4 md:flex-row md:items-center md:justify-between"
               >
                 <div className="space-y-2">
@@ -1013,7 +1146,7 @@ function ShareLinksManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleRemove(link.token)}
+                    onClick={() => handleRemove(link.code)}
                   >
                     <Trash2 className="w-4 h-4 ml-2" />
                     حذف

@@ -1,10 +1,19 @@
 import { SignJWT, jwtVerify } from "jose";
-import { nanoid } from "nanoid";
+import { nanoid, customAlphabet } from "nanoid";
+import { createHmac } from "crypto";
 import { ENV } from "./env";
 
 const SHARE_LINK_ISSUER = "badr-photography";
 const SHARE_LINK_AUDIENCE = "share-link";
 const SHARE_LINK_SUBJECT = "site-share";
+const SHARE_CODE_PREFIX = "badrabdoph";
+const SHARE_CODE_SIGNATURE_LENGTH = 6;
+const SHARE_CODE_RANDOM_LENGTH = 4;
+const SHARE_CODE_ALPHABET = "23456789abcdefghijkmnpqrstuvwxyz";
+const generateShortRandom = customAlphabet(
+  SHARE_CODE_ALPHABET,
+  SHARE_CODE_RANDOM_LENGTH
+);
 
 function getShareLinkSecret() {
   return new TextEncoder().encode(ENV.cookieSecret);
@@ -41,4 +50,72 @@ export async function verifyShareLink(token: string) {
   } catch {
     return { valid: false, expiresAt: null };
   }
+}
+
+function signShortPayload(payload: string) {
+  const secret = ENV.cookieSecret;
+  const digest = createHmac("sha256", secret).update(payload).digest("base64url");
+  return digest.slice(0, SHARE_CODE_SIGNATURE_LENGTH);
+}
+
+function encodeExpiry(expiresAt: Date) {
+  const seconds = Math.floor(expiresAt.getTime() / 1000);
+  return seconds.toString(36);
+}
+
+function decodeExpiry(encoded: string) {
+  const seconds = Number.parseInt(encoded, 36);
+  if (!Number.isFinite(seconds)) return null;
+  return new Date(seconds * 1000);
+}
+
+export function createShortShareCode(expiresInMs: number) {
+  const issuedAt = Date.now();
+  const expiresAt = new Date(issuedAt + expiresInMs);
+  const expiryEncoded = encodeExpiry(expiresAt);
+  const randomPart = generateShortRandom();
+  const payload = `${expiryEncoded}.${randomPart}`;
+  const signature = signShortPayload(payload);
+  const code = `${SHARE_CODE_PREFIX}-${payload}.${signature}`;
+
+  return { code, expiresAt };
+}
+
+export function verifyShortShareCode(code: string) {
+  if (!code.startsWith(`${SHARE_CODE_PREFIX}-`)) {
+    return { valid: false, expiresAt: null };
+  }
+
+  const raw = code.slice(SHARE_CODE_PREFIX.length + 1);
+  const lastDot = raw.lastIndexOf(".");
+  if (lastDot <= 0) {
+    return { valid: false, expiresAt: null };
+  }
+
+  const payload = raw.slice(0, lastDot);
+  const signature = raw.slice(lastDot + 1);
+  if (!payload || !signature) {
+    return { valid: false, expiresAt: null };
+  }
+
+  const expected = signShortPayload(payload);
+  if (signature !== expected) {
+    return { valid: false, expiresAt: null };
+  }
+
+  const [expiryEncoded] = payload.split(".");
+  if (!expiryEncoded) {
+    return { valid: false, expiresAt: null };
+  }
+
+  const expiresAt = decodeExpiry(expiryEncoded);
+  if (!expiresAt) {
+    return { valid: false, expiresAt: null };
+  }
+
+  if (expiresAt.getTime() <= Date.now()) {
+    return { valid: false, expiresAt };
+  }
+
+  return { valid: true, expiresAt };
 }

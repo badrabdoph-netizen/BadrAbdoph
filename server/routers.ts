@@ -7,7 +7,14 @@ import { z } from "zod";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import * as db from "./db";
-import { createShareLink, verifyShareLink } from "./_core/shareLinks";
+import { createShortShareCode, verifyShareLink, verifyShortShareCode } from "./_core/shareLinks";
+import { TRPCError } from "@trpc/server";
+import {
+  clearAdminSessionCookie,
+  createAdminSession,
+  matchesAdminCredentials,
+  setAdminSessionCookie,
+} from "./_core/adminAuth";
 
 export const appRouter = router({
   system: systemRouter,
@@ -22,6 +29,41 @@ export const appRouter = router({
     }),
   }),
 
+  // Admin Access (Username/Password)
+  adminAccess: router({
+    status: publicProcedure.query(({ ctx }) => {
+      return {
+        authenticated: ctx.adminAccess,
+        expiresAt: ctx.adminExpiresAt ? ctx.adminExpiresAt.toISOString() : null,
+      };
+    }),
+    login: publicProcedure
+      .input(
+        z.object({
+          username: z.string().min(1),
+          password: z.string().min(1),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const ok = matchesAdminCredentials(input.username, input.password);
+        if (!ok) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "بيانات الدخول غير صحيحة" });
+        }
+
+        const { token, expiresAt } = await createAdminSession();
+        setAdminSessionCookie(ctx.req, ctx.res, token);
+
+        return {
+          success: true,
+          expiresAt: expiresAt.toISOString(),
+        };
+      }),
+    logout: publicProcedure.mutation(({ ctx }) => {
+      clearAdminSessionCookie(ctx.req, ctx.res);
+      return { success: true };
+    }),
+  }),
+
   // Temporary Share Links
   shareLinks: router({
     create: adminProcedure
@@ -33,10 +75,10 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         const expiresInMs = input.ttlHours * 60 * 60 * 1000;
-        const { token, expiresAt } = await createShareLink(expiresInMs);
+        const { code, expiresAt } = createShortShareCode(expiresInMs);
 
         return {
-          token,
+          code,
           expiresAt: expiresAt.toISOString(),
           note: input.note ?? null,
         };
@@ -45,6 +87,16 @@ export const appRouter = router({
       .input(z.object({ token: z.string().min(10) }))
       .query(async ({ input }) => {
         const result = await verifyShareLink(input.token);
+
+        return {
+          valid: result.valid,
+          expiresAt: result.expiresAt ? result.expiresAt.toISOString() : null,
+        };
+      }),
+    validateShort: publicProcedure
+      .input(z.object({ code: z.string().min(8) }))
+      .query(async ({ input }) => {
+        const result = verifyShortShareCode(input.code);
 
         return {
           valid: result.valid,
