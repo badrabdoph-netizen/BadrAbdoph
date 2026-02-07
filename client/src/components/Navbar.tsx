@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Instagram, Facebook, Sparkles, Phone, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { navLinks, photographerInfo, ctaTexts } from "@/config/siteConfig";
 import { useContactData, useContentData } from "@/hooks/useSiteData";
-import { EditableText } from "@/components/InlineEdit";
+import { EditableLinkIcon, EditableText } from "@/components/InlineEdit";
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
@@ -18,12 +18,6 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
       />
     </svg>
   );
-}
-
-function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
-  const phone = (whatsappNumber ?? "").replace(/[^\d]/g, "");
-  if (!phone) return "";
-  return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
 
 export default function Navbar() {
@@ -82,12 +76,14 @@ export default function Navbar() {
     };
   }, [isOpen]);
 
-  const telHref = `tel:${(contactInfo?.phone ?? "").replace(/\s/g, "")}`;
-
-  const waInquiryHref = useMemo(
-    () => buildWhatsAppHref("حابب استفسر ❤️", contactInfo.whatsappNumber),
-    [contactInfo.whatsappNumber]
-  );
+  const formatWhatsAppHref = (value: string) => {
+    const phone = (value ?? "").replace(/[^\d]/g, "");
+    return phone ? `https://wa.me/${phone}` : "";
+  };
+  const formatTelHref = (value: string) => {
+    const phone = (value ?? "").replace(/\s/g, "");
+    return phone ? `tel:${phone}` : "";
+  };
 
   return (
     <nav
@@ -199,24 +195,26 @@ export default function Navbar() {
 
           {/* Desktop social + CTA */}
           <div className="hidden md:flex items-center space-x-4 space-x-reverse">
-            <a
-              href={socialLinks.instagram}
-              target="_blank"
-              rel="noreferrer"
-              className="social-orb tap-target"
-              aria-label="Instagram"
+            <EditableLinkIcon
+              value={socialLinks.instagram}
+              fieldKey="instagram"
+              label="رابط إنستجرام"
+              placeholder="https://instagram.com/..."
+              ariaLabel="Instagram"
+              linkClassName="social-orb tap-target"
             >
               <Instagram size={18} />
-            </a>
-            <a
-              href={socialLinks.facebook}
-              target="_blank"
-              rel="noreferrer"
-              className="social-orb tap-target"
-              aria-label="Facebook"
+            </EditableLinkIcon>
+            <EditableLinkIcon
+              value={socialLinks.facebook}
+              fieldKey="facebook"
+              label="رابط فيسبوك"
+              placeholder="https://facebook.com/..."
+              ariaLabel="Facebook"
+              linkClassName="social-orb tap-target"
             >
               <Facebook size={18} />
-            </a>
+            </EditableLinkIcon>
 
             <Link href="/contact">
               <Button
@@ -236,27 +234,29 @@ export default function Navbar() {
 
           {/* Mobile buttons */}
           <div className="md:hidden flex items-center gap-2">
-            {telHref && telHref !== "tel:" ? (
-              <a
-                href={telHref}
-                className="social-orb social-orb--phone tap-target"
-                aria-label="Call"
-              >
-                <Phone size={18} />
-              </a>
-            ) : null}
+            <EditableLinkIcon
+              value={contactInfo.phone}
+              fieldKey="phone"
+              label="رقم الهاتف"
+              placeholder="01xxxxxxxxx"
+              ariaLabel="Call"
+              formatHref={formatTelHref}
+              linkClassName="social-orb social-orb--phone tap-target"
+            >
+              <Phone size={18} />
+            </EditableLinkIcon>
 
-            {waInquiryHref ? (
-              <a
-                href={waInquiryHref}
-                target="_blank"
-                rel="noreferrer"
-                className="social-orb social-orb--wa tap-target"
-                aria-label="WhatsApp"
-              >
-                <WhatsAppIcon size={18} />
-              </a>
-            ) : null}
+            <EditableLinkIcon
+              value={contactInfo.whatsappNumber}
+              fieldKey="whatsapp"
+              label="رقم واتساب"
+              placeholder="2010xxxxxxx"
+              ariaLabel="WhatsApp"
+              formatHref={formatWhatsAppHref}
+              linkClassName="social-orb social-orb--wa tap-target"
+            >
+              <WhatsAppIcon size={18} />
+            </EditableLinkIcon>
 
             <button
               className="w-11 h-11 border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-foreground hover:text-primary transition-colors tap-target"
