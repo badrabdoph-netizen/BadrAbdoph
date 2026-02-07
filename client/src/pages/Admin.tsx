@@ -2329,8 +2329,8 @@ function LiveEditor() {
             تحديث المعاينة
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <a href="/" target="_blank" rel="noreferrer">
-              فتح بملء الشاشة
+            <a href="/?adminPreview=1" target="_blank" rel="noreferrer">
+              فتح المعاينة كاملة
             </a>
           </Button>
         </div>
