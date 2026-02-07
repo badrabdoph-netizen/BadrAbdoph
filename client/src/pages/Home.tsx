@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +21,8 @@ import {
   homeServicesPreview,
   externalPortfolioUrl,
 } from "@/config/siteConfig";
-import { useContactData, useContentData, usePortfolioData, useTestimonialsData } from "@/hooks/useSiteData";
-import { EditableText } from "@/components/InlineEdit";
+import { useContactData, useContentData, usePortfolioData, useTestimonialsData, useSiteImagesData } from "@/hooks/useSiteData";
+import { EditableImage, EditableText, useInlineEditMode } from "@/components/InlineEdit";
 
 function ServiceIcon({ title }: { title: string }) {
   const t = title.toLowerCase();
@@ -105,27 +105,65 @@ function MosaicCard({
   onClick,
   className,
   eager = false,
+  imageKey,
+  imageLabel,
 }: {
   img: { src: string; title: string };
   onClick: () => void;
   className?: string;
   eager?: boolean;
+  imageKey?: string;
+  imageLabel?: string;
 }) {
   const [loaded, setLoaded] = useState(false);
+  const { enabled } = useInlineEditMode();
+  const trigger = () => {
+    if (!enabled) onClick();
+  };
+  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (enabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    trigger();
+  };
 
   return (
-    <button
+    <div
       className={[
         "mosaic-card premium-border border border-white/10 overflow-hidden group",
         loaded ? "is-loaded" : "",
         className ?? "",
       ].join(" ")}
-      onClick={onClick}
+      onClick={handleClick}
       aria-label="Open external portfolio"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          trigger();
+        }
+      }}
       style={{
         backgroundImage: `url('${img.src}')`,
       }}
     >
+      {enabled && imageKey ? (
+        <div className="absolute top-3 right-3 z-20">
+          <EditableImage
+            src={img.src}
+            alt={img.title}
+            fieldKey={imageKey}
+            category="portfolio"
+            label={imageLabel ?? "صورة المعرض"}
+            className="w-fit"
+            imgClassName="hidden"
+            overlayClassName="opacity-100"
+          />
+        </div>
+      ) : null}
       <img
         src={img.src}
         alt={img.title}
@@ -143,7 +181,7 @@ function MosaicCard({
       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-center">
         <span className="camera-badge">📸</span>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -152,8 +190,17 @@ export default function Home() {
   const portfolioRef = useRef<HTMLElement | null>(null);
   const { contactInfo, socialLinks } = useContactData();
   const content = useContentData();
+  const contentMap = content.contentMap ?? {};
   const testimonials = useTestimonialsData();
   const { gallery } = usePortfolioData();
+  const { imageMap } = useSiteImagesData();
+
+  const heroImage = imageMap.heroImage?.url ?? siteImages.heroImage;
+  const heroImageMobile =
+    imageMap.heroImageMobile?.url ?? siteImages.heroImageMobile ?? heroImage;
+  const aboutImage = imageMap.aboutImage?.url ?? siteImages.aboutImage;
+  const getValue = (key: string, fallback: string = "") =>
+    (contentMap[key] as string | undefined) ?? fallback;
 
   const waSocialHref = useMemo(() => {
     const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
@@ -208,21 +255,35 @@ export default function Home() {
     return "مش مجرد صور\nدي ذكريات متعاشة";
   }, []);
 
-  const safeGallery = useMemo(() => {
+  const galleryWithKeys = useMemo(() => {
     if (!gallery.length) return [];
+    return gallery.map((img, index) => {
+      const editKey = img.id ? `portfolio_${img.id}` : `portfolio_fallback_${index + 1}`;
+      const override = imageMap[editKey]?.url;
+      return {
+        ...img,
+        src: override ?? img.src,
+        editKey,
+        editLabel: `صورة المعرض ${index + 1}`,
+      };
+    });
+  }, [gallery, imageMap]);
+
+  const safeGallery = useMemo(() => {
+    if (!galleryWithKeys.length) return [];
     const min = 16;
-    if (gallery.length >= min) return gallery;
-    const times = Math.ceil(min / gallery.length);
-    const out: typeof gallery = [];
-    for (let i = 0; i < times; i++) out.push(...gallery);
+    if (galleryWithKeys.length >= min) return galleryWithKeys;
+    const times = Math.ceil(min / galleryWithKeys.length);
+    const out: typeof galleryWithKeys = [];
+    for (let i = 0; i < times; i++) out.push(...galleryWithKeys);
     return out;
-  }, [gallery]);
+  }, [galleryWithKeys]);
 
   const mobileGallery = useMemo(() => {
-    if (!gallery.length) return [];
-    if (gallery.length <= 8) return gallery;
-    return gallery.slice(0, 8);
-  }, [gallery]);
+    if (!galleryWithKeys.length) return [];
+    if (galleryWithKeys.length <= 8) return galleryWithKeys;
+    return galleryWithKeys.slice(0, 8);
+  }, [galleryWithKeys]);
 
   const desktopGallery = useMemo(() => {
     if (!safeGallery.length) return [];
@@ -264,8 +325,8 @@ export default function Home() {
           className="absolute inset-0 w-full h-[120%] bg-cover bg-center z-0 will-change-transform hero-image"
           style={{
             // @ts-ignore
-            "--hero-image": `url('${siteImages.heroImage}')`,
-            "--hero-image-mobile": `url('${siteImages.heroImageMobile ?? siteImages.heroImage}')`,
+            "--hero-image": `url('${heroImage}')`,
+            "--hero-image-mobile": `url('${heroImageMobile}')`,
             filter: "brightness(0.36)",
           }}
         />
@@ -274,9 +335,38 @@ export default function Home() {
         <div className="absolute inset-0 z-10 pointer-events-none [background:radial-gradient(circle_at_50%_35%,rgba(255,200,80,0.10),transparent_55%)]" />
         <div className="absolute inset-0 z-10 pointer-events-none hero-grain opacity-[0.12]" />
 
+        <div className="absolute top-6 right-6 z-30 flex flex-col gap-2">
+          <EditableImage
+            src={heroImage}
+            alt="Hero"
+            fieldKey="heroImage"
+            category="home"
+            label="صورة الهيرو"
+            className="w-fit"
+            imgClassName="hidden"
+            overlayClassName="opacity-100"
+          />
+          <EditableImage
+            src={heroImageMobile}
+            alt="Hero mobile"
+            fieldKey="heroImageMobile"
+            category="home"
+            label="صورة الهيرو للموبايل"
+            className="w-fit"
+            imgClassName="hidden"
+            overlayClassName="opacity-100"
+          />
+        </div>
+
         <div className="relative z-20 container mx-auto px-4 text-center flex flex-col items-center -translate-y-1 md:-translate-y-6 animate-in fade-in zoom-in duration-1000">
           <h2 className="text-primary text-lg md:text-xl tracking-[0.3em] uppercase mb-4 font-medium">
-            {photographerInfo.title}
+            <EditableText
+              value={contentMap.home_hero_overline}
+              fallback={photographerInfo.title}
+              fieldKey="home_hero_overline"
+              category="home"
+              label="عنوان الهيرو العلوي"
+            />
           </h2>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
@@ -306,7 +396,15 @@ export default function Home() {
           </p>
 
           <div className="mt-8 flex flex-col items-center gap-4">
-            <div className="hero-follow-title">تابعنا</div>
+            <div className="hero-follow-title">
+              <EditableText
+                value={contentMap.home_follow_title}
+                fallback="تابعنا"
+                fieldKey="home_follow_title"
+                category="home"
+                label="عنوان تابعنا"
+              />
+            </div>
             <div className="hero-follow-icons">
               {socialLinks.instagram ? (
                 <a
@@ -375,10 +473,33 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
-            <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">الخدمات</h3>
-            <h2 className="text-4xl md:text-5xl font-bold">باقات التصوير</h2>
+            <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
+              <EditableText
+                value={getValue("home_services_kicker")}
+                fallback="الخدمات"
+                fieldKey="home_services_kicker"
+                category="home"
+                label="عنوان صغير (الخدمات)"
+              />
+            </h3>
+            <h2 className="text-4xl md:text-5xl font-bold">
+              <EditableText
+                value={getValue("home_services_title")}
+                fallback="باقات التصوير"
+                fieldKey="home_services_title"
+                category="home"
+                label="عنوان قسم الخدمات"
+              />
+            </h2>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto leading-relaxed">
-              كلها بتتعمل بنفس الجودة والاهتمام بالتفاصيل لأن التزامي في المواعيد وجودة التسليم جزء من شغلي، مش ميزة إضافية.
+              <EditableText
+                value={getValue("home_services_desc")}
+                fallback="كلها بتتعمل بنفس الجودة والاهتمام بالتفاصيل لأن التزامي في المواعيد وجودة التسليم جزء من شغلي، مش ميزة إضافية."
+                fieldKey="home_services_desc"
+                category="home"
+                label="وصف قسم الخدمات"
+                multiline
+              />
             </p>
             <div className="mt-6 flex justify-center">
               <Link href="/services">
@@ -386,7 +507,14 @@ export default function Home() {
                   variant="outline"
                   className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-12 py-5 text-lg cta-glow"
                 >
-                  شوف الباقات <ArrowDownRight className="w-4 h-4 cta-icon" />
+                  <EditableText
+                    value={getValue("home_services_button")}
+                    fallback="شوف الباقات"
+                    fieldKey="home_services_button"
+                    category="home"
+                    label="زر شوف الباقات"
+                  />
+                  <ArrowDownRight className="w-4 h-4 cta-icon" />
                 </Button>
               </Link>
             </div>
@@ -402,6 +530,7 @@ export default function Home() {
                 <Sparkles key="spark" size={15} />,
               ][idx % 3];
               const isSignature = card.id === "home-service-sessions";
+              const baseKey = `home_service_${card.id}`;
 
               return (
                 <div
@@ -425,11 +554,27 @@ export default function Home() {
 
                   {card.badge ? (
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-bold px-3 py-1">
-                      {card.badge}
+                      <EditableText
+                        value={getValue(`${baseKey}_badge`)}
+                        fallback={card.badge}
+                        fieldKey={`${baseKey}_badge`}
+                        category="home"
+                        label={`شارة ${card.title}`}
+                      />
                     </div>
                   ) : null}
 
-                  {card.vipLabel ? <div className="vip-label">{card.vipLabel}</div> : null}
+                  {card.vipLabel ? (
+                    <div className="vip-label">
+                      <EditableText
+                        value={getValue(`${baseKey}_vip_label`)}
+                        fallback={card.vipLabel}
+                        fieldKey={`${baseKey}_vip_label`}
+                        category="home"
+                        label={`شارة VIP ${card.title}`}
+                      />
+                    </div>
+                  ) : null}
 
                   <div className="relative z-10 flex flex-col h-full">
                     <div className={featured ? "" : "group-hover:scale-110 transition-transform duration-300"}>
@@ -438,7 +583,15 @@ export default function Home() {
 
                     <h3 className="card-title-chip">
                       <span className="title-icon">{titleIcon}</span>
-                      <span>{card.title}</span>
+                      <span>
+                        <EditableText
+                          value={getValue(`${baseKey}_title`)}
+                          fallback={card.title}
+                          fieldKey={`${baseKey}_title`}
+                          category="home"
+                          label={`عنوان كارت ${card.title}`}
+                        />
+                      </span>
                     </h3>
 
                     <div className="card-fade">
@@ -448,15 +601,41 @@ export default function Home() {
                           isSignature ? "card-desc--glow" : "",
                         ].join(" ")}
                       >
-                        {card.description}
+                        <EditableText
+                          value={getValue(`${baseKey}_description`)}
+                          fallback={card.description}
+                          fieldKey={`${baseKey}_description`}
+                          category="home"
+                          label={`وصف كارت ${card.title}`}
+                          multiline
+                        />
                       </p>
-                      {card.note ? <div className="card-note">{card.note}</div> : null}
+                      {card.note ? (
+                        <div className="card-note">
+                          <EditableText
+                            value={getValue(`${baseKey}_note`)}
+                            fallback={card.note}
+                            fieldKey={`${baseKey}_note`}
+                            category="home"
+                            label={`ملاحظة كارت ${card.title}`}
+                          />
+                        </div>
+                      ) : null}
 
                       <ul className="text-sm text-muted-foreground space-y-2 pb-2">
                         {card.bullets.map((b, bIdx) => (
                           <li key={`${card.id}-b-${bIdx}`} className="flex items-start">
                             <Check size={15} className="ml-2 mt-1 text-primary" />
-                            <span>{b}</span>
+                            <span>
+                              <EditableText
+                                value={getValue(`${baseKey}_bullet_${bIdx + 1}`)}
+                                fallback={b}
+                                fieldKey={`${baseKey}_bullet_${bIdx + 1}`}
+                                category="home"
+                                label={`نقطة ${bIdx + 1} - ${card.title}`}
+                                multiline
+                              />
+                            </span>
                           </li>
                         ))}
                       </ul>
@@ -475,7 +654,13 @@ export default function Home() {
                               : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
                           ].join(" ")}
                         >
-                          عرض التفاصيل
+                          <EditableText
+                            value={getValue(`${baseKey}_cta`)}
+                            fallback="عرض التفاصيل"
+                            fieldKey={`${baseKey}_cta`}
+                            category="home"
+                            label={`زر الكارت ${card.title}`}
+                          />
                         </Button>
                       </Link>
                     </div>
@@ -495,18 +680,21 @@ export default function Home() {
               <div className="absolute -top-4 -left-4 w-full h-full border border-primary/30 z-0 hidden md:block" />
               <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-black/55 via-transparent to-black/15" />
 
-              <img
-                src={siteImages.aboutImage}
+              <EditableImage
+                src={aboutImage}
                 alt="Badr Photography Style"
-                className="
-                  relative z-0 w-full h-[600px] object-cover
+                fieldKey="aboutImage"
+                category="about"
+                label="صورة قسم من أنا"
+                className="relative z-0 w-full h-[600px] md:h-[600px]"
+                imgClassName="
+                  w-full h-[600px] object-cover
                   saturate-[1.35] contrast-[1.12] brightness-[1.05]
                   transition-transform duration-[1100ms] ease-out
                   scale-[1.06] md:scale-100
                   md:group-hover:scale-[1.12]
                   shadow-[0_30px_120px_rgba(0,0,0,0.65)]
                 "
-                loading="lazy"
               />
             </div>
 
@@ -575,10 +763,20 @@ export default function Home() {
                     onClick={goPortfolio}
                     eager={i < 2}
                     className="gallery-slide aspect-[4/5]"
+                    imageKey={img.editKey}
+                    imageLabel={img.editLabel}
                   />
                 ))}
               </div>
-              <div className="gallery-hint">اسحب لمشاهدة المزيد</div>
+              <div className="gallery-hint">
+                <EditableText
+                  value={getValue("home_gallery_hint")}
+                  fallback="اسحب لمشاهدة المزيد"
+                  fieldKey="home_gallery_hint"
+                  category="home"
+                  label="تلميح المعرض"
+                />
+              </div>
 
             </div>
 
@@ -591,6 +789,8 @@ export default function Home() {
                     onClick={goPortfolio}
                     eager={i < 2}
                     className={["gallery-card h-full", collageLayout[i] ?? ""].join(" ")}
+                    imageKey={img.editKey}
+                    imageLabel={img.editLabel}
                   />
                 ))}
               </div>
@@ -604,13 +804,29 @@ export default function Home() {
       <section className="pt-4 pb-6">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-3 gap-3 max-w-4xl mx-auto">
-            {aboutContent.stats.map((s) => (
+            {aboutContent.stats.map((s, index) => (
               <div
                 key={s.label}
                 className="bg-card/40 border border-white/10 backdrop-blur-sm px-3 py-4 text-center premium-border"
               >
-                <div className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground">{s.number}</div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground mt-1">{s.label}</div>
+                <div className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground">
+                  <EditableText
+                    value={getValue(`about_stat_${index + 1}_number`)}
+                    fallback={s.number}
+                    fieldKey={`about_stat_${index + 1}_number`}
+                    category="about"
+                    label={`رقم الإحصائية ${index + 1}`}
+                  />
+                </div>
+                <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground mt-1">
+                  <EditableText
+                    value={getValue(`about_stat_${index + 1}_label`)}
+                    fallback={s.label}
+                    fieldKey={`about_stat_${index + 1}_label`}
+                    category="about"
+                    label={`عنوان الإحصائية ${index + 1}`}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -621,8 +837,25 @@ export default function Home() {
       <section className="pt-6 pb-16 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_35%_25%,rgba(255,200,80,0.12),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">المعرض</h3>
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">شوف جزء من تصويري بالكوالتي الكاملة</h2>
+          <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
+            <EditableText
+              value={getValue("home_portfolio_kicker")}
+              fallback="المعرض"
+              fieldKey="home_portfolio_kicker"
+              category="home"
+              label="عنوان المعرض الصغير"
+            />
+          </h3>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">
+            <EditableText
+              value={getValue("home_portfolio_title")}
+              fallback="شوف جزء من تصويري بالكوالتي الكاملة"
+              fieldKey="home_portfolio_title"
+              category="home"
+              label="عنوان قسم المعرض"
+              multiline
+            />
+          </h2>
 
           <a
             href={externalPortfolioUrl}
@@ -630,7 +863,14 @@ export default function Home() {
             target="_blank"
             rel="noreferrer"
           >
-            عرض المعرض كامل <ZoomIn className="w-4 h-4" />
+            <EditableText
+              value={getValue("home_portfolio_button")}
+              fallback="عرض المعرض كامل"
+              fieldKey="home_portfolio_button"
+              category="home"
+              label="زر المعرض"
+            />
+            <ZoomIn className="w-4 h-4" />
           </a>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -699,10 +939,33 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_20%_30%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
-            <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">آراء العملاء</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">عرساني🫶</h2>
+            <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
+              <EditableText
+                value={getValue("home_testimonials_kicker")}
+                fallback="آراء العملاء"
+                fieldKey="home_testimonials_kicker"
+                category="home"
+                label="عنوان قسم الآراء الصغير"
+              />
+            </h3>
+            <h2 className="text-3xl md:text-5xl font-bold">
+              <EditableText
+                value={getValue("home_testimonials_title")}
+                fallback="عرساني🫶"
+                fieldKey="home_testimonials_title"
+                category="home"
+                label="عنوان قسم الآراء"
+              />
+            </h2>
             <p className="testimonials-glow mt-4 max-w-2xl mx-auto leading-relaxed">
-              أهم حاجة… الناس تطلع مبسوطة ومرتاحه من أول لحظة لحد التسليم ❤️
+              <EditableText
+                value={getValue("home_testimonials_desc")}
+                fallback="أهم حاجة… الناس تطلع مبسوطة ومرتاحه من أول لحظة لحد التسليم ❤️"
+                fieldKey="home_testimonials_desc"
+                category="home"
+                label="وصف قسم الآراء"
+                multiline
+              />
             </p>
           </div>
 
@@ -728,16 +991,36 @@ export default function Home() {
                 quote:
                   "سيشن عيد ميلادي كان خطير بجد متصورتش صور بالحلاوه دي قبل كد تسلم ايدك ❤️",
               },
-            ].map((t, i) => (
+            ].map((t, i) => {
+              const keyBase = `home_testimonial_${i + 1}`;
+              return (
               <div
                 key={i}
                 className="bg-background/45 border border-white/10 p-5 md:p-6 premium-border testimonial-card hover:border-primary/25 transition-colors"
               >
                 <StarsRow />
-                <p className="text-sm md:text-base text-muted-foreground italic leading-relaxed mt-3 mb-4">"{t.quote}"</p>
-                <div className="text-sm md:text-base font-bold">{t.name}</div>
+                <p className="text-sm md:text-base text-muted-foreground italic leading-relaxed mt-3 mb-4">
+                  "<EditableText
+                    value={getValue(`${keyBase}_quote`)}
+                    fallback={t.quote}
+                    fieldKey={`${keyBase}_quote`}
+                    category="home"
+                    label={`نص رأي ${i + 1}`}
+                    multiline
+                  />"
+                </p>
+                <div className="text-sm md:text-base font-bold">
+                  <EditableText
+                    value={getValue(`${keyBase}_name`)}
+                    fallback={t.name}
+                    fieldKey={`${keyBase}_name`}
+                    category="home"
+                    label={`اسم رأي ${i + 1}`}
+                  />
+                </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </div>
       </section>

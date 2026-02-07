@@ -4,7 +4,8 @@ import { Menu, X, Instagram, Facebook, Sparkles, Phone, ArrowLeft } from "lucide
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { navLinks, photographerInfo, ctaTexts } from "@/config/siteConfig";
-import { useContactData } from "@/hooks/useSiteData";
+import { useContactData, useContentData } from "@/hooks/useSiteData";
+import { EditableText } from "@/components/InlineEdit";
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
@@ -28,6 +29,8 @@ function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
 export default function Navbar() {
   const navRef = useRef<HTMLElement | null>(null);
   const { contactInfo, socialLinks } = useContactData();
+  const content = useContentData();
+  const contentMap = content.contentMap ?? {};
 
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -107,20 +110,41 @@ export default function Navbar() {
             className="text-2xl md:text-3xl font-bold tracking-wider text-foreground hover:text-primary transition-colors flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2 tap-target leading-tight"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
-            <span>BADR ABDO</span>
+            <span>
+              <EditableText
+                value={contentMap.nav_brand_primary}
+                fallback="BADR ABDO"
+                fieldKey="nav_brand_primary"
+                category="nav"
+                label="اسم البراند الرئيسي"
+              />
+            </span>
             <span className="text-primary text-sm md:text-base font-semibold tracking-[0.2em] uppercase">
-              Photograpy
+              <EditableText
+                value={contentMap.nav_brand_secondary}
+                fallback="Photograpy"
+                fieldKey="nav_brand_secondary"
+                category="nav"
+                label="اسم البراند الفرعي"
+              />
             </span>
             <span className="hidden md:inline-flex items-center gap-1 text-[10px] text-foreground/60 border border-white/10 px-2 py-1 ml-2">
               <Sparkles className="w-3 h-3 text-primary" />
-              Luxury
+              <EditableText
+                value={contentMap.nav_brand_badge}
+                fallback="Luxury"
+                fieldKey="nav_brand_badge"
+                category="nav"
+                label="شارة البراند"
+              />
             </span>
           </Link>
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-            {navLinks.map((link) => {
+            {navLinks.map((link, index) => {
               const active = !isExternal(link.href) && location === link.href;
+              const labelKey = `nav_label_${index + 1}`;
 
               if (isExternal(link.href)) {
                 return (
@@ -134,7 +158,13 @@ export default function Navbar() {
                       "text-foreground/80"
                     )}
                   >
-                    {link.label}
+                    <EditableText
+                      value={contentMap[labelKey]}
+                      fallback={link.label}
+                      fieldKey={labelKey}
+                      category="nav"
+                      label={`عنوان القائمة ${index + 1}`}
+                    />
                     <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full" />
                   </a>
                 );
@@ -149,7 +179,13 @@ export default function Navbar() {
                     active ? "text-primary" : "text-foreground/80"
                   )}
                 >
-                  {link.label}
+                  <EditableText
+                    value={contentMap[labelKey]}
+                    fallback={link.label}
+                    fieldKey={labelKey}
+                    category="nav"
+                    label={`عنوان القائمة ${index + 1}`}
+                  />
                   <span
                     className={cn(
                       "absolute -bottom-2 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full",
@@ -187,7 +223,13 @@ export default function Navbar() {
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-6 cta-glow"
               >
-                {ctaTexts.bookNow}
+                <EditableText
+                  value={contentMap.cta_book_now}
+                  fallback={ctaTexts.bookNow}
+                  fieldKey="cta_book_now"
+                  category="cta"
+                  label="زر احجز الآن (الهيدر)"
+                />
               </Button>
             </Link>
           </div>
@@ -255,8 +297,24 @@ export default function Navbar() {
 
           <div className="px-4 pb-3 flex items-center justify-between">
             <div className="text-right">
-              <div className="text-sm text-foreground/80">القائمة</div>
-              <div className="text-xs text-muted-foreground">اختر صفحة</div>
+              <div className="text-sm text-foreground/80">
+                <EditableText
+                  value={contentMap.nav_mobile_title}
+                  fallback="القائمة"
+                  fieldKey="nav_mobile_title"
+                  category="nav"
+                  label="عنوان قائمة الموبايل"
+                />
+              </div>
+              <div className="text-xs text-muted-foreground">
+                <EditableText
+                  value={contentMap.nav_mobile_subtitle}
+                  fallback="اختر صفحة"
+                  fieldKey="nav_mobile_subtitle"
+                  category="nav"
+                  label="وصف قائمة الموبايل"
+                />
+              </div>
             </div>
 
             <button
@@ -270,8 +328,9 @@ export default function Navbar() {
 
           <div className="px-4 pb-4">
             <div className="flex flex-col gap-2">
-              {navLinks.map((link) => {
+              {navLinks.map((link, index) => {
                 const active = !isExternal(link.href) && location === link.href;
+                const labelKey = `nav_label_${index + 1}`;
 
                 if (isExternal(link.href)) {
                   return (
@@ -285,7 +344,15 @@ export default function Navbar() {
                         "bg-black/10 border-white/10 text-foreground hover:border-primary/35 hover:text-primary"
                       )}
                     >
-                      <span className="text-base font-semibold">{link.label}</span>
+                      <span className="text-base font-semibold">
+                        <EditableText
+                          value={contentMap[labelKey]}
+                          fallback={link.label}
+                          fieldKey={labelKey}
+                          category="nav"
+                          label={`عنوان القائمة ${index + 1}`}
+                        />
+                      </span>
                       <ArrowLeft className="w-4 h-4 text-foreground/60" />
                     </a>
                   );
@@ -301,7 +368,15 @@ export default function Navbar() {
                           : "bg-black/10 border-white/10 text-foreground hover:border-primary/35 hover:text-primary"
                       )}
                     >
-                      <span className="text-base font-semibold">{link.label}</span>
+                      <span className="text-base font-semibold">
+                        <EditableText
+                          value={contentMap[labelKey]}
+                          fallback={link.label}
+                          fieldKey={labelKey}
+                          category="nav"
+                          label={`عنوان القائمة ${index + 1}`}
+                        />
+                      </span>
                       <ArrowLeft className={cn("w-4 h-4", active ? "text-primary" : "text-foreground/60")} />
                     </a>
                   </Link>
@@ -312,13 +387,25 @@ export default function Navbar() {
             <div className="mt-4 grid grid-cols-1 gap-3">
               <Link href="/contact">
                 <a className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-4 font-semibold tap-target text-center cta-glow">
-                  {ctaTexts.bookNow}
+                  <EditableText
+                    value={contentMap.cta_book_now}
+                    fallback={ctaTexts.bookNow}
+                    fieldKey="cta_book_now"
+                    category="cta"
+                    label="زر احجز الآن (الموبايل)"
+                  />
                 </a>
               </Link>
             </div>
 
             <div className="mt-4 text-center text-xs text-muted-foreground">
-              {photographerInfo.name} • {photographerInfo.title}
+              <EditableText
+                value={contentMap.nav_mobile_footer}
+                fallback={`${photographerInfo.name} • ${photographerInfo.title}`}
+                fieldKey="nav_mobile_footer"
+                category="nav"
+                label="نص الفوتر في الموبايل"
+              />
             </div>
           </div>
         </div>

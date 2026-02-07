@@ -4,14 +4,16 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Camera, Sparkles, Heart, Star, ArrowLeft } from "lucide-react";
 import { aboutContent, photographerInfo, siteImages, ctaTexts, externalPortfolioUrl } from "@/config/siteConfig";
-import { useContentData, useTestimonialsData } from "@/hooks/useSiteData";
+import { useContentData, useTestimonialsData, useSiteImagesData } from "@/hooks/useSiteData";
 import SmartImage from "@/components/SmartImage";
-import { EditableText } from "@/components/InlineEdit";
+import { EditableImage, EditableText } from "@/components/InlineEdit";
 
 export default function About() {
-  const aboutImg = siteImages.aboutImage ?? siteImages.heroImage;
   const content = useContentData();
+  const { imageMap } = useSiteImagesData();
   const testimonials = useTestimonialsData();
+  const contentMap = content.contentMap ?? {};
+  const aboutImg = imageMap.aboutImage?.url ?? siteImages.aboutImage ?? siteImages.heroImage;
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -30,7 +32,13 @@ export default function About() {
           <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/10 bg-black/20 backdrop-blur-md mb-6">
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-xs md:text-sm text-foreground/80">
-              ستايل سينمائي • تفاصيل • تسليم احترافي
+              <EditableText
+                value={contentMap.about_kicker}
+                fallback="ستايل سينمائي • تفاصيل • تسليم احترافي"
+                fieldKey="about_kicker"
+                category="about"
+                label="كلمة افتتاحية (من أنا)"
+              />
             </span>
           </div>
 
@@ -63,7 +71,13 @@ export default function About() {
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/contact">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto cta-glow">
-                {ctaTexts.bookNow ?? "احجز الآن"}
+                <EditableText
+                  value={contentMap.about_cta_primary}
+                  fallback={ctaTexts.bookNow ?? "احجز الآن"}
+                  fieldKey="about_cta_primary"
+                  category="about"
+                  label="زر احجز الآن (من أنا)"
+                />
               </Button>
             </Link>
 
@@ -72,7 +86,13 @@ export default function About() {
                 variant="outline"
                 className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto cta-glow"
               >
-                الأسعار والباقات
+                <EditableText
+                  value={contentMap.about_cta_secondary}
+                  fallback="الأسعار والباقات"
+                  fieldKey="about_cta_secondary"
+                  category="about"
+                  label="زر الأسعار والباقات (من أنا)"
+                />
               </Button>
             </Link>
           </div>
@@ -86,6 +106,18 @@ export default function About() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
             <div className="order-1 lg:order-2 relative overflow-hidden premium-border">
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/55 via-transparent to-black/10 z-10" />
+              <div className="absolute top-4 right-4 z-20">
+                <EditableImage
+                  src={aboutImg}
+                  alt="About"
+                  fieldKey="aboutImage"
+                  category="about"
+                  label="صورة صفحة من أنا"
+                  className="w-fit"
+                  imgClassName="hidden"
+                  overlayClassName="opacity-100"
+                />
+              </div>
 
               <SmartImage
                 src={aboutImg}
@@ -108,31 +140,54 @@ export default function About() {
               </h3>
 
               <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight">
-                تصوير يحافظ على الإحساس… قبل الشكل
+                <EditableText
+                  value={contentMap.about_story_title}
+                  fallback="تصوير يحافظ على الإحساس… قبل الشكل"
+                  fieldKey="about_story_title"
+                  category="about"
+                  label="عنوان قصة من أنا"
+                  multiline
+                />
               </h2>
 
               <p className="text-muted-foreground leading-relaxed mb-8 text-base md:text-lg">
                 <EditableText
-                  value={content.aboutDescription}
+                  value={contentMap.about_story_description}
                   fallback={
                     aboutContent.description ||
                     "بحب أصوّر اللحظات الطبيعية من غير مبالغة… مع اهتمام بالتفاصيل والإضاءة واللون. الهدف إن الصور تحسّها حقيقية وفخمة في نفس الوقت."
                   }
-                  fieldKey="about_description"
+                  fieldKey="about_story_description"
                   category="about"
-                  label="وصف صفحة من أنا"
+                  label="وصف قصة من أنا"
                   multiline
                 />
               </p>
 
               <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                {(aboutContent.stats ?? []).map((s) => (
+                {(aboutContent.stats ?? []).map((s, index) => (
                   <div
-                    key={s.label}
+                    key={`${s.label}-${index}`}
                     className="bg-card/40 border border-white/10 backdrop-blur-sm px-3 py-4 text-center premium-border"
                   >
-                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">{s.number}</div>
-                    <div className="text-[11px] sm:text-sm text-muted-foreground mt-1">{s.label}</div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
+                      <EditableText
+                        value={contentMap[`about_stat_${index + 1}_number`]}
+                        fallback={s.number}
+                        fieldKey={`about_stat_${index + 1}_number`}
+                        category="about"
+                        label={`رقم الإحصائية ${index + 1}`}
+                      />
+                    </div>
+                    <div className="text-[11px] sm:text-sm text-muted-foreground mt-1">
+                      <EditableText
+                        value={contentMap[`about_stat_${index + 1}_label`]}
+                        fallback={s.label}
+                        fieldKey={`about_stat_${index + 1}_label`}
+                        category="about"
+                        label={`عنوان الإحصائية ${index + 1}`}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -140,7 +195,13 @@ export default function About() {
               <div className="mt-8">
                 <a href={externalPortfolioUrl} target="_blank" rel="noreferrer">
                   <Button variant="link" className="text-primary p-0 text-lg hover:no-underline group">
-                    شوف المعرض{" "}
+                    <EditableText
+                      value={contentMap.about_portfolio_link}
+                      fallback="شوف المعرض"
+                      fieldKey="about_portfolio_link"
+                      category="about"
+                      label="زر شوف المعرض (من أنا)"
+                    />{" "}
                     <ArrowLeft className="mr-2 transition-transform group-hover:-translate-x-2" />
                   </Button>
                 </a>
@@ -154,35 +215,103 @@ export default function About() {
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
-            <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">ليه تختارني؟</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">تفاصيل بتفرق</h2>
+            <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
+              <EditableText
+                value={contentMap.about_features_kicker}
+                fallback="ليه تختارني؟"
+                fieldKey="about_features_kicker"
+                category="about"
+                label="عنوان صغير (ليه تختارني؟)"
+              />
+            </h3>
+            <h2 className="text-3xl md:text-5xl font-bold">
+              <EditableText
+                value={contentMap.about_features_title}
+                fallback="تفاصيل بتفرق"
+                fieldKey="about_features_title"
+                category="about"
+                label="عنوان قسم المميزات"
+              />
+            </h2>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto leading-relaxed">
-              نفس الجودة… في كل باقة. ونفس الاهتمام… في كل لقطة.
+              <EditableText
+                value={contentMap.about_features_desc}
+                fallback="نفس الجودة… في كل باقة. ونفس الاهتمام… في كل لقطة."
+                fieldKey="about_features_desc"
+                category="about"
+                label="وصف قسم المميزات"
+                multiline
+              />
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-background/45 border border-white/10 p-7 premium-border group hover:border-primary/25 transition-colors">
               <Camera className="w-10 h-10 text-primary mb-5" />
-              <h3 className="text-xl font-bold mb-3">إضاءة وستايل سينمائي</h3>
+              <h3 className="text-xl font-bold mb-3">
+                <EditableText
+                  value={contentMap.about_feature_1_title}
+                  fallback="إضاءة وستايل سينمائي"
+                  fieldKey="about_feature_1_title"
+                  category="about"
+                  label="عنوان الميزة 1"
+                />
+              </h3>
               <p className="text-muted-foreground leading-relaxed text-sm">
-                ألوان متزنة، Skin tones طبيعية، ولمسة فخمة من غير مبالغة.
+                <EditableText
+                  value={contentMap.about_feature_1_desc}
+                  fallback="ألوان متزنة، Skin tones طبيعية، ولمسة فخمة من غير مبالغة."
+                  fieldKey="about_feature_1_desc"
+                  category="about"
+                  label="وصف الميزة 1"
+                  multiline
+                />
               </p>
             </div>
 
             <div className="bg-background/45 border border-white/10 p-7 premium-border group hover:border-primary/25 transition-colors">
               <Heart className="w-10 h-10 text-primary mb-5" />
-              <h3 className="text-xl font-bold mb-3">لقطات إحساس مش “بوزات”</h3>
+              <h3 className="text-xl font-bold mb-3">
+                <EditableText
+                  value={contentMap.about_feature_2_title}
+                  fallback="لقطات إحساس مش “بوزات”"
+                  fieldKey="about_feature_2_title"
+                  category="about"
+                  label="عنوان الميزة 2"
+                />
+              </h3>
               <p className="text-muted-foreground leading-relaxed text-sm">
-                توجيه بسيط… ولقطات طبيعية حقيقية، عشان اليوم يفضل حي في الصور.
+                <EditableText
+                  value={contentMap.about_feature_2_desc}
+                  fallback="توجيه بسيط… ولقطات طبيعية حقيقية، عشان اليوم يفضل حي في الصور."
+                  fieldKey="about_feature_2_desc"
+                  category="about"
+                  label="وصف الميزة 2"
+                  multiline
+                />
               </p>
             </div>
 
             <div className="bg-background/45 border border-white/10 p-7 premium-border group hover:border-primary/25 transition-colors">
               <Sparkles className="w-10 h-10 text-primary mb-5" />
-              <h3 className="text-xl font-bold mb-3">تفاصيل وتسليم مرتب</h3>
+              <h3 className="text-xl font-bold mb-3">
+                <EditableText
+                  value={contentMap.about_feature_3_title}
+                  fallback="تفاصيل وتسليم مرتب"
+                  fieldKey="about_feature_3_title"
+                  category="about"
+                  label="عنوان الميزة 3"
+                />
+              </h3>
               <p className="text-muted-foreground leading-relaxed text-sm">
-                تنظيم قبل التصوير، اختيار أفضل لقطات، وتسليم بجودة عالية.
+                <EditableText
+                  value={contentMap.about_feature_3_desc}
+                  fallback="تنظيم قبل التصوير، اختيار أفضل لقطات، وتسليم بجودة عالية."
+                  fieldKey="about_feature_3_desc"
+                  category="about"
+                  label="وصف الميزة 3"
+                  multiline
+                />
               </p>
             </div>
           </div>
@@ -192,8 +321,24 @@ export default function About() {
       <section className="py-14 md:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">آراء العملاء</h3>
-            <h2 className="text-3xl md:text-5xl font-bold">قصص سعيدة</h2>
+            <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
+              <EditableText
+                value={contentMap.about_testimonials_kicker}
+                fallback="آراء العملاء"
+                fieldKey="about_testimonials_kicker"
+                category="about"
+                label="عنوان صغير (آراء العملاء)"
+              />
+            </h3>
+            <h2 className="text-3xl md:text-5xl font-bold">
+              <EditableText
+                value={contentMap.about_testimonials_title}
+                fallback="قصص سعيدة"
+                fieldKey="about_testimonials_title"
+                category="about"
+                label="عنوان قسم آراء العملاء"
+              />
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -209,8 +354,27 @@ export default function About() {
                   <Star className="w-4 h-4" />
                   <Star className="w-4 h-4" />
                 </div>
-                <p className="text-muted-foreground italic leading-relaxed mb-5">"{t.quote}"</p>
-                <div className="font-bold">{t.name}</div>
+                <p className="text-muted-foreground italic leading-relaxed mb-5">
+                  “
+                  <EditableText
+                    value={contentMap[`about_testimonial_${i + 1}_quote`]}
+                    fallback={t.quote}
+                    fieldKey={`about_testimonial_${i + 1}_quote`}
+                    category="about"
+                    label={`رأي العميل ${i + 1}`}
+                    multiline
+                  />
+                  ”
+                </p>
+                <div className="font-bold">
+                  <EditableText
+                    value={contentMap[`about_testimonial_${i + 1}_name`]}
+                    fallback={t.name}
+                    fieldKey={`about_testimonial_${i + 1}_name`}
+                    category="about"
+                    label={`اسم العميل ${i + 1}`}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -219,15 +383,37 @@ export default function About() {
 
       <section className="py-16 bg-primary/5 border-t border-white/5 text-center">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-5">جاهز نثبت يومك بصور تفضل معاك؟</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-5">
+            <EditableText
+              value={contentMap.about_cta_title}
+              fallback="جاهز نثبت يومك بصور تفضل معاك؟"
+              fieldKey="about_cta_title"
+              category="about"
+              label="عنوان CTA (من أنا)"
+              multiline
+            />
+          </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-            ابعت التفاصيل بسرعة… وهنرتب كل حاجة بشكل مريح وواضح.
+            <EditableText
+              value={contentMap.about_cta_desc}
+              fallback="ابعت التفاصيل بسرعة… وهنرتب كل حاجة بشكل مريح وواضح."
+              fieldKey="about_cta_desc"
+              category="about"
+              label="وصف CTA (من أنا)"
+              multiline
+            />
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/contact">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-7 text-lg w-full sm:w-auto cta-glow">
-                {ctaTexts.contactNow ?? "تواصل الآن"}
+                <EditableText
+                  value={contentMap.about_cta_primary_contact}
+                  fallback={ctaTexts.contactNow ?? "تواصل الآن"}
+                  fieldKey="about_cta_primary_contact"
+                  category="about"
+                  label="زر تواصل الآن (من أنا)"
+                />
               </Button>
             </Link>
             <Link href="/services">
@@ -235,7 +421,13 @@ export default function About() {
                 variant="outline"
                 className="border-white/15 text-foreground hover:bg-white hover:text-black rounded-none px-10 py-7 text-lg w-full sm:w-auto cta-glow"
               >
-                شوف الباقات
+                <EditableText
+                  value={contentMap.about_cta_secondary_packages}
+                  fallback="شوف الباقات"
+                  fieldKey="about_cta_secondary_packages"
+                  category="about"
+                  label="زر شوف الباقات (من أنا)"
+                />
               </Button>
             </Link>
           </div>

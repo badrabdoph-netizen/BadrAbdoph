@@ -20,7 +20,8 @@ import {
   pageTexts,
   ctaTexts,
 } from "@/config/siteConfig";
-import { useContactData, usePackagesData } from "@/hooks/useSiteData";
+import { useContactData, usePackagesData, useContentData } from "@/hooks/useSiteData";
+import { EditableText } from "@/components/InlineEdit";
 
 type Pkg = {
   id: string;
@@ -88,8 +89,8 @@ function SectionHeader({
   icon,
   subtitleClassName,
 }: {
-  title: string;
-  subtitle?: string;
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
   icon?: React.ReactNode;
   subtitleClassName?: string;
 }) {
@@ -107,7 +108,7 @@ function SectionHeader({
   );
 }
 
-function PrimaryCTA({ whatsappNumber }: { whatsappNumber: string | undefined }) {
+function PrimaryCTA({ whatsappNumber, label }: { whatsappNumber: string | undefined; label: React.ReactNode }) {
   void whatsappNumber;
   return (
     <Link href="/contact">
@@ -115,7 +116,7 @@ function PrimaryCTA({ whatsappNumber }: { whatsappNumber: string | undefined }) 
         size="lg"
         className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 py-7 text-lg rounded-none w-full sm:w-auto cta-glow"
       >
-        {ctaTexts.bookNow}
+        {label}
       </Button>
     </Link>
   );
@@ -125,10 +126,12 @@ function PackageCard({
   pkg,
   kind,
   whatsappNumber,
+  contentMap,
 }: {
   pkg: Pkg;
   kind: "session" | "prints" | "wedding" | "addon";
   whatsappNumber: string | undefined;
+  contentMap: Record<string, string>;
 }) {
   const isVipPlus = (p: any) => p?.id === "full-day-vip-plus" || p?.featured === true;
   const isWedding = kind === "wedding";
@@ -137,7 +140,9 @@ function PackageCard({
   const popular = !!pkg.popular;
   const isCustom = pkg.id === "special-montage-design";
   const isPro = pkg.id === "session-2";
-  const customDescription = (pkg.description ?? "").trim();
+  const baseKey = `package_${pkg.id}`;
+  const getValue = (key: string, fallback = "") => (contentMap[key] as string | undefined) ?? fallback;
+  const customDescription = getValue(`${baseKey}_description`, pkg.description ?? "").trim();
 
   const Icon =
     kind === "wedding" || kind === "prints" ? (
@@ -148,7 +153,8 @@ function PackageCard({
       <Camera className="w-9 h-9 text-primary" />
     );
 
-  const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️", whatsappNumber);
+  const waInquiryText = getValue("services_whatsapp_inquiry_text", "حابب استفسر ❤️");
+  const waInquiryHref = buildWhatsAppHref(waInquiryText, whatsappNumber);
 
   return (
     <div
@@ -184,38 +190,107 @@ function PackageCard({
             <div className="text-right">
               <div className="flex items-baseline gap-2">
                 <h3 className={["text-xl md:text-2xl font-bold leading-tight", vip ? "text-primary" : ""].join(" ")}>
-                  {pkg.name}
+                  <EditableText
+                    value={contentMap[`${baseKey}_name`]}
+                    fallback={pkg.name}
+                    fieldKey={`${baseKey}_name`}
+                    category="services"
+                    label={`اسم الباقة ${pkg.name}`}
+                  />
                 </h3>
                 {vip && (
                   <span className="inline-flex items-center justify-center px-2.5 py-1 text-[10px] md:text-xs font-semibold tracking-wide rounded-full border border-amber-300/50 text-amber-100/90 bg-[linear-gradient(135deg,rgba(255,215,140,0.22),rgba(255,180,60,0.12))] shadow-[0_10px_28px_rgba(255,200,80,0.18)] backdrop-blur-sm relative md:-translate-y-[1px]">
-                    VIP PLUS
+                    <EditableText
+                      value={contentMap[`${baseKey}_vip_label`]}
+                      fallback="VIP PLUS"
+                      fieldKey={`${baseKey}_vip_label`}
+                      category="services"
+                      label={`شارة VIP - ${pkg.name}`}
+                    />
                   </span>
                 )}
-                {pkg.badge && !vip ? (
-                  <span className="pro-badge">{pkg.badge}</span>
+                {(contentMap[`${baseKey}_badge`] ?? pkg.badge) && !vip ? (
+                  <span className="pro-badge">
+                    <EditableText
+                      value={contentMap[`${baseKey}_badge`]}
+                      fallback={pkg.badge ?? ""}
+                      fieldKey={`${baseKey}_badge`}
+                      category="services"
+                      label={`شارة الباقة ${pkg.name}`}
+                    />
+                  </span>
                 ) : null}
-                {popular && !vip && !pkg.badge ? (
+                {popular && !vip && !(contentMap[`${baseKey}_badge`] ?? pkg.badge) ? (
                   <span className="inline-flex items-center justify-center px-2.5 py-1 text-[10px] md:text-xs font-semibold rounded-full border border-white/15 text-foreground/90 bg-white/5 shadow-[0_10px_24px_rgba(0,0,0,0.25)] backdrop-blur-sm relative md:-translate-y-[1px]">
-                    الأكثر طلباً
+                    <EditableText
+                      value={contentMap[`${baseKey}_popular_label`]}
+                      fallback="الأكثر طلباً"
+                      fieldKey={`${baseKey}_popular_label`}
+                      category="services"
+                      label={`شارة الأكثر طلباً - ${pkg.name}`}
+                    />
                   </span>
                 ) : null}
               </div>
               {isCustom ? (
-                customDescription ? <div className="custom-line">{customDescription}</div> : null
+                customDescription ? (
+                  <div className="custom-line">
+                    <EditableText
+                      value={contentMap[`${baseKey}_description`]}
+                      fallback={customDescription}
+                      fieldKey={`${baseKey}_description`}
+                      category="services"
+                      label={`وصف الباقة ${pkg.name}`}
+                      multiline
+                    />
+                  </div>
+                ) : null
               ) : (
-                <p className="text-xs md:text-sm text-muted-foreground mt-1">{pkg.description}</p>
+                <p className="text-xs md:text-sm text-muted-foreground mt-1">
+                  <EditableText
+                    value={contentMap[`${baseKey}_description`]}
+                    fallback={pkg.description}
+                    fieldKey={`${baseKey}_description`}
+                    category="services"
+                    label={`وصف الباقة ${pkg.name}`}
+                    multiline
+                  />
+                </p>
               )}
             </div>
           </div>
 
           <div className="text-right sm:text-left">
             <div className="text-primary font-bold text-2xl md:text-3xl leading-none">
-              {pkg.price}
-              {vip ? <span className="price-note-inline">متوسط</span> : null}
+              <EditableText
+                value={contentMap[`${baseKey}_price`]}
+                fallback={pkg.price}
+                fieldKey={`${baseKey}_price`}
+                category="services"
+                label={`سعر الباقة ${pkg.name}`}
+              />
+              {vip ? (
+                <span className="price-note-inline">
+                  <EditableText
+                    value={contentMap.services_price_note_inline}
+                    fallback="متوسط"
+                    fieldKey="services_price_note_inline"
+                    category="services"
+                    label="ملحوظة سعر VIP"
+                  />
+                </span>
+              ) : null}
             </div>
-            {pkg.priceNote ? (
+            {(contentMap[`${baseKey}_price_note`] ?? pkg.priceNote) ? (
               <div className={["text-xs mt-2", vip ? "text-primary/90" : "text-muted-foreground"].join(" ")}>
-                {pkg.priceNote}
+                <EditableText
+                  value={contentMap[`${baseKey}_price_note`]}
+                  fallback={pkg.priceNote}
+                  fieldKey={`${baseKey}_price_note`}
+                  category="services"
+                  label={`ملاحظة السعر ${pkg.name}`}
+                  multiline
+                />
               </div>
             ) : null}
           </div>
@@ -224,7 +299,15 @@ function PackageCard({
         {isPro ? (
           <div className="pro-note">
             <Check size={14} className="text-primary ml-2 flex-shrink-0" />
-            <span className="pro-note-text">MEDIA COVERAGE REELS & TIKTOK</span>
+            <span className="pro-note-text">
+              <EditableText
+                value={contentMap.services_pro_note_text}
+                fallback="MEDIA COVERAGE REELS & TIKTOK"
+                fieldKey="services_pro_note_text"
+                category="services"
+                label="ملاحظة برو"
+              />
+            </span>
           </div>
         ) : null}
 
@@ -237,10 +320,35 @@ function PackageCard({
                 <li key={i} className="flex items-start text-sm">
                   <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
                   <span className="text-gray-300 leading-relaxed">
-                    {feature}
-                    {showProTag ? <span className="pro-note-tag">مصور خاص</span> : null}
+                    <EditableText
+                      value={contentMap[`${baseKey}_feature_${i + 1}`]}
+                      fallback={feature}
+                      fieldKey={`${baseKey}_feature_${i + 1}`}
+                      category="services"
+                      label={`ميزة ${i + 1} - ${pkg.name}`}
+                      multiline
+                    />
+                    {showProTag ? (
+                      <span className="pro-note-tag">
+                        <EditableText
+                          value={contentMap.services_pro_tag}
+                          fallback="مصور خاص"
+                          fieldKey="services_pro_tag"
+                          category="services"
+                          label="وسم مصور خاص"
+                        />
+                      </span>
+                    ) : null}
                     {showMediaTag ? (
-                      <span className="pro-note-tag media-tag-glow">مصور خاص</span>
+                      <span className="pro-note-tag media-tag-glow">
+                        <EditableText
+                          value={contentMap.services_media_tag}
+                          fallback="مصور خاص"
+                          fieldKey="services_media_tag"
+                          category="services"
+                          label="وسم مصور خاص (إعلامي)"
+                        />
+                      </span>
                     ) : null}
                   </span>
                 </li>
@@ -260,7 +368,13 @@ function PackageCard({
                   : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
               ].join(" ")}
             >
-              {ctaTexts.bookNow}
+              <EditableText
+                value={contentMap.services_primary_cta}
+                fallback={ctaTexts.bookNow ?? "احجز الآن"}
+                fieldKey="services_primary_cta"
+                category="services"
+                label="زر احجز الآن (الباقات)"
+              />
             </Button>
           </Link>
 
@@ -270,13 +384,27 @@ function PackageCard({
             rel="noreferrer"
             className="w-full h-[56px] border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors inline-flex items-center justify-center gap-2 rounded-none cta-glow"
           >
-            اسأل عن التفاصيل <ArrowLeft className="mr-2 w-4 h-4" />
+            <EditableText
+              value={contentMap.services_secondary_cta}
+              fallback="اسأل عن التفاصيل"
+              fieldKey="services_secondary_cta"
+              category="services"
+              label="زر اسأل عن التفاصيل"
+            />
+            <ArrowLeft className="mr-2 w-4 h-4" />
           </a>
         </div>
 
         {vip && (
           <div className="mt-5 text-xs vip-note">
-            * تسعير VIP Plus بيتم تحديده حسب تفاصيل اليوم والمكان وعدد ساعات التغطية.
+            <EditableText
+              value={contentMap.services_vip_note}
+              fallback="* تسعير VIP Plus بيتم تحديده حسب تفاصيل اليوم والمكان وعدد ساعات التغطية."
+              fieldKey="services_vip_note"
+              category="services"
+              label="ملاحظة VIP"
+              multiline
+            />
           </div>
         )}
       </div>
@@ -289,17 +417,19 @@ function QuickNav({
   onJump,
   stuck,
   navRef,
+  contentMap,
 }: {
   active: string;
   onJump: (id: string) => void;
   stuck: boolean;
   navRef: React.Ref<HTMLDivElement>;
+  contentMap: Record<string, string>;
 }) {
   const items = [
-    { id: "sessions", label: "سيشن" },
-    { id: "prints", label: "جلسات + مطبوعات" },
-    { id: "wedding", label: "Full Day" },
-    { id: "addons", label: "إضافات" },
+    { id: "sessions", labelKey: "services_nav_sessions", fallback: "سيشن" },
+    { id: "prints", labelKey: "services_nav_prints", fallback: "جلسات + مطبوعات" },
+    { id: "wedding", labelKey: "services_nav_wedding", fallback: "Full Day" },
+    { id: "addons", labelKey: "services_nav_addons", fallback: "إضافات" },
   ];
 
   return (
@@ -321,7 +451,13 @@ function QuickNav({
                   isActive ? "quicknav-btn--active" : "quicknav-btn--idle",
                 ].join(" ")}
               >
-                {it.label}
+                <EditableText
+                  value={contentMap[it.labelKey]}
+                  fallback={it.fallback}
+                  fieldKey={it.labelKey}
+                  category="services"
+                  label={`عنوان التنقل ${it.fallback}`}
+                />
               </button>
             );
           })}
@@ -333,12 +469,15 @@ function QuickNav({
 
 export default function Services() {
   const { contactInfo } = useContactData();
+  const content = useContentData();
   const {
     sessionPackages,
     sessionPackagesWithPrints,
     weddingPackages,
     additionalServices,
   } = usePackagesData();
+  const contentMap = content.contentMap ?? {};
+  const getValue = (key: string, fallback = "") => (contentMap[key] as string | undefined) ?? fallback;
   const [activeSection, setActiveSection] = useState("sessions");
   const [isNavStuck, setIsNavStuck] = useState(false);
   const navRef = useRef<HTMLDivElement | null>(null);
@@ -424,9 +563,23 @@ export default function Services() {
           <div className="flex items-center justify-center gap-2 text-sm text-foreground/90">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 px-3 py-1 text-[11px] font-semibold tracking-wide text-primary">
               <Gift className="w-4 h-4" />
-              هديّة
+              <EditableText
+                value={contentMap.services_promo_badge}
+                fallback="هديّة"
+                fieldKey="services_promo_badge"
+                category="services"
+                label="شارة العرض"
+              />
             </span>
-            <span>عند الحجز اسأل عن هديتك</span>
+            <span>
+              <EditableText
+                value={contentMap.services_promo_text}
+                fallback="عند الحجز اسأل عن هديتك"
+                fieldKey="services_promo_text"
+                category="services"
+                label="نص العرض"
+              />
+            </span>
             <ArrowDown className="promo-arrow w-4 h-4 text-primary/70" />
           </div>
         </div>
@@ -441,24 +594,61 @@ export default function Services() {
           <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/10 bg-black/20 backdrop-blur-md mb-6">
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-xs md:text-sm text-foreground/80">
-              باقات واضحة • ستايل فاخر • تسليم احترافي
+              <EditableText
+                value={contentMap.services_kicker}
+                fallback="باقات واضحة • ستايل فاخر • تسليم احترافي"
+                fieldKey="services_kicker"
+                category="services"
+                label="عنوان صغير (الخدمات)"
+              />
             </span>
           </div>
 
           <h1 className="text-4xl md:text-7xl font-bold mb-5 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {pageTexts.services.title}
+            <EditableText
+              value={contentMap.services_title}
+              fallback={pageTexts.services.title}
+              fieldKey="services_title"
+              category="services"
+              label="عنوان صفحة الخدمات"
+            />
           </h1>
           <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed services-subtitle-glow">
-            {pageTexts.services.subtitle}
+            <EditableText
+              value={contentMap.services_subtitle}
+              fallback={pageTexts.services.subtitle}
+              fieldKey="services_subtitle"
+              category="services"
+              label="وصف صفحة الخدمات"
+              multiline
+            />
           </p>
           <div className="mt-4 mb-3 flex flex-col items-center gap-3">
             <div className="vip-highlight animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
               <Gem className="w-4 h-4 vip-highlight-icon" />
-              <span>- VIP بمجرد حجزك لليوم، مش بيتحجز لغيرك حتى لو سنة.</span>
+              <span>
+                <EditableText
+                  value={contentMap.services_vip_line_1}
+                  fallback="- VIP بمجرد حجزك لليوم، مش بيتحجز لغيرك حتى لو سنة."
+                  fieldKey="services_vip_line_1"
+                  category="services"
+                  label="سطر VIP 1"
+                  multiline
+                />
+              </span>
             </div>
             <div className="vip-highlight animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-400">
               <Receipt className="w-4 h-4 vip-highlight-icon" />
-              <span>بعد الحجز، تكون الأسعار نهائية كما في إيصال حجزك، بدون أي زيادات أو رسوم إضافية.</span>
+              <span>
+                <EditableText
+                  value={contentMap.services_vip_line_2}
+                  fallback="بعد الحجز، تكون الأسعار نهائية كما في إيصال حجزك، بدون أي زيادات أو رسوم إضافية."
+                  fieldKey="services_vip_line_2"
+                  category="services"
+                  label="سطر VIP 2"
+                  multiline
+                />
+              </span>
             </div>
           </div>
         </div>
@@ -466,13 +656,35 @@ export default function Services() {
 
       <div ref={navAnchorRef} className="h-px" aria-hidden="true" />
       {isNavStuck ? <div style={{ height: navHeight }} aria-hidden="true" /> : null}
-      <QuickNav active={activeSection} onJump={jumpTo} stuck={isNavStuck} navRef={navRef} />
+      <QuickNav
+        active={activeSection}
+        onJump={jumpTo}
+        stuck={isNavStuck}
+        navRef={navRef}
+        contentMap={contentMap}
+      />
 
       <section id="sessions" className="pt-3 pb-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
-            title={pageTexts.services.sessionsTitle}
-            subtitle="اختيار موفق - نفس الجودة"
+            title={
+              <EditableText
+                value={contentMap.services_sessions_title}
+                fallback={pageTexts.services.sessionsTitle}
+                fieldKey="services_sessions_title"
+                category="services"
+                label="عنوان قسم السيشن"
+              />
+            }
+            subtitle={
+              <EditableText
+                value={contentMap.services_sessions_subtitle}
+                fallback="اختيار موفق - نفس الجودة"
+                fieldKey="services_sessions_subtitle"
+                category="services"
+                label="وصف قسم السيشن"
+              />
+            }
             subtitleClassName="section-subtitle-glow"
             icon={<Camera className="w-4 h-4 text-primary" />}
           />
@@ -484,6 +696,7 @@ export default function Services() {
                 pkg={pkg as any}
                 kind="session"
                 whatsappNumber={contactInfo.whatsappNumber}
+                contentMap={contentMap}
               />
             ))}
           </div>
@@ -493,8 +706,24 @@ export default function Services() {
       <section id="prints" className="pt-3 pb-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
-            title={pageTexts.services.sessionsWithPrintsTitle}
-            subtitle="للي بيحبوا المطبوعات الفاخرة والألبومات"
+            title={
+              <EditableText
+                value={contentMap.services_prints_title}
+                fallback={pageTexts.services.sessionsWithPrintsTitle}
+                fieldKey="services_prints_title"
+                category="services"
+                label="عنوان قسم المطبوعات"
+              />
+            }
+            subtitle={
+              <EditableText
+                value={contentMap.services_prints_subtitle}
+                fallback="للي بيحبوا المطبوعات الفاخرة والألبومات"
+                fieldKey="services_prints_subtitle"
+                category="services"
+                label="وصف قسم المطبوعات"
+              />
+            }
             icon={<Receipt className="w-4 h-4 text-primary" />}
           />
 
@@ -505,6 +734,7 @@ export default function Services() {
                 pkg={pkg as any}
                 kind="prints"
                 whatsappNumber={contactInfo.whatsappNumber}
+                contentMap={contentMap}
               />
             ))}
           </div>
@@ -514,8 +744,24 @@ export default function Services() {
       <section id="wedding" className="pt-3 pb-16 bg-card border-y border-white/5" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
-            title={pageTexts.services.weddingTitle}
-            subtitle="تغطية يوم كامل • فريق • تفاصيل • تسليم سريع"
+            title={
+              <EditableText
+                value={contentMap.services_wedding_title}
+                fallback={pageTexts.services.weddingTitle}
+                fieldKey="services_wedding_title"
+                category="services"
+                label="عنوان قسم الزفاف"
+              />
+            }
+            subtitle={
+              <EditableText
+                value={contentMap.services_wedding_subtitle}
+                fallback="تغطية يوم كامل • فريق • تفاصيل • تسليم سريع"
+                fieldKey="services_wedding_subtitle"
+                category="services"
+                label="وصف قسم الزفاف"
+              />
+            }
             icon={<Heart className="w-4 h-4 text-primary" />}
           />
 
@@ -526,6 +772,7 @@ export default function Services() {
                 pkg={pkg as any}
                 kind="wedding"
                 whatsappNumber={contactInfo.whatsappNumber}
+                contentMap={contentMap}
               />
             ))}
           </div>
@@ -536,8 +783,24 @@ export default function Services() {
       <section id="addons" className="pt-3 pb-24" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
-            title={pageTexts.services.addonsTitle}
-            subtitle="اختيارات إضافية تزود التجربة جمال"
+            title={
+              <EditableText
+                value={contentMap.services_addons_title}
+                fallback={pageTexts.services.addonsTitle}
+                fieldKey="services_addons_title"
+                category="services"
+                label="عنوان قسم الإضافات"
+              />
+            }
+            subtitle={
+              <EditableText
+                value={contentMap.services_addons_subtitle}
+                fallback="اختيارات إضافية تزود التجربة جمال"
+                fieldKey="services_addons_subtitle"
+                category="services"
+                label="وصف قسم الإضافات"
+              />
+            }
             icon={<PlusCircle className="w-4 h-4 text-primary" />}
           />
 
@@ -551,26 +814,68 @@ export default function Services() {
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-xl font-bold">
-                      {service.emoji} {service.name}
+                      {service.emoji}{" "}
+                      <EditableText
+                        value={contentMap[`package_${service.id}_name`]}
+                        fallback={service.name}
+                        fieldKey={`package_${service.id}_name`}
+                        category="services"
+                        label={`اسم الإضافة ${service.name}`}
+                      />
                     </h3>
-                    <span className="text-primary font-bold">{service.price}</span>
+                    <span className="text-primary font-bold">
+                      <EditableText
+                        value={contentMap[`package_${service.id}_price`]}
+                        fallback={service.price}
+                        fieldKey={`package_${service.id}_price`}
+                        category="services"
+                        label={`سعر الإضافة ${service.name}`}
+                      />
+                    </span>
                   </div>
 
                   <p className="text-muted-foreground text-sm leading-relaxed mb-5">
-                    {service.description}
+                    <EditableText
+                      value={contentMap[`package_${service.id}_description`]}
+                      fallback={service.description}
+                      fieldKey={`package_${service.id}_description`}
+                      category="services"
+                      label={`وصف الإضافة ${service.name}`}
+                      multiline
+                    />
                   </p>
 
                   <ul className="space-y-3">
                     {service.features.map((feature, i) => (
                       <li key={i} className="flex items-start text-sm">
                         <Check size={14} className="text-primary ml-2 mt-1 flex-shrink-0" />
-                        <span className="text-gray-300">{feature}</span>
+                        <span className="text-gray-300">
+                          <EditableText
+                            value={contentMap[`package_${service.id}_feature_${i + 1}`]}
+                            fallback={feature}
+                            fieldKey={`package_${service.id}_feature_${i + 1}`}
+                            category="services"
+                            label={`ميزة الإضافة ${i + 1} - ${service.name}`}
+                            multiline
+                          />
+                        </span>
                       </li>
                     ))}
                   </ul>
 
                   <div className="mt-7">
-                    <PrimaryCTA whatsappNumber={contactInfo.whatsappNumber} />
+                    <PrimaryCTA
+                      whatsappNumber={contactInfo.whatsappNumber}
+                      label={
+                        <EditableText
+                          value={contentMap.services_primary_cta}
+                          fallback={ctaTexts.bookNow ?? "احجز الآن"}
+                          fieldKey="services_primary_cta"
+                          category="services"
+                          label="زر احجز الآن (الإضافات)"
+                        />
+                      }
+                    />
                   </div>
                 </div>
               </div>
@@ -578,12 +883,66 @@ export default function Services() {
           </div>
 
           <div className="text-center text-muted-foreground mt-10 text-sm leading-relaxed space-y-2">
-            <div>اطمئن التزامي في المواعيد وجودة التسليم جزء من شغلي، مش ميزة إضافية.</div>
-            <div>* الأسعار قد تختلف حسب الموقع والتفاصيل الإضافية. غير شامل رسوم اللوكيشن.</div>
-            <div>حجز اليوم بالأسبقية — Full Day لو اليوم محجوز لعريس تاني قبلك بنعتذر.</div>
-            <div>الحجز يتم بتأكيد على واتساب + ديبوزيت تأكيد.</div>
-            <div>الاستفسار فقط لا يعتبر حجزًا ويتم إلغاؤه تلقائيًا بدون تأكيد.</div>
-            <div>أقدر أساعدك في أي شيء خارج التصوير يوم الزفاف (خدمات ونصائح مجانية).</div>
+            <div>
+              <EditableText
+                value={contentMap.services_note_1}
+                fallback="اطمئن التزامي في المواعيد وجودة التسليم جزء من شغلي، مش ميزة إضافية."
+                fieldKey="services_note_1"
+                category="services"
+                label="ملاحظة الخدمات 1"
+                multiline
+              />
+            </div>
+            <div>
+              <EditableText
+                value={contentMap.services_note_2}
+                fallback="* الأسعار قد تختلف حسب الموقع والتفاصيل الإضافية. غير شامل رسوم اللوكيشن."
+                fieldKey="services_note_2"
+                category="services"
+                label="ملاحظة الخدمات 2"
+                multiline
+              />
+            </div>
+            <div>
+              <EditableText
+                value={contentMap.services_note_3}
+                fallback="حجز اليوم بالأسبقية — Full Day لو اليوم محجوز لعريس تاني قبلك بنعتذر."
+                fieldKey="services_note_3"
+                category="services"
+                label="ملاحظة الخدمات 3"
+                multiline
+              />
+            </div>
+            <div>
+              <EditableText
+                value={contentMap.services_note_4}
+                fallback="الحجز يتم بتأكيد على واتساب + ديبوزيت تأكيد."
+                fieldKey="services_note_4"
+                category="services"
+                label="ملاحظة الخدمات 4"
+                multiline
+              />
+            </div>
+            <div>
+              <EditableText
+                value={contentMap.services_note_5}
+                fallback="الاستفسار فقط لا يعتبر حجزًا ويتم إلغاؤه تلقائيًا بدون تأكيد."
+                fieldKey="services_note_5"
+                category="services"
+                label="ملاحظة الخدمات 5"
+                multiline
+              />
+            </div>
+            <div>
+              <EditableText
+                value={contentMap.services_note_6}
+                fallback="أقدر أساعدك في أي شيء خارج التصوير يوم الزفاف (خدمات ونصائح مجانية)."
+                fieldKey="services_note_6"
+                category="services"
+                label="ملاحظة الخدمات 6"
+                multiline
+              />
+            </div>
           </div>
         </div>
       </section>

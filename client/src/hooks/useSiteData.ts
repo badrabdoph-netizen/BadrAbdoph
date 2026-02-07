@@ -142,12 +142,16 @@ export function usePortfolioData() {
         .filter((img: any) => img.visible !== false)
         .sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
         .map((img: any) => ({
+          id: img.id,
           src: img.url,
           title: img.title,
           category: img.category,
         }));
     }
-    return siteImages.portfolioGallery ?? [];
+    return (siteImages.portfolioGallery ?? []).map((img) => ({
+      ...img,
+      id: null,
+    }));
   }, [data]);
 
   return { gallery };
@@ -167,6 +171,7 @@ export function useContentData() {
   }, [data]);
 
   return {
+    contentMap: map,
     heroTitle: map.hero_title ?? "",
     heroSubtitle: map.hero_subtitle ?? "",
     heroDescription: map.hero_description ?? homeHero.subTextAr ?? "",
@@ -176,4 +181,20 @@ export function useContentData() {
     ctaTitle: map.cta_title ?? "",
     ctaDescription: map.cta_description ?? "",
   };
+}
+
+export function useSiteImagesData() {
+  const { data } = trpc.siteImages.getAll.useQuery(undefined, {
+    staleTime: 60_000,
+  });
+
+  const map = useMemo(() => {
+    const out: Record<string, { url: string; alt?: string | null }> = {};
+    (data ?? []).forEach((item) => {
+      out[item.key] = { url: item.url, alt: item.alt };
+    });
+    return out;
+  }, [data]);
+
+  return { imageMap: map };
 }

@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Check, Loader2, Pencil, X } from "lucide-react";
+import { Check, Loader2, Pencil, X, Image as ImageIcon, Upload } from "lucide-react";
 
 type EditableTextProps = {
   value?: string | null;
@@ -170,7 +170,13 @@ export function EditableText({
               : "",
             displayClassName
           )}
-          onClick={startEditing}
+          onClick={(event) => {
+            if (enabled) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            startEditing();
+          }}
         >
           {normalizedValue ? (
             <span className="whitespace-pre-line">{normalizedValue}</span>
@@ -190,5 +196,297 @@ export function EditableText({
         </span>
       )}
     </Tag>
+  );
+}
+
+type EditableContactTextProps = {
+  value?: string | null;
+  fallback?: string;
+  placeholder?: string;
+  fieldKey: string;
+  label: string;
+  className?: string;
+  displayClassName?: string;
+  multiline?: boolean;
+};
+
+export function EditableContactText({
+  value,
+  fallback,
+  placeholder,
+  fieldKey,
+  label,
+  className,
+  displayClassName,
+  multiline = false,
+}: EditableContactTextProps) {
+  const { enabled } = useInlineEditMode();
+  const utils = trpc.useUtils();
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  const normalizedValue = value ?? "";
+  const displayValue = normalizedValue || fallback || "";
+  const showPlaceholder = !normalizedValue && !!placeholder;
+
+  useEffect(() => {
+    if (isEditing) return;
+    setDraft(normalizedValue);
+  }, [normalizedValue, isEditing]);
+
+  const upsertMutation = trpc.contactInfo.upsert.useMutation({
+    onSuccess: () => {
+      toast.success("تم حفظ البيانات");
+      utils.contactInfo.getAll.invalidate();
+      setIsEditing(false);
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const handleSave = () => {
+    if (!enabled || upsertMutation.isPending) return;
+    upsertMutation.mutate({
+      key: fieldKey,
+      value: draft,
+      label,
+    });
+  };
+
+  const handleCancel = () => {
+    setDraft(normalizedValue);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      handleCancel();
+      return;
+    }
+    if (!multiline && event.key === "Enter") {
+      event.preventDefault();
+      handleSave();
+    }
+    if (multiline && event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      handleSave();
+    }
+  };
+
+  return (
+    <span className={cn("relative", className)}>
+      {isEditing ? (
+        <div className="space-y-2">
+          {multiline ? (
+            <Textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="min-h-[110px]"
+              autoFocus
+            />
+          ) : (
+            <Input
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={handleKeyDown}
+              autoFocus
+            />
+          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" onClick={handleSave} disabled={upsertMutation.isPending}>
+              {upsertMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin ml-2" />
+              ) : (
+                <Check className="w-4 h-4 ml-2" />
+              )}
+              حفظ
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleCancel}>
+              <X className="w-4 h-4 ml-2" />
+              إلغاء
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <span
+          className={cn(
+            "inline-flex items-center gap-2",
+            showPlaceholder ? "text-muted-foreground" : "text-inherit",
+            enabled
+              ? "group cursor-text rounded-md outline outline-1 outline-dashed outline-transparent hover:outline-primary/40 transition"
+              : "",
+            displayClassName
+          )}
+          onClick={(event) => {
+            if (enabled) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            setIsEditing(true);
+            setDraft(normalizedValue || fallback || "");
+          }}
+        >
+          {displayValue || placeholder || ""}
+          {enabled && (
+            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground opacity-0 transition group-hover:opacity-100">
+              <Pencil className="w-3 h-3" />
+              تعديل
+            </span>
+          )}
+        </span>
+      )}
+    </span>
+  );
+}
+
+type EditableImageProps = {
+  src: string;
+  alt?: string;
+  fieldKey: string;
+  label: string;
+  category: string;
+  className?: string;
+  imgClassName?: string;
+  overlayClassName?: string;
+};
+
+export function EditableImage({
+  src,
+  alt = "",
+  fieldKey,
+  label,
+  category,
+  className,
+  imgClassName,
+  overlayClassName,
+}: EditableImageProps) {
+  const { enabled } = useInlineEditMode();
+  const utils = trpc.useUtils();
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftUrl, setDraftUrl] = useState(src);
+
+  useEffect(() => {
+    if (isEditing) return;
+    setDraftUrl(src);
+  }, [src, isEditing]);
+
+  const upsertMutation = trpc.siteImages.upsert.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث الصورة");
+      utils.siteImages.getAll.invalidate();
+      setIsEditing(false);
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const uploadMutation = trpc.siteImages.upload.useMutation({
+    onSuccess: () => {
+      toast.success("تم رفع الصورة");
+      utils.siteImages.getAll.invalidate();
+      setIsEditing(false);
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const handleSaveUrl = () => {
+    if (!enabled || upsertMutation.isPending) return;
+    upsertMutation.mutate({
+      key: fieldKey,
+      url: draftUrl,
+      alt,
+      category,
+    });
+  };
+
+  const handleFileChange = (file: File | undefined) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = (reader.result as string).split(",")[1] ?? "";
+      if (!base64) {
+        toast.error("تعذر قراءة الصورة");
+        return;
+      }
+      uploadMutation.mutate({
+        key: fieldKey,
+        base64,
+        mimeType: file.type,
+        alt,
+        category,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className={cn("relative group", className)}>
+      <img src={src} alt={alt} className={imgClassName} />
+      {enabled && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setIsEditing((prev) => !prev);
+          }}
+          className={cn(
+            "absolute top-3 right-3 z-20 flex items-center gap-1 rounded-full border border-white/20 bg-black/50 px-3 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100",
+            overlayClassName
+          )}
+        >
+          <ImageIcon className="w-3 h-3" />
+          تعديل الصورة
+        </button>
+      )}
+
+      {enabled && isEditing && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-sm rounded-xl border border-white/15 bg-background p-4 text-right shadow-xl">
+            <div className="text-sm font-semibold mb-2">{label}</div>
+            <Input
+              value={draftUrl}
+              onChange={(e) => setDraftUrl(e.target.value)}
+              placeholder="رابط الصورة"
+              className="mb-3"
+            />
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                <Upload className="w-3 h-3" />
+                رفع صورة جديدة
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleFileChange(e.target.files?.[0])}
+                />
+              </label>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  onClick={handleSaveUrl}
+                  disabled={upsertMutation.isPending}
+                >
+                  {upsertMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                  ) : (
+                    <Check className="w-4 h-4 ml-2" />
+                  )}
+                  حفظ
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                >
+                  <X className="w-4 h-4 ml-2" />
+                  إلغاء
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

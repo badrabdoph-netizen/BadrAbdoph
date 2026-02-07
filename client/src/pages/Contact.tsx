@@ -23,7 +23,8 @@ import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, Sele
 import {
   pageTexts,
 } from "@/config/siteConfig";
-import { useContactData, usePackagesData } from "@/hooks/useSiteData";
+import { useContactData, usePackagesData, useContentData } from "@/hooks/useSiteData";
+import { EditableContactText, EditableText } from "@/components/InlineEdit";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" }),
@@ -78,12 +79,15 @@ function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
 
 export default function Contact() {
   const { contactInfo, socialLinks } = useContactData();
+  const content = useContentData();
   const {
     sessionPackages,
     sessionPackagesWithPrints,
     weddingPackages,
     additionalServices,
   } = usePackagesData();
+  const contentMap = content.contentMap ?? {};
+  const getValue = (key: string, fallback = "") => (contentMap[key] as string | undefined) ?? fallback;
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: "", phone: "", date: "", packageId: "", addonIds: [] },
@@ -92,13 +96,20 @@ export default function Contact() {
 
   const packageOptions = useMemo(() => {
     const map = (items: Array<{ id: string; name: string; price: string }>) =>
-      items.map((p) => ({ id: p.id, label: p.name, price: p.price }));
+      items.map((p) => {
+        const baseKey = `package_${p.id}`;
+        return {
+          id: p.id,
+          label: getValue(`${baseKey}_name`, p.name),
+          price: getValue(`${baseKey}_price`, p.price),
+        };
+      });
     return [
       ...map(sessionPackages as any),
       ...map(sessionPackagesWithPrints as any),
       ...map(weddingPackages as any),
     ];
-  }, [sessionPackages, sessionPackagesWithPrints, weddingPackages]);
+  }, [sessionPackages, sessionPackagesWithPrints, weddingPackages, contentMap]);
 
   const addonOptions = useMemo(() => {
     const list = (additionalServices ?? []) as Array<{
@@ -108,14 +119,17 @@ export default function Contact() {
       emoji?: string;
       priceNote?: string;
     }>;
-    return list.map((a) => ({
-      id: a.id,
-      label: a.name,
-      price: a.price,
-      emoji: a.emoji,
-      priceNote: a.priceNote,
-    }));
-  }, [additionalServices]);
+    return list.map((a) => {
+      const baseKey = `package_${a.id}`;
+      return {
+        id: a.id,
+        label: getValue(`${baseKey}_name`, a.name),
+        price: getValue(`${baseKey}_price`, a.price),
+        emoji: a.emoji,
+        priceNote: getValue(`${baseKey}_price_note`, a.priceNote ?? ""),
+      };
+    });
+  }, [additionalServices, contentMap]);
 
   const watchedName = useWatch({ control: form.control, name: "name" }) ?? "";
   const watchedPhone = useWatch({ control: form.control, name: "phone" }) ?? "";
@@ -135,25 +149,26 @@ export default function Contact() {
 
   const addonsText = selectedAddons.length
     ? selectedAddons.map((a) => a.label).join("، ")
-    : "—";
+    : getValue("contact_addons_empty", "—");
 
   const addonsPreview = selectedAddons.length
     ? selectedAddons.map((a) => a.label).join("، ")
-    : "اختر الإضافات";
+    : getValue("contact_addons_placeholder", "اختر الإضافات");
 
   const priceValue = selectedPackage?.price ?? "";
   const receiptText = useMemo(() => {
+    const emptyValue = getValue("contact_receipt_empty", "—");
     const lines = [
-      "إيصال حجز ❤️",
-      `الاسم: ${watchedName || "—"}`,
-      `الهاتف: ${watchedPhone || "—"}`,
-      `التاريخ: ${watchedDate || "—"}`,
-      `الباقة: ${selectedPackage?.label || "—"}`,
-      `الإضافات: ${addonsText}`,
-      `السعر: ${priceValue || "—"}`,
+      getValue("contact_receipt_title", "إيصال حجز ❤️"),
+      `${getValue("contact_receipt_label_name", "الاسم")}: ${watchedName || emptyValue}`,
+      `${getValue("contact_receipt_label_phone", "الهاتف")}: ${watchedPhone || emptyValue}`,
+      `${getValue("contact_receipt_label_date", "التاريخ")}: ${watchedDate || emptyValue}`,
+      `${getValue("contact_receipt_label_package", "الباقة")}: ${selectedPackage?.label || emptyValue}`,
+      `${getValue("contact_receipt_label_addons", "الإضافات")}: ${addonsText}`,
+      `${getValue("contact_receipt_label_price", "السعر")}: ${priceValue || emptyValue}`,
     ];
     return lines.join("\n");
-  }, [watchedName, watchedPhone, watchedDate, selectedPackage, addonsText, priceValue]);
+  }, [watchedName, watchedPhone, watchedDate, selectedPackage, addonsText, priceValue, contentMap]);
 
   const whatsappReceiptHref = useMemo(
     () => buildWhatsAppHref(receiptText, contactInfo.whatsappNumber),
@@ -206,15 +221,34 @@ export default function Contact() {
           <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/10 bg-black/20 backdrop-blur-md mb-6">
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-xs md:text-sm text-foreground/80">
-              رد سريع • تنظيم مواعيد • تفاصيل واضحة
+              <EditableText
+                value={contentMap.contact_kicker}
+                fallback="رد سريع • تنظيم مواعيد • تفاصيل واضحة"
+                fieldKey="contact_kicker"
+                category="contact"
+                label="عنوان صغير (تواصل)"
+              />
             </span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {pageTexts.contact.title}
+            <EditableText
+              value={contentMap.contact_title}
+              fallback={pageTexts.contact.title}
+              fieldKey="contact_title"
+              category="contact"
+              label="عنوان صفحة التواصل"
+            />
           </h1>
           <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed">
-            {pageTexts.contact.subtitle}
+            <EditableText
+              value={contentMap.contact_subtitle}
+              fallback={pageTexts.contact.subtitle}
+              fieldKey="contact_subtitle"
+              category="contact"
+              label="وصف صفحة التواصل"
+              multiline
+            />
           </p>
         </div>
       </header>
@@ -232,7 +266,15 @@ export default function Contact() {
               <span className="text-primary">
                 <WhatsAppIcon />
               </span>
-              <span className="text-sm font-semibold">واتساب</span>
+              <span className="text-sm font-semibold">
+                <EditableText
+                  value={contentMap.contact_quick_whatsapp}
+                  fallback="واتساب"
+                  fieldKey="contact_quick_whatsapp"
+                  category="contact"
+                  label="زر واتساب سريع"
+                />
+              </span>
             </a>
 
             <a
@@ -240,7 +282,15 @@ export default function Contact() {
               className="premium-border bg-card/40 border border-white/10 px-4 py-4 flex items-center justify-center gap-2 hover:border-primary/35 transition-colors"
             >
               <Phone className="w-5 h-5 text-primary" />
-              <span className="text-sm font-semibold">مكالمة</span>
+              <span className="text-sm font-semibold">
+                <EditableText
+                  value={contentMap.contact_quick_call}
+                  fallback="مكالمة"
+                  fieldKey="contact_quick_call"
+                  category="contact"
+                  label="زر مكالمة سريع"
+                />
+              </span>
             </a>
           </div>
         </div>
@@ -251,7 +301,15 @@ export default function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
             {/* Form FIRST on mobile */}
             <div className="order-1 lg:order-2 bg-card p-7 md:p-10 border border-white/10 premium-border">
-              <h2 className="text-2xl font-bold mb-6">{pageTexts.contact.formTitle}</h2>
+              <h2 className="text-2xl font-bold mb-6">
+                <EditableText
+                  value={contentMap.contact_form_title}
+                  fallback={pageTexts.contact.formTitle}
+                  fieldKey="contact_form_title"
+                  category="contact"
+                  label="عنوان نموذج التواصل"
+                />
+              </h2>
 
               <Form {...form}>
                 <form className="space-y-5">
@@ -260,9 +318,21 @@ export default function Contact() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>الاسم بالكامل</FormLabel>
+                        <FormLabel>
+                          <EditableText
+                            value={contentMap.contact_label_name}
+                            fallback="الاسم بالكامل"
+                            fieldKey="contact_label_name"
+                            category="contact"
+                            label="حقل الاسم"
+                          />
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="أدخل اسمك" {...field} className={fieldClass} />
+                          <Input
+                            placeholder={getValue("contact_placeholder_name", "أدخل اسمك")}
+                            {...field}
+                            className={fieldClass}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -274,7 +344,15 @@ export default function Contact() {
                     name="date"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>تاريخ المناسبة</FormLabel>
+                        <FormLabel>
+                          <EditableText
+                            value={contentMap.contact_label_date}
+                            fallback="تاريخ المناسبة"
+                            fieldKey="contact_label_date"
+                            category="contact"
+                            label="حقل التاريخ"
+                          />
+                        </FormLabel>
                         <FormControl>
                           <Input type="date" {...field} className={fieldClass} />
                         </FormControl>
@@ -288,11 +366,21 @@ export default function Contact() {
                     name="packageId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>اختر الباقة</FormLabel>
+                        <FormLabel>
+                          <EditableText
+                            value={contentMap.contact_label_package}
+                            fallback="اختر الباقة"
+                            fieldKey="contact_label_package"
+                            category="contact"
+                            label="حقل الباقة"
+                          />
+                        </FormLabel>
                         <FormControl>
                           <Select value={field.value} onValueChange={field.onChange}>
                             <SelectTrigger className={`w-full ${fieldClass}`}>
-                              <SelectValue placeholder="اختر الباقة المناسبة" />
+                              <SelectValue
+                                placeholder={getValue("contact_placeholder_package", "اختر الباقة المناسبة")}
+                              />
                             </SelectTrigger>
                             <SelectContent className="border-white/10 bg-background/95 backdrop-blur-md">
                               {packageOptions.map((opt, index) => {
@@ -343,10 +431,18 @@ export default function Contact() {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>رقم الهاتف</FormLabel>
+                        <FormLabel>
+                          <EditableText
+                            value={contentMap.contact_label_phone}
+                            fallback="رقم الهاتف"
+                            fieldKey="contact_label_phone"
+                            category="contact"
+                            label="حقل الهاتف"
+                          />
+                        </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="01xxxxxxxxx"
+                            placeholder={getValue("contact_placeholder_phone", "01xxxxxxxxx")}
                             value={field.value}
                             onChange={(e) => field.onChange(normalizePhone(e.target.value))}
                             className={`${fieldClass} text-right`}
@@ -361,11 +457,19 @@ export default function Contact() {
                   />
 
                   <div className="grid gap-2">
-                    <Label>السعر المختار</Label>
+                    <Label>
+                      <EditableText
+                        value={contentMap.contact_label_price}
+                        fallback="السعر المختار"
+                        fieldKey="contact_label_price"
+                        category="contact"
+                        label="عنوان السعر"
+                      />
+                    </Label>
                     <Input
                       value={priceValue}
                       readOnly
-                      placeholder="سيظهر السعر تلقائياً"
+                      placeholder={getValue("contact_placeholder_price", "سيظهر السعر تلقائياً")}
                       className={`${fieldClass} text-right font-semibold text-primary/90`}
                     />
                   </div>
@@ -375,7 +479,15 @@ export default function Contact() {
                     name="addonIds"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>اختيارات الإضافات (اختياري)</FormLabel>
+                        <FormLabel>
+                          <EditableText
+                            value={contentMap.contact_label_addons}
+                            fallback="اختيارات الإضافات (اختياري)"
+                            fieldKey="contact_label_addons"
+                            category="contact"
+                            label="حقل الإضافات"
+                          />
+                        </FormLabel>
                         <FormControl>
                           <Popover>
                             <PopoverTrigger asChild>
@@ -446,7 +558,13 @@ export default function Contact() {
                     <div className="relative flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2 text-sm font-semibold">
                         <Receipt className="w-4 h-4 text-primary" />
-                        الإيصال
+                        <EditableText
+                          value={contentMap.contact_receipt_heading}
+                          fallback="الإيصال"
+                          fieldKey="contact_receipt_heading"
+                          category="contact"
+                          label="عنوان الإيصال"
+                        />
                       </div>
                       <button
                         type="button"
@@ -454,7 +572,13 @@ export default function Contact() {
                         className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                       >
                         <Copy size={14} />
-                        نسخ
+                        <EditableText
+                          value={contentMap.contact_receipt_copy}
+                          fallback="نسخ"
+                          fieldKey="contact_receipt_copy"
+                          category="contact"
+                          label="زر نسخ الإيصال"
+                        />
                       </button>
                     </div>
                     <pre className="relative whitespace-pre-line text-sm md:text-base text-foreground/85 leading-relaxed font-medium">
@@ -474,12 +598,25 @@ export default function Contact() {
                         className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 text-lg rounded-none"
                         onClick={form.handleSubmit(onSendReceipt)}
                       >
-                        إرسال الإيصال على واتساب
+                        <EditableText
+                          value={contentMap.contact_submit_button}
+                          fallback="إرسال الإيصال على واتساب"
+                          fieldKey="contact_submit_button"
+                          category="contact"
+                          label="زر إرسال الإيصال"
+                        />
                         <Send size={18} className="mr-2" />
                       </Button>
 
                       <p className="text-[11px] text-muted-foreground/75 text-center mt-3 leading-relaxed">
-                        بالضغط على إرسال، سيتم فتح واتساب بإيصال جاهز حسب اختياراتك.
+                        <EditableText
+                          value={contentMap.contact_submit_helper}
+                          fallback="بالضغط على إرسال، سيتم فتح واتساب بإيصال جاهز حسب اختياراتك."
+                          fieldKey="contact_submit_helper"
+                          category="contact"
+                          label="تنبيه إرسال الإيصال"
+                          multiline
+                        />
                       </p>
                     </div>
                   </div>
@@ -490,9 +627,24 @@ export default function Contact() {
             {/* Info SECOND on mobile */}
             <div className="order-2 lg:order-1 space-y-10">
               <div className="premium-border bg-card/40 border border-white/10 p-7 md:p-9">
-                <h2 className="text-2xl font-bold mb-4 text-primary">{pageTexts.contact.infoTitle}</h2>
+                <h2 className="text-2xl font-bold mb-4 text-primary">
+                  <EditableText
+                    value={contentMap.contact_info_title}
+                    fallback={pageTexts.contact.infoTitle}
+                    fieldKey="contact_info_title"
+                    category="contact"
+                    label="عنوان معلومات التواصل"
+                  />
+                </h2>
                 <p className="text-muted-foreground leading-relaxed mb-7">
-                  {pageTexts.contact.infoDescription}
+                  <EditableText
+                    value={contentMap.contact_info_desc}
+                    fallback={pageTexts.contact.infoDescription}
+                    fieldKey="contact_info_desc"
+                    category="contact"
+                    label="وصف معلومات التواصل"
+                    multiline
+                  />
                 </p>
 
                 <div className="space-y-5">
@@ -501,12 +653,25 @@ export default function Contact() {
                       <Phone size={22} />
                     </div>
                     <div className="text-right">
-                      <h4 className="font-bold">الهاتف</h4>
+                      <h4 className="font-bold">
+                        <EditableText
+                          value={contentMap.contact_info_phone_label}
+                          fallback="الهاتف"
+                          fieldKey="contact_info_phone_label"
+                          category="contact"
+                          label="عنوان الهاتف"
+                        />
+                      </h4>
                       <a
                         href={telHref}
                         className="text-muted-foreground hover:text-primary transition-colors dir-ltr block"
                       >
-                        {contactInfo.phone}
+                        <EditableContactText
+                          value={contactInfo.phone}
+                          fallback={contactInfo.phone ?? ""}
+                          fieldKey="phone"
+                          label="رقم الهاتف"
+                        />
                       </a>
                     </div>
                   </div>
@@ -518,14 +683,27 @@ export default function Contact() {
                       </span>
                     </div>
                     <div className="text-right">
-                      <h4 className="font-bold">واتساب</h4>
+                      <h4 className="font-bold">
+                        <EditableText
+                          value={contentMap.contact_info_whatsapp_label}
+                          fallback="واتساب"
+                          fieldKey="contact_info_whatsapp_label"
+                          category="contact"
+                          label="عنوان واتساب"
+                        />
+                      </h4>
                       <a
                         href={whatsappBookingHref}
                         target="_blank"
                         rel="noreferrer"
                         className="text-muted-foreground hover:text-primary transition-colors dir-ltr block"
                       >
-                        {contactInfo.phone}
+                        <EditableContactText
+                          value={contactInfo.whatsappNumber}
+                          fallback={contactInfo.whatsappNumber ?? ""}
+                          fieldKey="whatsapp"
+                          label="رقم واتساب"
+                        />
                       </a>
                     </div>
                   </div>
@@ -535,12 +713,25 @@ export default function Contact() {
                       <Mail size={22} />
                     </div>
                     <div className="text-right">
-                      <h4 className="font-bold">البريد الإلكتروني</h4>
+                      <h4 className="font-bold">
+                        <EditableText
+                          value={contentMap.contact_info_email_label}
+                          fallback="البريد الإلكتروني"
+                          fieldKey="contact_info_email_label"
+                          category="contact"
+                          label="عنوان البريد"
+                        />
+                      </h4>
                       <a
                         href={`mailto:${contactInfo.email}`}
                         className="text-muted-foreground hover:text-primary transition-colors"
                       >
-                        {contactInfo.email}
+                        <EditableContactText
+                          value={contactInfo.email}
+                          fallback={contactInfo.email ?? ""}
+                          fieldKey="email"
+                          label="البريد الإلكتروني"
+                        />
                       </a>
                     </div>
                   </div>
@@ -550,15 +741,39 @@ export default function Contact() {
                       <MapPin size={22} />
                     </div>
                     <div className="text-right">
-                      <h4 className="font-bold">الموقع</h4>
-                      <p className="text-muted-foreground">{contactInfo.location}</p>
+                      <h4 className="font-bold">
+                        <EditableText
+                          value={contentMap.contact_info_location_label}
+                          fallback="الموقع"
+                          fieldKey="contact_info_location_label"
+                          category="contact"
+                          label="عنوان الموقع"
+                        />
+                      </h4>
+                      <p className="text-muted-foreground">
+                        <EditableContactText
+                          value={contactInfo.location}
+                          fallback={contactInfo.location ?? ""}
+                          fieldKey="location"
+                          label="الموقع"
+                          multiline
+                        />
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="premium-border bg-card/40 border border-white/10 p-7 md:p-9">
-                <h2 className="text-xl font-bold mb-5">تابعنا على</h2>
+                <h2 className="text-xl font-bold mb-5">
+                  <EditableText
+                    value={contentMap.contact_follow_title}
+                    fallback="تابعنا على"
+                    fieldKey="contact_follow_title"
+                    category="contact"
+                    label="عنوان تابعنا"
+                  />
+                </h2>
                 <div className="flex gap-3">
                   <a
                     href={socialLinks.instagram}
@@ -616,7 +831,15 @@ export default function Contact() {
         title="تواصل عبر واتساب"
       >
         <WhatsAppIcon />
-        <span className="text-sm font-semibold md:hidden">واتساب</span>
+        <span className="text-sm font-semibold md:hidden">
+          <EditableText
+            value={contentMap.contact_floating_label}
+            fallback="واتساب"
+            fieldKey="contact_floating_label"
+            category="contact"
+            label="زر واتساب العائم"
+          />
+        </span>
       </a>
 
       <style>{`

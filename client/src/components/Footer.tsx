@@ -3,7 +3,8 @@ import { Instagram, Facebook, Phone, Mail, MapPin, ArrowLeft, ArrowDownRight, Sp
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { photographerInfo, navLinks, ctaTexts } from "@/config/siteConfig";
-import { useContactData } from "@/hooks/useSiteData";
+import { useContactData, useContentData } from "@/hooks/useSiteData";
+import { EditableContactText, EditableText } from "@/components/InlineEdit";
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
@@ -27,6 +28,8 @@ function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
 export default function Footer() {
   const [location] = useLocation();
   const { contactInfo, socialLinks } = useContactData();
+  const content = useContentData();
+  const contentMap = content.contentMap ?? {};
 
   const phoneClean = (contactInfo.phone ?? "").replace(/\s/g, "");
   const telHref = phoneClean ? `tel:${phoneClean}` : "";
@@ -44,25 +47,52 @@ export default function Footer() {
             <div className="text-center md:text-right">
               <div className="inline-flex items-center gap-2 px-3 py-2 border border-white/10 bg-black/15">
                 <Sparkles className="w-4 h-4 text-primary" />
-                <span className="text-xs text-foreground/80">رد سريع • تنظيم مواعيد • تسليم مرتب</span>
+                <span className="text-xs text-foreground/80">
+                  <EditableText
+                    value={contentMap.footer_badge_text}
+                    fallback="رد سريع • تنظيم مواعيد • تسليم مرتب"
+                    fieldKey="footer_badge_text"
+                    category="footer"
+                    label="شريط الفوتر العلوي"
+                  />
+                </span>
               </div>
 
               <h3 className="text-xl md:text-2xl font-bold mt-3">
-                جاهز نبدأ؟ ابعت التفاصيل وهنرتب كل حاجة
+                <EditableText
+                  value={contentMap.footer_cta_title}
+                  fallback="جاهز نبدأ؟ ابعت التفاصيل وهنرتب كل حاجة"
+                  fieldKey="footer_cta_title"
+                  category="footer"
+                  label="عنوان دعوة الفوتر"
+                  multiline
+                />
               </h3>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
               <Link href="/contact">
                 <Button className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-8 py-6 text-base cta-glow">
-                  {ctaTexts.bookNow}
+                  <EditableText
+                    value={contentMap.footer_cta_primary}
+                    fallback={ctaTexts.bookNow}
+                    fieldKey="footer_cta_primary"
+                    category="cta"
+                    label="زر الفوتر الأساسي"
+                  />
                 </Button>
               </Link>
 
               <Link href="/services">
                 <a className="w-full md:w-auto border border-white/15 bg-black/15 hover:bg-white hover:text-black transition-colors rounded-none px-8 py-6 text-base inline-flex items-center justify-center gap-2 cta-glow">
                   <ArrowDownRight className="w-4 h-4 text-primary" />
-                  اعرف الأسعار والباقات المتاحة
+                  <EditableText
+                    value={contentMap.footer_cta_secondary}
+                    fallback="اعرف الأسعار والباقات المتاحة"
+                    fieldKey="footer_cta_secondary"
+                    category="cta"
+                    label="زر الفوتر الثانوي"
+                  />
                 </a>
               </Link>
             </div>
@@ -74,11 +104,28 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           <div className="text-center md:text-right">
             <div className="text-2xl font-bold tracking-wider">
-              <span className="text-foreground">{photographerInfo.brandName ?? photographerInfo.name}</span>
+              <span className="text-foreground">
+                <EditableText
+                  value={contentMap.footer_brand_name}
+                  fallback={photographerInfo.brandName ?? photographerInfo.name}
+                  fieldKey="footer_brand_name"
+                  category="footer"
+                  label="اسم البراند في الفوتر"
+                />
+              </span>
             </div>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-              {photographerInfo.descriptionAr ??
-                "تصوير يركز على اللحظة… ويطلعها بأفضل شكل. ستايل سينمائي فاخر واهتمام بالتفاصيل."}
+              <EditableText
+                value={contentMap.footer_brand_desc}
+                fallback={
+                  photographerInfo.descriptionAr ??
+                  "تصوير يركز على اللحظة… ويطلعها بأفضل شكل. ستايل سينمائي فاخر واهتمام بالتفاصيل."
+                }
+                fieldKey="footer_brand_desc"
+                category="footer"
+                label="وصف البراند في الفوتر"
+                multiline
+              />
             </p>
 
             <div className="mt-6 flex items-center justify-center md:justify-start gap-3">
@@ -121,10 +168,19 @@ export default function Footer() {
           </div>
 
           <div className="text-center md:text-right">
-            <h4 className="text-lg font-bold mb-4">روابط سريعة</h4>
+            <h4 className="text-lg font-bold mb-4">
+              <EditableText
+                value={contentMap.footer_links_title}
+                fallback="روابط سريعة"
+                fieldKey="footer_links_title"
+                category="footer"
+                label="عنوان روابط سريعة"
+              />
+            </h4>
             <div className="grid grid-cols-2 gap-2">
-              {navLinks.map((l) => {
+              {navLinks.map((l, index) => {
                 const active = !isExternal(l.href) && location === l.href;
+                const labelKey = `nav_label_${index + 1}`;
 
                 if (isExternal(l.href)) {
                   return (
@@ -135,7 +191,15 @@ export default function Footer() {
                       rel="noreferrer"
                       className="px-4 py-3 border border-white/10 bg-black/10 hover:border-primary/35 hover:text-primary transition-colors tap-target inline-flex items-center justify-between"
                     >
-                      <span className="text-sm font-semibold">{l.label}</span>
+                      <span className="text-sm font-semibold">
+                        <EditableText
+                          value={contentMap[labelKey]}
+                          fallback={l.label}
+                          fieldKey={labelKey}
+                          category="nav"
+                          label={`عنوان القائمة ${index + 1}`}
+                        />
+                      </span>
                       <ArrowLeft className="w-4 h-4 text-foreground/50" />
                     </a>
                   );
@@ -149,7 +213,15 @@ export default function Footer() {
                         active ? "text-primary border-primary/30 bg-primary/10" : "text-foreground/80"
                       )}
                     >
-                      <span className="text-sm font-semibold">{l.label}</span>
+                      <span className="text-sm font-semibold">
+                        <EditableText
+                          value={contentMap[labelKey]}
+                          fallback={l.label}
+                          fieldKey={labelKey}
+                          category="nav"
+                          label={`عنوان القائمة ${index + 1}`}
+                        />
+                      </span>
                       <ArrowLeft className="w-4 h-4 text-foreground/50" />
                     </a>
                   </Link>
@@ -159,7 +231,15 @@ export default function Footer() {
           </div>
 
           <div className="text-center md:text-right">
-            <h4 className="text-lg font-bold mb-4">تواصل</h4>
+            <h4 className="text-lg font-bold mb-4">
+              <EditableText
+                value={contentMap.footer_contact_title}
+                fallback="تواصل"
+                fieldKey="footer_contact_title"
+                category="footer"
+                label="عنوان التواصل"
+              />
+            </h4>
 
             <div className="space-y-3">
               {telHref ? (
@@ -172,8 +252,23 @@ export default function Footer() {
                       <Phone size={20} />
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold">مكالمة</div>
-                      <div className="text-xs text-muted-foreground dir-ltr">{contactInfo.phone}</div>
+                      <div className="text-sm font-bold">
+                        <EditableText
+                          value={contentMap.footer_contact_call_label}
+                          fallback="مكالمة"
+                          fieldKey="footer_contact_call_label"
+                          category="footer"
+                          label="عنوان المكالمة"
+                        />
+                      </div>
+                      <div className="text-xs text-muted-foreground dir-ltr">
+                        <EditableContactText
+                          value={contactInfo.phone}
+                          fallback=""
+                          fieldKey="phone"
+                          label="رقم الهاتف"
+                        />
+                      </div>
                     </div>
                   </div>
                   <ArrowLeft className="w-4 h-4 text-foreground/50" />
@@ -192,8 +287,23 @@ export default function Footer() {
                       <WhatsAppIcon size={20} />
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold">واتساب</div>
-                      <div className="text-xs text-muted-foreground dir-ltr">{contactInfo.phone}</div>
+                      <div className="text-sm font-bold">
+                        <EditableText
+                          value={contentMap.footer_contact_whatsapp_label}
+                          fallback="واتساب"
+                          fieldKey="footer_contact_whatsapp_label"
+                          category="footer"
+                          label="عنوان الواتساب"
+                        />
+                      </div>
+                      <div className="text-xs text-muted-foreground dir-ltr">
+                        <EditableContactText
+                          value={contactInfo.whatsappNumber ?? contactInfo.phone}
+                          fallback=""
+                          fieldKey="whatsapp"
+                          label="رقم الواتساب"
+                        />
+                      </div>
                     </div>
                   </div>
                   <ArrowLeft className="w-4 h-4 text-foreground/50" />
@@ -210,8 +320,23 @@ export default function Footer() {
                       <Mail size={20} />
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold">إيميل</div>
-                      <div className="text-xs text-muted-foreground">{contactInfo.email}</div>
+                      <div className="text-sm font-bold">
+                        <EditableText
+                          value={contentMap.footer_contact_email_label}
+                          fallback="إيميل"
+                          fieldKey="footer_contact_email_label"
+                          category="footer"
+                          label="عنوان الإيميل"
+                        />
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        <EditableContactText
+                          value={contactInfo.email}
+                          fallback=""
+                          fieldKey="email"
+                          label="البريد الإلكتروني"
+                        />
+                      </div>
                     </div>
                   </div>
                   <ArrowLeft className="w-4 h-4 text-foreground/50" />
@@ -224,8 +349,23 @@ export default function Footer() {
                     <MapPin size={20} />
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-bold">الموقع</div>
-                    <div className="text-xs text-muted-foreground">{contactInfo.location}</div>
+                    <div className="text-sm font-bold">
+                      <EditableText
+                        value={contentMap.footer_contact_location_label}
+                        fallback="الموقع"
+                        fieldKey="footer_contact_location_label"
+                        category="footer"
+                        label="عنوان الموقع"
+                      />
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      <EditableContactText
+                        value={contactInfo.location}
+                        fallback=""
+                        fieldKey="location"
+                        label="الموقع"
+                      />
+                    </div>
                   </div>
                 </div>
               ) : null}
@@ -235,8 +375,24 @@ export default function Footer() {
 
         <div className="mt-10 pt-6 border-t border-white/10 text-center text-xs text-muted-foreground/80">
           <div className="flex flex-col md:flex-row items-center justify-between gap-2">
-            <div>© {new Date().getFullYear()} {photographerInfo.name}. All rights reserved.</div>
-            <div className="text-muted-foreground/70">Built with a cinematic touch ✨</div>
+            <div>
+              <EditableText
+                value={contentMap.footer_copyright}
+                fallback={`© ${new Date().getFullYear()} ${photographerInfo.name}. All rights reserved.`}
+                fieldKey="footer_copyright"
+                category="footer"
+                label="حقوق النشر"
+              />
+            </div>
+            <div className="text-muted-foreground/70">
+              <EditableText
+                value={contentMap.footer_built_by}
+                fallback="Built with a cinematic touch ✨"
+                fieldKey="footer_built_by"
+                category="footer"
+                label="تذييل الفوتر"
+              />
+            </div>
           </div>
         </div>
       </div>
