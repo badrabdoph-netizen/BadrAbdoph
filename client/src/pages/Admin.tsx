@@ -44,7 +44,6 @@ import {
   Copy,
   Lock,
   LogOut,
-  ShieldCheck,
   Sparkles,
   KeyRound,
   Undo2,
@@ -912,110 +911,6 @@ function ContentManager({ onRefresh }: ManagerProps) {
           ))}
         </CardContent>
       </Card>
-    </div>
-  );
-}
-
-// ============================================
-// Backstage (Internal) Settings
-// ============================================
-function BackstageManager({ onRefresh }: ManagerProps) {
-  const { data: content, refetch, isLoading } = trpc.siteContent.getAll.useQuery();
-  const upsertMutation = trpc.siteContent.upsert.useMutation({
-    onSuccess: () => {
-      toast.success("تم حفظ الإعدادات الداخلية");
-      refetch();
-      onRefresh?.();
-    },
-    onError: (error) => toast.error(error.message),
-  });
-
-  const [editingContent, setEditingContent] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (content) {
-      const contentMap: Record<string, string> = {};
-      content.forEach((item) => {
-        contentMap[item.key] = item.value;
-      });
-      setEditingContent(contentMap);
-    }
-  }, [content]);
-
-  const backstageFields = [
-    {
-      key: "backstage_packages_rules",
-      label: "قواعد الباقات (داخلي)",
-      placeholder: "مثال: ملاحظات داخلية على الباقات، الاستثناءات، إلخ",
-      category: "backstage",
-    },
-    {
-      key: "backstage_booking_flow",
-      label: "خطوات الحجز (داخلي)",
-      placeholder: "مثال: تأكيد الحجز، العربون، التذكير قبل المناسبة",
-      category: "backstage",
-    },
-    {
-      key: "backstage_booking_deposit",
-      label: "تفاصيل العربون/الدفع (داخلي)",
-      placeholder: "مثال: قيمة العربون، سياسة الدفع، مواعيد التحصيل",
-      category: "backstage",
-    },
-    {
-      key: "backstage_booking_policy",
-      label: "سياسة التأجيل/الإلغاء (داخلي)",
-      placeholder: "مثال: شروط التأجيل، الإلغاء، الاسترجاع",
-      category: "backstage",
-    },
-    {
-      key: "backstage_booking_notes",
-      label: "ملاحظات خاصة بالحجوزات (داخلي)",
-      placeholder: "أي ملاحظات إضافية خاصة بالحجوزات",
-      category: "backstage",
-    },
-  ];
-
-  const handleSave = async (field: (typeof backstageFields)[number]) => {
-    await upsertMutation.mutateAsync({
-      key: field.key,
-      value: editingContent[field.key] || "",
-      category: field.category,
-      label: field.label,
-    });
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-10">
-        <Loader2 className="w-6 h-6 animate-spin" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-5">
-      {backstageFields.map((field) => (
-        <div key={field.key} className="space-y-2">
-          <Label>{field.label}</Label>
-          <div className="flex gap-2">
-            <Textarea
-              value={editingContent[field.key] || ""}
-              onChange={(e) =>
-                setEditingContent({ ...editingContent, [field.key]: e.target.value })
-              }
-              placeholder={field.placeholder}
-              rows={3}
-            />
-            <Button
-              size="icon"
-              onClick={() => handleSave(field)}
-              disabled={upsertMutation.isPending}
-            >
-              <Save className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      ))}
     </div>
   );
 }
@@ -2465,20 +2360,6 @@ function LiveEditor() {
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5" />
-                    وراء الستار
-                  </CardTitle>
-                  <CardDescription>
-                    إعدادات داخلية للباقات والحجوزات لا تظهر للزوار.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2 lg:max-h-[42vh] lg:overflow-y-auto">
-                  <BackstageManager onRefresh={refreshPreview} />
-                </CardContent>
-              </Card>
             </div>
           </div>
         )}
