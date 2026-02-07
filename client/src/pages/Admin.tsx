@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { 
   Image, 
@@ -31,6 +32,9 @@ import {
   Copy,
   Lock,
   LogOut,
+  ShieldCheck,
+  Sparkles,
+  KeyRound,
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -86,8 +90,6 @@ function AdminDashboard({
   onLogout: () => void;
   logoutPending: boolean;
 }) {
-  const [activeTab, setActiveTab] = useState("portfolio");
-
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
@@ -123,74 +125,7 @@ function AdminDashboard({
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-4 md:grid-cols-8 w-full max-w-6xl mx-auto">
-            <TabsTrigger value="portfolio" className="flex items-center gap-2">
-              <Image className="w-4 h-4" />
-              <span className="hidden sm:inline">المعرض</span>
-            </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">النصوص</span>
-            </TabsTrigger>
-            <TabsTrigger value="packages" className="flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              <span className="hidden sm:inline">الباقات</span>
-            </TabsTrigger>
-            <TabsTrigger value="testimonials" className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">الآراء</span>
-            </TabsTrigger>
-            <TabsTrigger value="contact" className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
-              <span className="hidden sm:inline">التواصل</span>
-            </TabsTrigger>
-            <TabsTrigger value="sections" className="flex items-center gap-2">
-              <LayoutGrid className="w-4 h-4" />
-              <span className="hidden sm:inline">الأقسام</span>
-            </TabsTrigger>
-            <TabsTrigger value="share" className="flex items-center gap-2">
-              <Link2 className="w-4 h-4" />
-              <span className="hidden sm:inline">روابط مؤقتة</span>
-            </TabsTrigger>
-            <TabsTrigger value="preview" className="flex items-center gap-2">
-              <Monitor className="w-4 h-4" />
-              <span className="hidden sm:inline">المعاينة</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="portfolio">
-            <PortfolioManager />
-          </TabsContent>
-          
-          <TabsContent value="content">
-            <ContentManager />
-          </TabsContent>
-          
-          <TabsContent value="packages">
-            <PackagesManager />
-          </TabsContent>
-          
-          <TabsContent value="testimonials">
-            <TestimonialsManager />
-          </TabsContent>
-          
-          <TabsContent value="contact">
-            <ContactManager />
-          </TabsContent>
-          
-          <TabsContent value="sections">
-            <SectionsManager />
-          </TabsContent>
-
-          <TabsContent value="share">
-            <ShareLinksManager />
-          </TabsContent>
-
-          <TabsContent value="preview">
-            <PreviewPane />
-          </TabsContent>
-        </Tabs>
+        <LiveEditor />
       </main>
     </div>
   );
@@ -205,55 +140,115 @@ function AdminLogin({
 }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const canSubmit = username.trim().length > 0 && password.length > 0;
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4" dir="rtl">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-2">
-          <CardTitle className="flex items-center gap-2">
-            <Lock className="w-5 h-5" />
-            تسجيل دخول لوحة التحكم
-          </CardTitle>
-          <CardDescription>
-            أدخل اسم المستخدم وكلمة المرور للمتابعة.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="admin-user">اسم المستخدم</Label>
-            <Input
-              id="admin-user"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="اسم المستخدم"
-              autoComplete="username"
-            />
+    <div
+      className="min-h-screen bg-background relative overflow-hidden"
+      dir="rtl"
+    >
+      <div className="pointer-events-none absolute -top-32 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-gradient-to-br from-amber-200/20 via-amber-100/10 to-transparent blur-3xl animate-pulse" />
+      <div className="pointer-events-none absolute bottom-0 right-[-120px] h-[360px] w-[360px] rounded-full bg-gradient-to-tr from-amber-500/10 via-orange-300/10 to-transparent blur-3xl" />
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-16">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-6">
+            <Badge variant="secondary" className="gap-2">
+              <Sparkles className="w-3 h-3" />
+              بوابة آمنة
+            </Badge>
+            <div className="space-y-3">
+              <h1 className="text-3xl md:text-4xl font-semibold leading-tight">
+                لوحة تحكم الموقع
+                <span className="block text-muted-foreground text-lg md:text-xl font-normal mt-2">
+                  دخول مُخصّص للإدارة فقط مع حماية للجلسة.
+                </span>
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground max-w-xl">
+                عشان نضمن إن أي تعديلات على المحتوى تتم بأمان، محتاجين تسجيل
+                دخول سريع قبل المتابعة.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-border/60 bg-card/50 p-4 backdrop-blur">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <ShieldCheck className="w-4 h-4" />
+                  جلسة محمية
+                </div>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                  الجلسة بتنتهي تلقائياً عشان الأمان، وتقدر تعمل خروج بضغطة واحدة.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border/60 bg-card/50 p-4 backdrop-blur">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <KeyRound className="w-4 h-4" />
+                  دخول سريع
+                </div>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                  محتاج اسم مستخدم وكلمة مرور فقط بدون أي خطوات إضافية.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="admin-pass">كلمة المرور</Label>
-            <Input
-              id="admin-pass"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="كلمة المرور"
-              autoComplete="current-password"
-            />
-          </div>
-          <Button
-            className="w-full"
-            onClick={() => onSubmit(username.trim(), password)}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin ml-2" />
-            ) : (
-              <Lock className="w-4 h-4 ml-2" />
-            )}
-            دخول
-          </Button>
-        </CardContent>
-      </Card>
+
+          <Card className="w-full max-w-md mx-auto border-border/70 bg-card/70 shadow-xl shadow-black/10 backdrop-blur">
+            <CardHeader className="space-y-2">
+              <CardTitle className="flex items-center gap-2">
+                <Lock className="w-5 h-5" />
+                تسجيل الدخول
+              </CardTitle>
+              <CardDescription>
+                أدخل بيانات الدخول للوصول إلى لوحة التحكم.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form
+                className="space-y-4"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onSubmit(username.trim(), password);
+                }}
+              >
+                <div className="space-y-2">
+                  <Label htmlFor="admin-user">اسم المستخدم</Label>
+                  <Input
+                    id="admin-user"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="اسم المستخدم"
+                    autoComplete="username"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="admin-pass">كلمة المرور</Label>
+                  <Input
+                    id="admin-pass"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="كلمة المرور"
+                    autoComplete="current-password"
+                  />
+                </div>
+                <Separator />
+                <Button
+                  className="w-full"
+                  type="submit"
+                  disabled={!canSubmit || isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                  ) : (
+                    <Lock className="w-4 h-4 ml-2" />
+                  )}
+                  دخول
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -261,12 +256,17 @@ function AdminLogin({
 // ============================================
 // Portfolio Manager Component
 // ============================================
-function PortfolioManager() {
+type ManagerProps = {
+  onRefresh?: () => void;
+};
+
+function PortfolioManager({ onRefresh }: ManagerProps) {
   const { data: images, refetch, isLoading } = trpc.portfolio.getAll.useQuery();
   const createMutation = trpc.portfolio.upload.useMutation({
     onSuccess: () => {
       toast.success("تم إضافة الصورة بنجاح");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -274,6 +274,7 @@ function PortfolioManager() {
     onSuccess: () => {
       toast.success("تم تحديث الصورة");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -281,6 +282,7 @@ function PortfolioManager() {
     onSuccess: () => {
       toast.success("تم حذف الصورة");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -401,12 +403,13 @@ function PortfolioManager() {
 // ============================================
 // Content Manager Component
 // ============================================
-function ContentManager() {
+function ContentManager({ onRefresh }: ManagerProps) {
   const { data: content, refetch, isLoading } = trpc.siteContent.getAll.useQuery();
   const upsertMutation = trpc.siteContent.upsert.useMutation({
     onSuccess: () => {
       toast.success("تم حفظ التغييرات");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -484,12 +487,13 @@ function ContentManager() {
 // ============================================
 // Packages Manager Component
 // ============================================
-function PackagesManager() {
+function PackagesManager({ onRefresh }: ManagerProps) {
   const { data: packages, refetch, isLoading } = trpc.packages.getAll.useQuery();
   const createMutation = trpc.packages.create.useMutation({
     onSuccess: () => {
       toast.success("تم إضافة الباقة");
       refetch();
+      onRefresh?.();
       setNewPackage({ name: "", price: "", description: "", category: "session", features: "" });
     },
     onError: (error) => toast.error(error.message),
@@ -498,6 +502,7 @@ function PackagesManager() {
     onSuccess: () => {
       toast.success("تم تحديث الباقة");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -505,6 +510,7 @@ function PackagesManager() {
     onSuccess: () => {
       toast.success("تم حذف الباقة");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -650,12 +656,13 @@ function PackagesManager() {
 // ============================================
 // Testimonials Manager Component
 // ============================================
-function TestimonialsManager() {
+function TestimonialsManager({ onRefresh }: ManagerProps) {
   const { data: testimonials, refetch, isLoading } = trpc.testimonials.getAll.useQuery();
   const createMutation = trpc.testimonials.create.useMutation({
     onSuccess: () => {
       toast.success("تم إضافة الرأي");
       refetch();
+      onRefresh?.();
       setNewTestimonial({ name: "", quote: "" });
     },
     onError: (error) => toast.error(error.message),
@@ -664,6 +671,7 @@ function TestimonialsManager() {
     onSuccess: () => {
       toast.success("تم حذف الرأي");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -745,12 +753,13 @@ function TestimonialsManager() {
 // ============================================
 // Contact Manager Component
 // ============================================
-function ContactManager() {
+function ContactManager({ onRefresh }: ManagerProps) {
   const { data: contactInfo, refetch, isLoading } = trpc.contactInfo.getAll.useQuery();
   const upsertMutation = trpc.contactInfo.upsert.useMutation({
     onSuccess: () => {
       toast.success("تم حفظ التغييرات");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -824,12 +833,13 @@ function ContactManager() {
 // ============================================
 // Sections Manager Component
 // ============================================
-function SectionsManager() {
+function SectionsManager({ onRefresh }: ManagerProps) {
   const { data: sections, refetch, isLoading } = trpc.sections.getAll.useQuery();
   const upsertMutation = trpc.sections.upsert.useMutation({
     onSuccess: () => {
       toast.success("تم حفظ التغييرات");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -837,6 +847,7 @@ function SectionsManager() {
     onSuccess: () => {
       toast.success("تم تحديث الإعدادات");
       refetch();
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -962,7 +973,7 @@ function formatShareDate(value: string) {
   }).format(date);
 }
 
-function ShareLinksManager() {
+function ShareLinksManager({ onRefresh }: ManagerProps) {
   const [ttlHours, setTtlHours] = useState(24);
   const [note, setNote] = useState("");
   const [links, setLinks] = useState<ShareLinkItem[]>(() => loadCachedShareLinks());
@@ -986,6 +997,7 @@ function ShareLinksManager() {
       setLinks(prev => [item, ...prev].slice(0, 12));
       setNote("");
       toast.success("تم إنشاء الرابط المؤقت");
+      onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
   });
@@ -1162,27 +1174,132 @@ function ShareLinksManager() {
 }
 
 // ============================================
-// Preview Pane Component
+// Live Editor Component
 // ============================================
-function PreviewPane() {
+function LiveEditor() {
+  const [panelOpen, setPanelOpen] = useState(true);
+  const [activePanelTab, setActivePanelTab] = useState("content");
+  const [previewKey, setPreviewKey] = useState(0);
+
+  const refreshPreview = () => {
+    setPreviewKey((prev) => prev + 1);
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>معاينة الموقع</CardTitle>
-        <CardDescription>شاهد الموقع كما يظهر للزوار بعد أي تعديل</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-lg border border-border overflow-hidden">
-          <iframe
-            src="/"
-            title="Site Preview"
-            className="w-full h-[70vh] bg-background"
-          />
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold">المعاينة المباشرة</h2>
+          <p className="text-sm text-muted-foreground">
+            عدّل أي جزء من الأدوات وشاهد النتيجة فوراً داخل المعاينة.
+          </p>
         </div>
-        <p className="text-xs text-muted-foreground mt-3">
-          لو عايز معاينة كاملة بملء الشاشة، افتح الموقع في تبويب جديد.
-        </p>
-      </CardContent>
-    </Card>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPanelOpen((open) => !open)}
+          >
+            {panelOpen ? "إخفاء الأدوات" : "إظهار الأدوات"}
+          </Button>
+          <Button variant="secondary" size="sm" onClick={refreshPreview}>
+            <Monitor className="w-4 h-4 ml-2" />
+            تحديث المعاينة
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href="/" target="_blank" rel="noreferrer">
+              فتح بملء الشاشة
+            </a>
+          </Button>
+        </div>
+      </div>
+
+      <div
+        className={[
+          "grid gap-6",
+          panelOpen ? "lg:grid-cols-[1.35fr_0.85fr]" : "",
+        ].join(" ")}
+      >
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Monitor className="w-5 h-5" />
+                معاينة الموقع
+              </CardTitle>
+              <CardDescription>
+                لو التعديلات ما ظهرتش فوراً، اضغط تحديث المعاينة.
+              </CardDescription>
+            </div>
+            <Badge variant="secondary" className="w-fit">
+              Live Preview
+            </Badge>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="relative border-t border-border">
+              <iframe
+                key={previewKey}
+                src="/"
+                title="Site Live Preview"
+                className="w-full h-[70vh] md:h-[78vh] bg-background"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {panelOpen && (
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                أدوات التعديل
+              </CardTitle>
+              <CardDescription>
+                كل أدوات التعديل مجمعة هنا، والتحديث يظهر مباشرة في المعاينة.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-2 max-h-[78vh] overflow-y-auto">
+              <Tabs
+                value={activePanelTab}
+                onValueChange={setActivePanelTab}
+                className="space-y-4"
+              >
+                <TabsList className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <TabsTrigger value="content">النصوص</TabsTrigger>
+                  <TabsTrigger value="portfolio">المعرض</TabsTrigger>
+                  <TabsTrigger value="packages">الباقات</TabsTrigger>
+                  <TabsTrigger value="testimonials">الآراء</TabsTrigger>
+                  <TabsTrigger value="contact">التواصل</TabsTrigger>
+                  <TabsTrigger value="sections">الأقسام</TabsTrigger>
+                  <TabsTrigger value="share">روابط مؤقتة</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="content">
+                  <ContentManager onRefresh={refreshPreview} />
+                </TabsContent>
+                <TabsContent value="portfolio">
+                  <PortfolioManager onRefresh={refreshPreview} />
+                </TabsContent>
+                <TabsContent value="packages">
+                  <PackagesManager onRefresh={refreshPreview} />
+                </TabsContent>
+                <TabsContent value="testimonials">
+                  <TestimonialsManager onRefresh={refreshPreview} />
+                </TabsContent>
+                <TabsContent value="contact">
+                  <ContactManager onRefresh={refreshPreview} />
+                </TabsContent>
+                <TabsContent value="sections">
+                  <SectionsManager onRefresh={refreshPreview} />
+                </TabsContent>
+                <TabsContent value="share">
+                  <ShareLinksManager onRefresh={refreshPreview} />
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
   );
 }
