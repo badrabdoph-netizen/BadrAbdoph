@@ -85,8 +85,14 @@ function Router() {
       <ScrollToTop />
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/s/:code/:rest*">
+          {(params) => <Share code={params.code} />}
+        </Route>
         <Route path="/s/:code">
           {(params) => <Share code={params.code} />}
+        </Route>
+        <Route path="/share/:token/:rest*">
+          {(params) => <Share token={params.token} />}
         </Route>
         <Route path="/share/:token">
           {(params) => <Share token={params.token} />}

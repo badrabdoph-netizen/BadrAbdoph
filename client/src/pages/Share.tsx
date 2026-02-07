@@ -1,31 +1,39 @@
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Link2, Clock, XCircle } from "lucide-react";
+import { Router, Route, Switch } from "wouter";
+import { Loader2, XCircle } from "lucide-react";
+import Home from "@/pages/Home";
+import About from "@/pages/About";
+import Services from "@/pages/Services";
+import Contact from "@/pages/Contact";
+import Portfolio from "@/pages/Portfolio";
+import NotFound from "@/pages/NotFound";
 
 type ShareProps = {
   token?: string;
   code?: string;
 };
 
-function formatDateTime(value: string | null | undefined) {
-  if (!value) return "غير محدد";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "غير محدد";
-
-  return new Intl.DateTimeFormat("ar-EG", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
+function SiteRoutes() {
+  return (
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route path="/about" component={About} />
+      <Route path="/portfolio" component={Portfolio} />
+      <Route path="/services" component={Services} />
+      <Route path="/contact" component={Contact} />
+      <Route component={NotFound} />
+    </Switch>
+  );
 }
 
 export default function Share({ token, code }: ShareProps) {
   const shortQuery = trpc.shareLinks.validateShort.useQuery(
     { code: code ?? "" },
-    { enabled: Boolean(code) }
+    { enabled: Boolean(code), staleTime: 60_000, refetchOnWindowFocus: false }
   );
   const tokenQuery = trpc.shareLinks.validate.useQuery(
     { token: token ?? "" },
-    { enabled: !code && Boolean(token) }
+    { enabled: !code && Boolean(token), staleTime: 60_000, refetchOnWindowFocus: false }
   );
 
   const data = code ? shortQuery.data : tokenQuery.data;
@@ -33,73 +41,38 @@ export default function Share({ token, code }: ShareProps) {
   const isError = code ? shortQuery.isError : tokenQuery.isError;
 
   const isValid = Boolean(data?.valid);
-  const expiresAt = data?.expiresAt ?? null;
+  const basePath = code ? `/s/${code}` : token ? `/share/${token}` : "";
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center" dir="rtl">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          جاري التأكد من صلاحية الرابط...
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !isValid || !basePath) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4" dir="rtl">
+        <div className="max-w-md text-center space-y-3">
+          <div className="flex items-center justify-center gap-2 text-destructive font-semibold">
+            <XCircle className="w-5 h-5" />
+            الرابط منتهي أو غير صالح.
+          </div>
+          <p className="text-sm text-muted-foreground">
+            اطلب رابط مؤقت جديد من صاحب الموقع.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background px-4 py-10" dir="rtl">
-      <div className="mx-auto w-full max-w-6xl space-y-6">
-        <Card>
-          <CardHeader className="space-y-2">
-            <CardTitle className="flex items-center gap-2">
-              <Link2 className="w-5 h-5" />
-              رابط مؤقت للموقع
-            </CardTitle>
-            <CardDescription>
-              لو الرابط صالح هتقدر تتصفح الموقع هنا بدون ما يتغير العنوان.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                جاري التأكد من صلاحية الرابط...
-              </div>
-            )}
-
-            {!isLoading && isError && (
-              <div className="flex items-center gap-2 text-sm text-destructive">
-                <XCircle className="w-4 h-4" />
-                حدث خطأ أثناء التحقق من الرابط.
-              </div>
-            )}
-
-            {!isLoading && !isError && !isValid && (
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-2 text-destructive">
-                  <XCircle className="w-4 h-4" />
-                  الرابط منتهي أو غير صالح.
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  لو محتاج رابط جديد اطلبه من صاحب الموقع.
-                </div>
-              </div>
-            )}
-
-            {!isLoading && !isError && isValid && (
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  صالح حتى {formatDateTime(expiresAt)}
-                </div>
-                <p>
-                  تصفح الموقع من الإطار بالأسفل علشان يفضل الرابط المؤقت ظاهر.
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {!isLoading && !isError && isValid && (
-          <div className="rounded-xl border border-border overflow-hidden bg-background shadow-sm">
-            <iframe
-              src="/"
-              title="Temporary Share Preview"
-              className="w-full h-[75vh] md:h-[80vh] bg-background"
-            />
-          </div>
-        )}
-      </div>
-    </div>
+    <Router base={basePath}>
+      <SiteRoutes />
+    </Router>
   );
 }
