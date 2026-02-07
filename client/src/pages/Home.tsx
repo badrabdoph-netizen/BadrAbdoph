@@ -22,7 +22,7 @@ import {
   externalPortfolioUrl,
 } from "@/config/siteConfig";
 import { useContactData, useContentData, usePortfolioData, useTestimonialsData, useSiteImagesData } from "@/hooks/useSiteData";
-import { EditableImage, EditableText, useInlineEditMode } from "@/components/InlineEdit";
+import { EditableImage, EditableLinkIcon, EditableText, useInlineEditMode } from "@/components/InlineEdit";
 
 function ServiceIcon({ title }: { title: string }) {
   const t = title.toLowerCase();
@@ -202,10 +202,10 @@ export default function Home() {
   const getValue = (key: string, fallback: string = "") =>
     (contentMap[key] as string | undefined) ?? fallback;
 
-  const waSocialHref = useMemo(() => {
-    const phone = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
+  const formatWhatsAppHref = (value: string) => {
+    const phone = (value ?? "").replace(/[^\d]/g, "");
     return phone ? `https://wa.me/${phone}` : "";
-  }, [contactInfo.whatsappNumber]);
+  };
 
   useEffect(() => {
     let raf = 0;
@@ -406,62 +406,59 @@ export default function Home() {
               />
             </div>
             <div className="hero-follow-icons">
-              {socialLinks.instagram ? (
-                <a
-                  href={socialLinks.instagram}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hero-social-btn hero-social--ig"
-                  aria-label="Instagram"
+              <EditableLinkIcon
+                value={socialLinks.instagram}
+                fieldKey="instagram"
+                label="رابط إنستجرام"
+                placeholder="https://instagram.com/..."
+                ariaLabel="Instagram"
+                linkClassName="hero-social-btn hero-social--ig"
+              >
+                <Instagram size={20} />
+              </EditableLinkIcon>
+              <EditableLinkIcon
+                value={socialLinks.facebook}
+                fieldKey="facebook"
+                label="رابط فيسبوك"
+                placeholder="https://facebook.com/..."
+                ariaLabel="Facebook"
+                linkClassName="hero-social-btn hero-social--fb"
+              >
+                <Facebook size={20} />
+              </EditableLinkIcon>
+              <EditableLinkIcon
+                value={socialLinks.tiktok}
+                fieldKey="tiktok"
+                label="رابط تيك توك"
+                placeholder="https://tiktok.com/..."
+                ariaLabel="TikTok"
+                linkClassName="hero-social-btn hero-social--tt"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <Instagram size={20} />
-                </a>
-              ) : null}
-              {socialLinks.facebook ? (
-                <a
-                  href={socialLinks.facebook}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hero-social-btn hero-social--fb"
-                  aria-label="Facebook"
-                >
-                  <Facebook size={20} />
-                </a>
-              ) : null}
-              {socialLinks.tiktok ? (
-                <a
-                  href={socialLinks.tiktok}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hero-social-btn hero-social--tt"
-                  aria-label="TikTok"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
-                  </svg>
-                </a>
-              ) : null}
-              {waSocialHref ? (
-                <a
-                  href={waSocialHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hero-social-btn hero-social--wa"
-                  aria-label="WhatsApp"
-                >
-                  <WhatsAppIcon size={20} />
-                </a>
-              ) : null}
+                  <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+                </svg>
+              </EditableLinkIcon>
+              <EditableLinkIcon
+                value={contactInfo.whatsappNumber}
+                fieldKey="whatsapp"
+                label="رقم واتساب"
+                placeholder="2010xxxxxxx"
+                ariaLabel="WhatsApp"
+                formatHref={formatWhatsAppHref}
+                linkClassName="hero-social-btn hero-social--wa"
+              >
+                <WhatsAppIcon size={20} />
+              </EditableLinkIcon>
             </div>
             <div className="hero-follow-glow" aria-hidden="true" />
           </div>
@@ -874,62 +871,59 @@ export default function Home() {
           </a>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            {socialLinks.instagram ? (
-              <a
-                href={socialLinks.instagram}
-                target="_blank"
-                rel="noreferrer"
-                className="portfolio-social portfolio-social--ig"
-                aria-label="Instagram"
+            <EditableLinkIcon
+              value={socialLinks.instagram}
+              fieldKey="instagram"
+              label="رابط إنستجرام"
+              placeholder="https://instagram.com/..."
+              ariaLabel="Instagram"
+              linkClassName="portfolio-social portfolio-social--ig"
+            >
+              <Instagram size={18} />
+            </EditableLinkIcon>
+            <EditableLinkIcon
+              value={socialLinks.facebook}
+              fieldKey="facebook"
+              label="رابط فيسبوك"
+              placeholder="https://facebook.com/..."
+              ariaLabel="Facebook"
+              linkClassName="portfolio-social portfolio-social--fb"
+            >
+              <Facebook size={18} />
+            </EditableLinkIcon>
+            <EditableLinkIcon
+              value={socialLinks.tiktok}
+              fieldKey="tiktok"
+              label="رابط تيك توك"
+              placeholder="https://tiktok.com/..."
+              ariaLabel="TikTok"
+              linkClassName="portfolio-social portfolio-social--tt"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <Instagram size={18} />
-              </a>
-            ) : null}
-            {socialLinks.facebook ? (
-              <a
-                href={socialLinks.facebook}
-                target="_blank"
-                rel="noreferrer"
-                className="portfolio-social portfolio-social--fb"
-                aria-label="Facebook"
-              >
-                <Facebook size={18} />
-              </a>
-            ) : null}
-            {socialLinks.tiktok ? (
-              <a
-                href={socialLinks.tiktok}
-                target="_blank"
-                rel="noreferrer"
-                className="portfolio-social portfolio-social--tt"
-                aria-label="TikTok"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
-                </svg>
-              </a>
-            ) : null}
-            {waSocialHref ? (
-              <a
-                href={waSocialHref}
-                target="_blank"
-                rel="noreferrer"
-                className="portfolio-social portfolio-social--wa"
-                aria-label="WhatsApp"
-              >
-                <WhatsAppIcon size={18} />
-              </a>
-            ) : null}
+                <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+              </svg>
+            </EditableLinkIcon>
+            <EditableLinkIcon
+              value={contactInfo.whatsappNumber}
+              fieldKey="whatsapp"
+              label="رقم واتساب"
+              placeholder="2010xxxxxxx"
+              ariaLabel="WhatsApp"
+              formatHref={formatWhatsAppHref}
+              linkClassName="portfolio-social portfolio-social--wa"
+            >
+              <WhatsAppIcon size={18} />
+            </EditableLinkIcon>
           </div>
         </div>
       </section>

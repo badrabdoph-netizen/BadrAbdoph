@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { photographerInfo, navLinks, ctaTexts } from "@/config/siteConfig";
 import { useContactData, useContentData } from "@/hooks/useSiteData";
-import { EditableContactText, EditableText } from "@/components/InlineEdit";
+import { EditableContactText, EditableLinkIcon, EditableText } from "@/components/InlineEdit";
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
@@ -36,6 +36,10 @@ export default function Footer() {
   const mailHref = contactInfo.email ? `mailto:${contactInfo.email}` : "";
 
   const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️", contactInfo.whatsappNumber);
+  const formatWhatsAppHref = (value: string) => {
+    const phone = (value ?? "").replace(/[^\d]/g, "");
+    return phone ? `https://wa.me/${phone}` : "";
+  };
 
   return (
     <footer className="relative border-t border-white/10 bg-card/30 overflow-hidden">
@@ -129,41 +133,39 @@ export default function Footer() {
             </p>
 
             <div className="mt-6 flex items-center justify-center md:justify-start gap-3">
-              {socialLinks.instagram ? (
-                <a
-                  href={socialLinks.instagram}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="social-orb"
-                  aria-label="Instagram"
-                >
-                  <Instagram size={18} />
-                </a>
-              ) : null}
+              <EditableLinkIcon
+                value={socialLinks.instagram}
+                fieldKey="instagram"
+                label="رابط إنستجرام"
+                placeholder="https://instagram.com/..."
+                ariaLabel="Instagram"
+                linkClassName="social-orb"
+              >
+                <Instagram size={18} />
+              </EditableLinkIcon>
 
-              {socialLinks.facebook ? (
-                <a
-                  href={socialLinks.facebook}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="social-orb"
-                  aria-label="Facebook"
-                >
-                  <Facebook size={18} />
-                </a>
-              ) : null}
+              <EditableLinkIcon
+                value={socialLinks.facebook}
+                fieldKey="facebook"
+                label="رابط فيسبوك"
+                placeholder="https://facebook.com/..."
+                ariaLabel="Facebook"
+                linkClassName="social-orb"
+              >
+                <Facebook size={18} />
+              </EditableLinkIcon>
 
-              {waInquiryHref ? (
-                <a
-                  href={waInquiryHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="social-orb social-orb--wa"
-                  aria-label="WhatsApp"
-                >
-                  <WhatsAppIcon size={18} />
-                </a>
-              ) : null}
+              <EditableLinkIcon
+                value={contactInfo.whatsappNumber}
+                fieldKey="whatsapp"
+                label="رقم واتساب"
+                placeholder="2010xxxxxxx"
+                ariaLabel="WhatsApp"
+                formatHref={formatWhatsAppHref}
+                linkClassName="social-orb social-orb--wa"
+              >
+                <WhatsAppIcon size={18} />
+              </EditableLinkIcon>
             </div>
           </div>
 

@@ -1369,7 +1369,7 @@ function LiveEditor() {
                 onValueChange={setActivePanelTab}
                 className="space-y-4"
               >
-                <TabsList className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <TabsList className="grid w-full h-auto grid-cols-2 md:grid-cols-3 gap-2">
                   <TabsTrigger value="content">النصوص</TabsTrigger>
                   <TabsTrigger value="portfolio">المعرض</TabsTrigger>
                   <TabsTrigger value="packages">الباقات</TabsTrigger>

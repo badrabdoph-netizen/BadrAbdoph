@@ -380,6 +380,160 @@ export function EditableContactText({
   );
 }
 
+type EditableLinkIconProps = {
+  value?: string | null;
+  fallback?: string;
+  placeholder?: string;
+  fieldKey: string;
+  label: string;
+  ariaLabel?: string;
+  className?: string;
+  linkClassName?: string;
+  editorClassName?: string;
+  formatHref?: (value: string) => string;
+  children: ReactNode;
+};
+
+export function EditableLinkIcon({
+  value,
+  fallback,
+  placeholder,
+  fieldKey,
+  label,
+  ariaLabel,
+  className,
+  linkClassName,
+  editorClassName,
+  formatHref,
+  children,
+}: EditableLinkIconProps) {
+  const { enabled } = useInlineEditMode();
+  const utils = trpc.useUtils();
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  const normalizedValue = value ?? "";
+  const displayValue = normalizedValue || fallback || "";
+
+  useEffect(() => {
+    if (isEditing) return;
+    setDraft(normalizedValue);
+  }, [normalizedValue, isEditing]);
+
+  const upsertMutation = trpc.contactInfo.upsert.useMutation({
+    onMutate: (input) => {
+      const prev = normalizedValue ?? "";
+      return {
+        action: {
+          kind: "contactInfo" as const,
+          key: input.key,
+          prev,
+          next: input.value,
+          label: input.label ?? label,
+        },
+      };
+    },
+    onSuccess: (_data, _input, ctx) => {
+      if (ctx?.action && ctx.action.prev !== ctx.action.next) {
+        pushEdit(ctx.action);
+      }
+      toast.success("تم تحديث الرابط");
+      utils.contactInfo.getAll.invalidate();
+      setIsEditing(false);
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const handleSave = () => {
+    if (!enabled || upsertMutation.isPending) return;
+    if (draft === normalizedValue) {
+      setIsEditing(false);
+      return;
+    }
+    upsertMutation.mutate({
+      key: fieldKey,
+      value: draft,
+      label,
+    });
+  };
+
+  const handleCancel = () => {
+    setDraft(normalizedValue);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      handleCancel();
+      return;
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSave();
+    }
+  };
+
+  if (!enabled && !displayValue) return null;
+
+  const hrefValue = displayValue ? (formatHref ? formatHref(displayValue) : displayValue) : "#";
+
+  return (
+    <div className={cn("relative inline-flex group", className)}>
+      <a
+        href={hrefValue}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={ariaLabel}
+        className={linkClassName}
+        onClick={(event) => {
+          if (!enabled) return;
+          event.preventDefault();
+          event.stopPropagation();
+          setIsEditing(true);
+          setDraft(displayValue);
+        }}
+      >
+        {children}
+      </a>
+      {enabled && (
+        <span className="absolute -top-2 -right-2 flex items-center gap-1 rounded-full border border-white/20 bg-black/60 px-2 py-0.5 text-[10px] text-white opacity-0 transition group-hover:opacity-100">
+          <Pencil className="w-3 h-3" />
+          تعديل
+        </span>
+      )}
+
+      {enabled && isEditing && (
+        <div className="absolute top-full right-0 mt-2 z-30 w-64 rounded-xl border border-white/15 bg-background p-3 text-right shadow-xl">
+          <div className="text-xs font-semibold mb-2">{label}</div>
+          <Input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder ?? "الرابط"}
+            className={cn("mb-2", editorClassName)}
+            autoFocus
+          />
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={handleSave} disabled={upsertMutation.isPending}>
+              {upsertMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin ml-2" />
+              ) : (
+                <Check className="w-4 h-4 ml-2" />
+              )}
+              حفظ
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleCancel}>
+              <X className="w-4 h-4 ml-2" />
+              إلغاء
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 type EditableImageProps = {
   src: string;
   alt?: string;
