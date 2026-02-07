@@ -119,13 +119,11 @@ function App() {
             <FloatingWhatsApp />
           </TooltipProvider>
           <style>{`
-            .wa-float-wrap {
+            .wa-float {
               position: fixed;
               right: 16px;
               bottom: 16px;
               z-index: 90;
-            }
-            .wa-float {
               display: inline-flex;
               align-items: center;
               justify-content: center;
@@ -178,12 +176,10 @@ function App() {
                 0 0 70px rgba(255,210,130,0.3);
             }
             @media (max-width: 768px) {
-              .wa-float-wrap {
+              .wa-float {
                 right: 12px;
                 left: auto;
                 bottom: calc(env(safe-area-inset-bottom) + 18px);
-              }
-              .wa-float {
                 width: 44px;
                 height: 44px;
                 border-radius: 14px;
