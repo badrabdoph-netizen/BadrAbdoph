@@ -775,30 +775,33 @@ export default function Contact() {
                   />
                 </h2>
                 <div className="flex gap-3">
-                  <a
-                    href={socialLinks.instagram}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
-                    aria-label="Instagram"
+                  <EditableLinkIcon
+                    value={socialLinks.instagram}
+                    fieldKey="instagram"
+                    label="رابط إنستجرام"
+                    placeholder="https://instagram.com/..."
+                    ariaLabel="Instagram"
+                    linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
                   >
                     <Instagram size={22} />
-                  </a>
-                  <a
-                    href={socialLinks.facebook}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
-                    aria-label="Facebook"
+                  </EditableLinkIcon>
+                  <EditableLinkIcon
+                    value={socialLinks.facebook}
+                    fieldKey="facebook"
+                    label="رابط فيسبوك"
+                    placeholder="https://facebook.com/..."
+                    ariaLabel="Facebook"
+                    linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
                   >
                     <Facebook size={22} />
-                  </a>
-                  <a
-                    href={socialLinks.tiktok}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
-                    aria-label="TikTok"
+                  </EditableLinkIcon>
+                  <EditableLinkIcon
+                    value={socialLinks.tiktok}
+                    fieldKey="tiktok"
+                    label="رابط تيك توك"
+                    placeholder="https://tiktok.com/..."
+                    ariaLabel="TikTok"
+                    linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -813,7 +816,7 @@ export default function Contact() {
                     >
                       <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
                     </svg>
-                  </a>
+                  </EditableLinkIcon>
                 </div>
               </div>
             </div>
