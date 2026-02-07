@@ -1778,8 +1778,13 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
   };
   const listQuery = trpc.shareLinks.list.useQuery(undefined, {
     onSuccess: (data) => {
-      updateCache(() => data);
+      updateCache((prev) => {
+        if (data.length === 0 && prev.length > 0) return prev;
+        return data;
+      });
     },
+    refetchOnWindowFocus: false,
+    staleTime: 60_000,
   });
   const [confirmState, setConfirmState] = useState<{
     open: boolean;
@@ -1793,7 +1798,8 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
     description: "",
     confirmLabel: "تأكيد",
   });
-  const links = listQuery.data ?? cachedLinks;
+  const links =
+    listQuery.data && listQuery.data.length > 0 ? listQuery.data : cachedLinks;
   const isLoading = listQuery.isLoading && cachedLinks.length === 0;
 
   const buildShareUrl = (code: string) => {
