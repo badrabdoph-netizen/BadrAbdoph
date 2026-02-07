@@ -162,7 +162,7 @@ export default function Share({ token, code }: ShareProps) {
 
           {socials.length > 0 && (
             <div className="relative z-10 mt-4">
-              <div className="hero-follow-icons">
+              <div className="hero-follow-icons hero-follow-icons--compact hero-social-compact">
                 {socials.map((social) => {
                   const Icon = social.icon as any;
                   return (
@@ -179,87 +179,10 @@ export default function Share({ token, code }: ShareProps) {
                   );
                 })}
               </div>
-              <div className="hero-follow-glow" aria-hidden="true" />
+              <div className="hero-follow-glow hero-follow-glow--compact" aria-hidden="true" />
             </div>
           )}
         </div>
-        <style>{`
-          .hero-follow-icons {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-          }
-          .hero-follow-glow {
-            width: min(200px, 60vw);
-            height: 16px;
-            margin: 12px auto 0;
-            background: radial-gradient(circle, rgba(255,210,130,0.45), transparent 70%);
-            filter: blur(8px);
-            opacity: 0.75;
-            animation: glow-pulse 4.2s ease-in-out infinite;
-          }
-          .hero-social-btn {
-            width: 52px;
-            height: 52px;
-            border-radius: 16px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255,255,255,0.16);
-            background: rgba(9,9,12,0.55);
-            color: #f6ddb0;
-            box-shadow: 0 18px 45px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.05);
-            transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
-            position: relative;
-            overflow: hidden;
-          }
-          .hero-social-btn::before {
-            content: "";
-            position: absolute;
-            inset: -35% -25%;
-            background: radial-gradient(circle, rgba(255,220,160,0.35), transparent 65%);
-            opacity: 0.35;
-            pointer-events: none;
-          }
-          .hero-social-btn::after {
-            content: "";
-            position: absolute;
-            inset: -40% -10%;
-            background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 48%, transparent 70%);
-            transform: translateX(-120%);
-            animation: social-shine 4.8s ease-in-out infinite;
-            opacity: 0.35;
-            pointer-events: none;
-          }
-          .hero-social-btn:hover {
-            transform: translateY(-3px) scale(1.03);
-            border-color: rgba(255,200,80,0.45);
-            box-shadow: 0 22px 60px rgba(0,0,0,0.6), 0 0 22px rgba(255,200,80,0.22);
-          }
-          .hero-social--ig,
-          .hero-social--fb,
-          .hero-social--tt,
-          .hero-social--wa {
-            background: radial-gradient(circle at 30% 20%, rgba(255,210,120,0.18), rgba(10,10,14,0.9));
-            color: #f7e4bf;
-            border-color: rgba(255,210,120,0.35);
-          }
-          @keyframes social-shine {
-            0% { transform: translateX(-120%); }
-            70% { transform: translateX(120%); }
-            100% { transform: translateX(120%); }
-          }
-          @keyframes glow-pulse {
-            0%, 100% { opacity: 0.55; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.15); }
-          }
-          @media (prefers-reduced-motion: reduce) {
-            .hero-follow-glow,
-            .hero-social-btn::after { animation: none !important; }
-          }
-        `}</style>
       </div>
     );
   }

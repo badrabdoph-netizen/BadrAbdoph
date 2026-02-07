@@ -464,7 +464,7 @@ export default function Home() {
                 <WhatsAppIcon size={20} />
               </EditableLinkIcon>
             </div>
-            <div className="hero-follow-glow" aria-hidden="true" />
+            <div className="hero-follow-glow hero-follow-glow--tight" aria-hidden="true" />
           </div>
         </div>
       </header>
@@ -1028,100 +1028,6 @@ export default function Home() {
       </section>
 
       <style>{`
-        .hero-follow-title {
-          font-size: 12px;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
-          font-weight: 600;
-          color: rgba(255,255,255,0.7);
-          position: relative;
-          padding-bottom: 10px;
-        }
-        .hero-follow-title::after {
-          content: "";
-          width: 54px;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255,200,80,0.8), transparent);
-          display: block;
-          margin: 10px auto 0;
-          box-shadow: 0 0 12px rgba(255,200,80,0.35);
-        }
-        .hero-follow-icons {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 14px;
-          flex-wrap: wrap;
-        }
-        .hero-follow-glow {
-          width: min(220px, 60vw);
-          height: 18px;
-          margin-top: 2px;
-          background: radial-gradient(circle, rgba(255,210,130,0.45), transparent 70%);
-          filter: blur(8px);
-          opacity: 0.75;
-          animation: glow-pulse 4.2s ease-in-out infinite;
-        }
-        .hero-social-btn {
-          width: 58px;
-          height: 58px;
-          border-radius: 18px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid rgba(255,255,255,0.16);
-          background: rgba(9,9,12,0.55);
-          color: #f6ddb0;
-          box-shadow: 0 18px 45px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.05);
-          transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
-          position: relative;
-          overflow: hidden;
-        }
-        .hero-social-btn::before {
-          content: "";
-          position: absolute;
-          inset: -35% -25%;
-          background: radial-gradient(circle, rgba(255,220,160,0.35), transparent 65%);
-          opacity: 0.35;
-          pointer-events: none;
-        }
-        .hero-social-btn::after {
-          content: "";
-          position: absolute;
-          inset: -40% -10%;
-          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 48%, transparent 70%);
-          transform: translateX(-120%);
-          animation: social-shine 4.8s ease-in-out infinite;
-          opacity: 0.35;
-          pointer-events: none;
-        }
-        .hero-social-btn:hover {
-          transform: translateY(-3px) scale(1.03);
-          border-color: rgba(255,200,80,0.45);
-          box-shadow: 0 22px 60px rgba(0,0,0,0.6), 0 0 22px rgba(255,200,80,0.22);
-        }
-        .hero-social--ig,
-        .hero-social--fb,
-        .hero-social--tt,
-        .hero-social--wa {
-          background: radial-gradient(circle at 30% 20%, rgba(255,210,120,0.18), rgba(10,10,14,0.9));
-          color: #f7e4bf;
-          border-color: rgba(255,210,120,0.35);
-        }
-        @media (max-width: 640px) {
-          .hero-social-btn {
-            width: 52px;
-            height: 52px;
-            border-radius: 16px;
-          }
-        }
-
-        .cta-icon {
-          margin-left: 8px;
-          filter: drop-shadow(0 0 10px rgba(255,210,130,0.55));
-          animation: cta-icon-pulse 2.6s ease-in-out infinite;
-        }
-
         .hero-image { background-image: var(--hero-image); }
         @media (max-width: 640px) {
           .hero-image { background-image: var(--hero-image-mobile); }
@@ -1516,16 +1422,6 @@ export default function Home() {
           100% { transform: translateX(120%); }
         }
 
-        @keyframes cta-icon-pulse {
-          0%, 100% { transform: translateY(0); opacity: 0.7; }
-          50% { transform: translateY(2px); opacity: 1; }
-        }
-
-        @keyframes social-shine {
-          0% { transform: translateX(-120%); }
-          70% { transform: translateX(120%); }
-          100% { transform: translateX(120%); }
-        }
         @keyframes vip-shine {
           0%, 100% { opacity: 0.8; text-shadow: 0 0 18px rgba(255,210,130,0.45); }
           50% { opacity: 1; text-shadow: 0 0 28px rgba(255,220,150,0.8); }
@@ -1533,10 +1429,6 @@ export default function Home() {
         @keyframes glow-drift {
           0%, 100% { transform: translateY(0); opacity: 0.35; }
           50% { transform: translateY(-8px); opacity: 0.6; }
-        }
-        @keyframes glow-pulse {
-          0%, 100% { opacity: 0.55; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.15); }
         }
         @keyframes float-soft {
           0%, 100% { transform: translateY(0); }
