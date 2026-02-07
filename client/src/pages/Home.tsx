@@ -413,6 +413,7 @@ export default function Home() {
                 placeholder="https://instagram.com/..."
                 ariaLabel="Instagram"
                 linkClassName="hero-social-btn hero-social--ig"
+                allowEdit={false}
               >
                 <Instagram size={20} />
               </EditableLinkIcon>
@@ -423,6 +424,7 @@ export default function Home() {
                 placeholder="https://facebook.com/..."
                 ariaLabel="Facebook"
                 linkClassName="hero-social-btn hero-social--fb"
+                allowEdit={false}
               >
                 <Facebook size={20} />
               </EditableLinkIcon>
@@ -433,6 +435,7 @@ export default function Home() {
                 placeholder="https://tiktok.com/..."
                 ariaLabel="TikTok"
                 linkClassName="hero-social-btn hero-social--tt"
+                allowEdit={false}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -456,6 +459,7 @@ export default function Home() {
                 ariaLabel="WhatsApp"
                 formatHref={formatWhatsAppHref}
                 linkClassName="hero-social-btn hero-social--wa"
+                allowEdit={false}
               >
                 <WhatsAppIcon size={20} />
               </EditableLinkIcon>
@@ -878,6 +882,7 @@ export default function Home() {
               placeholder="https://instagram.com/..."
               ariaLabel="Instagram"
               linkClassName="portfolio-social portfolio-social--ig"
+              allowEdit={false}
             >
               <Instagram size={18} />
             </EditableLinkIcon>
@@ -888,6 +893,7 @@ export default function Home() {
               placeholder="https://facebook.com/..."
               ariaLabel="Facebook"
               linkClassName="portfolio-social portfolio-social--fb"
+              allowEdit={false}
             >
               <Facebook size={18} />
             </EditableLinkIcon>
@@ -898,6 +904,7 @@ export default function Home() {
               placeholder="https://tiktok.com/..."
               ariaLabel="TikTok"
               linkClassName="portfolio-social portfolio-social--tt"
+              allowEdit={false}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -921,6 +928,7 @@ export default function Home() {
               ariaLabel="WhatsApp"
               formatHref={formatWhatsAppHref}
               linkClassName="portfolio-social portfolio-social--wa"
+              allowEdit={false}
             >
               <WhatsAppIcon size={18} />
             </EditableLinkIcon>

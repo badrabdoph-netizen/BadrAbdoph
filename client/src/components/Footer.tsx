@@ -140,6 +140,7 @@ export default function Footer() {
                 placeholder="https://instagram.com/..."
                 ariaLabel="Instagram"
                 linkClassName="social-orb"
+                allowEdit={false}
               >
                 <Instagram size={18} />
               </EditableLinkIcon>
@@ -151,6 +152,7 @@ export default function Footer() {
                 placeholder="https://facebook.com/..."
                 ariaLabel="Facebook"
                 linkClassName="social-orb"
+                allowEdit={false}
               >
                 <Facebook size={18} />
               </EditableLinkIcon>
@@ -163,6 +165,7 @@ export default function Footer() {
                 ariaLabel="WhatsApp"
                 formatHref={formatWhatsAppHref}
                 linkClassName="social-orb social-orb--wa"
+                allowEdit={false}
               >
                 <WhatsAppIcon size={18} />
               </EditableLinkIcon>
