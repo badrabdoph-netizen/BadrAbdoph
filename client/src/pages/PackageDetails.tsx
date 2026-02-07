@@ -166,7 +166,7 @@ export default function PackageDetails() {
                   <Link key={option.key} href={optionHref}>
                     <Button
                       variant="outline"
-                      className="w-full min-h-[56px] rounded-none px-6 cta-glow border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      className="w-full min-h-[56px] rounded-none cta-glow cta-size border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     >
                       {contentNode}
                     </Button>
@@ -179,7 +179,7 @@ export default function PackageDetails() {
                   key={option.key}
                   asChild
                   variant="outline"
-                  className="w-full min-h-[56px] rounded-none px-6 cta-glow border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                  className="w-full min-h-[56px] rounded-none cta-glow cta-size border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                 >
                   <a
                     href={optionHref}
