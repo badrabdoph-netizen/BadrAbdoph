@@ -314,8 +314,9 @@ function PackageCard({
         {pkg.features.length && !isCustom ? (
           <ul className="space-y-3 mb-6 md:mb-7">
             {pkg.features.map((feature, i) => {
-              const showProTag = isPro && feature.includes("تنظيم ريلز");
-              const showMediaTag = feature.includes("MEDIA COVERAGE REELS");
+              const featureValue = contentMap[`${baseKey}_feature_${i + 1}`] ?? feature;
+              const showProTag = isPro && featureValue.includes("تنظيم ريلز");
+              const showMediaTag = featureValue.includes("MEDIA COVERAGE REELS");
               return (
                 <li key={i} className="flex items-start text-sm">
                   <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
@@ -477,7 +478,6 @@ export default function Services() {
     additionalServices,
   } = usePackagesData();
   const contentMap = content.contentMap ?? {};
-  const getValue = (key: string, fallback = "") => (contentMap[key] as string | undefined) ?? fallback;
   const [activeSection, setActiveSection] = useState("sessions");
   const [isNavStuck, setIsNavStuck] = useState(false);
   const navRef = useRef<HTMLDivElement | null>(null);
