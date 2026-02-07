@@ -111,6 +111,31 @@ function Router() {
 }
 
 function App() {
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const setShield = (active: boolean) => {
+      root.classList.toggle("privacy-shield", active);
+    };
+
+    const handleVisibility = () => setShield(document.hidden);
+    const handleBlur = () => setShield(true);
+    const handleFocus = () => setShield(false);
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("focus", handleFocus);
+
+    handleVisibility();
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("focus", handleFocus);
+      root.classList.remove("privacy-shield");
+    };
+  }, []);
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
