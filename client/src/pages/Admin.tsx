@@ -12,11 +12,9 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { 
   Image, 
-  FileText, 
   Settings, 
   Package, 
   MessageSquare, 
-  Phone, 
   Upload,
   Trash2,
   Plus,
@@ -24,7 +22,6 @@ import {
   EyeOff,
   Save,
   Loader2,
-  LayoutGrid,
   Home,
   Monitor,
   Link2,
@@ -440,6 +437,7 @@ function ContentManager({ onRefresh }: ManagerProps) {
     { key: "hero_title", label: "عنوان الصفحة الرئيسية", category: "home" },
     { key: "hero_subtitle", label: "العنوان الفرعي", category: "home" },
     { key: "hero_description", label: "الوصف", category: "home" },
+    { key: "about_subtitle", label: "العنوان الفرعي (من أنا)", category: "about" },
     { key: "about_title", label: "عنوان صفحة من أنا", category: "about" },
     { key: "about_description", label: "وصف صفحة من أنا", category: "about" },
     { key: "cta_title", label: "عنوان قسم الدعوة للتواصل", category: "cta" },
@@ -1228,7 +1226,8 @@ function LiveEditor() {
                 معاينة الموقع
               </CardTitle>
               <CardDescription>
-                لو التعديلات ما ظهرتش فوراً، اضغط تحديث المعاينة.
+                اضغط على أي نص داخل المعاينة للتعديل المباشر. ولو التعديلات ما
+                ظهرتش فوراً، اضغط تحديث المعاينة.
               </CardDescription>
             </div>
             <Badge variant="secondary" className="w-fit">
@@ -1239,7 +1238,7 @@ function LiveEditor() {
             <div className="relative border-t border-border">
               <iframe
                 key={previewKey}
-                src="/"
+                src="/?adminPreview=1"
                 title="Site Live Preview"
                 className="w-full h-[70vh] md:h-[78vh] bg-background"
               />

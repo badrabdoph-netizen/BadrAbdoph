@@ -6,6 +6,7 @@ import { Camera, Sparkles, Heart, Star, ArrowLeft } from "lucide-react";
 import { aboutContent, photographerInfo, siteImages, ctaTexts, externalPortfolioUrl } from "@/config/siteConfig";
 import { useContentData, useTestimonialsData } from "@/hooks/useSiteData";
 import SmartImage from "@/components/SmartImage";
+import { EditableText } from "@/components/InlineEdit";
 
 export default function About() {
   const aboutImg = siteImages.aboutImage ?? siteImages.heroImage;
@@ -34,14 +35,29 @@ export default function About() {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {content.aboutTitle || aboutContent.title || "عن بدر"}
+            <EditableText
+              value={content.aboutTitle}
+              fallback={aboutContent.title || "عن بدر"}
+              fieldKey="about_title"
+              category="about"
+              label="عنوان صفحة من أنا"
+              multiline
+            />
           </h1>
 
           <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 leading-relaxed">
-            {content.aboutDescription ||
-              aboutContent.description ||
-              photographerInfo.descriptionAr ||
-              "تصوير يركز على اللحظة… ويطلعها بأفضل شكل."}
+            <EditableText
+              value={content.aboutDescription}
+              fallback={
+                aboutContent.description ||
+                photographerInfo.descriptionAr ||
+                "تصوير يركز على اللحظة… ويطلعها بأفضل شكل."
+              }
+              fieldKey="about_description"
+              category="about"
+              label="وصف صفحة من أنا"
+              multiline
+            />
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
@@ -82,7 +98,13 @@ export default function About() {
 
             <div className="order-2 lg:order-1 text-right">
               <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
-                {aboutContent.subtitle ?? "الستايل"}
+                <EditableText
+                  value={content.aboutSubtitle}
+                  fallback={aboutContent.subtitle ?? "الستايل"}
+                  fieldKey="about_subtitle"
+                  category="about"
+                  label="عنوان فرعي (من أنا)"
+                />
               </h3>
 
               <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight">
@@ -90,9 +112,17 @@ export default function About() {
               </h2>
 
               <p className="text-muted-foreground leading-relaxed mb-8 text-base md:text-lg">
-                {content.aboutDescription ||
-                  aboutContent.description ||
-                  "بحب أصوّر اللحظات الطبيعية من غير مبالغة… مع اهتمام بالتفاصيل والإضاءة واللون. الهدف إن الصور تحسّها حقيقية وفخمة في نفس الوقت."}
+                <EditableText
+                  value={content.aboutDescription}
+                  fallback={
+                    aboutContent.description ||
+                    "بحب أصوّر اللحظات الطبيعية من غير مبالغة… مع اهتمام بالتفاصيل والإضاءة واللون. الهدف إن الصور تحسّها حقيقية وفخمة في نفس الوقت."
+                  }
+                  fieldKey="about_description"
+                  category="about"
+                  label="وصف صفحة من أنا"
+                  multiline
+                />
               </p>
 
               <div className="grid grid-cols-3 gap-3 sm:gap-4">

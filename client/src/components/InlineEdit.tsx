@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, type KeyboardEvent, type ReactNode } from "react";
 import { trpc } from "@/lib/trpc";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,7 +10,7 @@ import { Check, Loader2, Pencil, X } from "lucide-react";
 type EditableTextProps = {
   value?: string | null;
   fallback?: string;
-  fallbackNode?: React.ReactNode;
+  fallbackNode?: ReactNode;
   placeholder?: string;
   fieldKey: string;
   category: string;
@@ -100,7 +100,7 @@ export function EditableText({
     setIsEditing(false);
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
       event.preventDefault();
       handleCancel();
@@ -166,7 +166,7 @@ export function EditableText({
             "inline-block",
             showPlaceholder ? "text-muted-foreground" : "text-inherit",
             enabled
-              ? "cursor-text rounded-md outline outline-1 outline-dashed outline-transparent hover:outline-primary/40 transition"
+              ? "group cursor-text rounded-md outline outline-1 outline-dashed outline-transparent hover:outline-primary/40 transition"
               : "",
             displayClassName
           )}
@@ -182,7 +182,7 @@ export function EditableText({
             placeholder ?? ""
           )}
           {enabled && (
-            <span className="ml-2 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+            <span className="ml-2 inline-flex items-center gap-1 text-[11px] text-muted-foreground opacity-0 transition group-hover:opacity-100">
               <Pencil className="w-3 h-3" />
               تعديل
             </span>

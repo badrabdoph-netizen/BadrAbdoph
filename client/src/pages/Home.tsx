@@ -22,6 +22,7 @@ import {
   externalPortfolioUrl,
 } from "@/config/siteConfig";
 import { useContactData, useContentData, usePortfolioData, useTestimonialsData } from "@/hooks/useSiteData";
+import { EditableText } from "@/components/InlineEdit";
 
 function ServiceIcon({ title }: { title: string }) {
   const t = title.toLowerCase();
@@ -179,31 +180,33 @@ export default function Home() {
     };
   }, []);
 
-  const heroHeadline = useMemo(() => {
-    if (content.heroTitle) {
-      const lines = content.heroTitle.split("\n").filter(Boolean);
-      if (!lines.length) return null;
+  const heroFallbackNode = useMemo(() => {
+    const h = homeHero?.headlineAr;
+    if (h) {
       return (
         <>
-          {lines.map((line, idx) => (
-            <span key={`${line}-${idx}`}>
-              {line}
-              {idx < lines.length - 1 ? <br /> : null}
-            </span>
-          ))}
+          {h.line1Prefix} <span className="italic text-primary">{h.highlight}</span>
+          <br />
+          {h.line2}
         </>
       );
     }
-    const h = homeHero?.headlineAr;
-    if (!h) return null;
     return (
       <>
-        {h.line1Prefix} <span className="italic text-primary">{h.highlight}</span>
+        مش مجرد <span className="italic text-primary">صور</span>
         <br />
-        {h.line2}
+        دي ذكريات متعاشة
       </>
     );
-  }, [content.heroTitle]);
+  }, []);
+
+  const heroFallbackText = useMemo(() => {
+    const h = homeHero?.headlineAr;
+    if (h) {
+      return `${h.line1Prefix} ${h.highlight}\n${h.line2}`.trim();
+    }
+    return "مش مجرد صور\nدي ذكريات متعاشة";
+  }, []);
 
   const safeGallery = useMemo(() => {
     if (!gallery.length) return [];
@@ -277,17 +280,29 @@ export default function Home() {
           </h2>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
-            {heroHeadline ?? (
-              <>
-                مش مجرد <span className="italic text-primary">صور</span>
-                <br />
-                دي ذكريات متعاشة
-              </>
-            )}
+            <EditableText
+              value={content.heroTitle}
+              fallback={heroFallbackText}
+              fallbackNode={heroFallbackNode}
+              fieldKey="hero_title"
+              category="home"
+              label="عنوان الصفحة الرئيسية"
+              multiline
+              className="block"
+              displayClassName="whitespace-pre-line"
+            />
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mb-6 font-light leading-relaxed">
-            {content.heroDescription || homeHero?.subTextAr || photographerInfo.descriptionAr}
+            <EditableText
+              value={content.heroDescription}
+              fallback={homeHero?.subTextAr || photographerInfo.descriptionAr || ""}
+              fieldKey="hero_description"
+              category="home"
+              label="وصف القسم الرئيسي"
+              multiline
+              className="block"
+            />
           </p>
 
           <div className="mt-8 flex flex-col items-center gap-4">
@@ -497,13 +512,33 @@ export default function Home() {
 
             <div className="order-1 md:order-2 text-right">
               <h3 className="about-subtitle">
-                {aboutContent.subtitle}
+                <EditableText
+                  value={content.aboutSubtitle}
+                  fallback={aboutContent.subtitle ?? ""}
+                  fieldKey="about_subtitle"
+                  category="about"
+                  label="عنوان فرعي (من أنا)"
+                />
               </h3>
               <h2 className="about-name">
-                {content.aboutTitle || aboutContent.title}
+                <EditableText
+                  value={content.aboutTitle}
+                  fallback={aboutContent.title ?? ""}
+                  fieldKey="about_title"
+                  category="about"
+                  label="عنوان صفحة من أنا"
+                  multiline
+                />
               </h2>
               <p className="about-text">
-                {content.aboutDescription || aboutContent.description}
+                <EditableText
+                  value={content.aboutDescription}
+                  fallback={aboutContent.description ?? ""}
+                  fieldKey="about_description"
+                  category="about"
+                  label="وصف صفحة من أنا"
+                  multiline
+                />
               </p>
             </div>
           </div>

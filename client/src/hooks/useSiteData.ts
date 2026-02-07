@@ -170,6 +170,7 @@ export function useContentData() {
     heroTitle: map.hero_title ?? "",
     heroSubtitle: map.hero_subtitle ?? "",
     heroDescription: map.hero_description ?? homeHero.subTextAr ?? "",
+    aboutSubtitle: map.about_subtitle ?? aboutContent.subtitle ?? "",
     aboutTitle: map.about_title ?? aboutContent.title ?? "",
     aboutDescription: map.about_description ?? aboutContent.description ?? "",
     ctaTitle: map.cta_title ?? "",
