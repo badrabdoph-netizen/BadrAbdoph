@@ -8,12 +8,15 @@ const SHARE_LINK_AUDIENCE = "share-link";
 const SHARE_LINK_SUBJECT = "site-share";
 const SHARE_CODE_PREFIX = "badrabdoph";
 const SHARE_CODE_SIGNATURE_LENGTH = 6;
-const SHARE_CODE_RANDOM_LENGTH = 4;
 const SHARE_CODE_ALPHABET = "23456789abcdefghijkmnpqrstuvwxyz";
-const generateShortRandom = customAlphabet(
-  SHARE_CODE_ALPHABET,
-  SHARE_CODE_RANDOM_LENGTH
+const SHARE_CODE_MIN_LENGTH = 4;
+const SHARE_CODE_MAX_LENGTH = 7;
+const SHARE_CODE_LENGTH = Math.min(
+  Math.max(Number.parseInt(process.env.SHARE_CODE_LENGTH ?? "6", 10), SHARE_CODE_MIN_LENGTH),
+  SHARE_CODE_MAX_LENGTH
 );
+const generateShortCode = customAlphabet(SHARE_CODE_ALPHABET, SHARE_CODE_LENGTH);
+const shortCodeRegex = new RegExp(`^[${SHARE_CODE_ALPHABET}]{${SHARE_CODE_MIN_LENGTH},${SHARE_CODE_MAX_LENGTH}}$`);
 
 function getShareLinkSecret() {
   return new TextEncoder().encode(ENV.cookieSecret);
@@ -72,50 +75,51 @@ function decodeExpiry(encoded: string) {
 export function createShortShareCode(expiresInMs: number) {
   const issuedAt = Date.now();
   const expiresAt = new Date(issuedAt + expiresInMs);
-  const expiryEncoded = encodeExpiry(expiresAt);
-  const randomPart = generateShortRandom();
-  const payload = `${expiryEncoded}.${randomPart}`;
-  const signature = signShortPayload(payload);
-  const code = `${SHARE_CODE_PREFIX}-${payload}.${signature}`;
+  const code = generateShortCode();
 
   return { code, expiresAt };
 }
 
 export function verifyShortShareCode(code: string) {
+  if (!code) {
+    return { valid: false, expiresAt: null, legacy: false, expired: false };
+  }
+
   if (!code.startsWith(`${SHARE_CODE_PREFIX}-`)) {
-    return { valid: false, expiresAt: null };
+    const isValid = shortCodeRegex.test(code);
+    return { valid: isValid, expiresAt: null, legacy: false, expired: false };
   }
 
   const raw = code.slice(SHARE_CODE_PREFIX.length + 1);
   const lastDot = raw.lastIndexOf(".");
   if (lastDot <= 0) {
-    return { valid: false, expiresAt: null };
+    return { valid: false, expiresAt: null, legacy: true, expired: false };
   }
 
   const payload = raw.slice(0, lastDot);
   const signature = raw.slice(lastDot + 1);
   if (!payload || !signature) {
-    return { valid: false, expiresAt: null };
+    return { valid: false, expiresAt: null, legacy: true, expired: false };
   }
 
   const expected = signShortPayload(payload);
   if (signature !== expected) {
-    return { valid: false, expiresAt: null };
+    return { valid: false, expiresAt: null, legacy: true, expired: false };
   }
 
   const [expiryEncoded] = payload.split(".");
   if (!expiryEncoded) {
-    return { valid: false, expiresAt: null };
+    return { valid: false, expiresAt: null, legacy: true, expired: false };
   }
 
   const expiresAt = decodeExpiry(expiryEncoded);
   if (!expiresAt) {
-    return { valid: false, expiresAt: null };
+    return { valid: false, expiresAt: null, legacy: true, expired: false };
   }
 
   if (expiresAt.getTime() <= Date.now()) {
-    return { valid: true, expiresAt, expired: true };
+    return { valid: true, expiresAt, legacy: true, expired: true };
   }
 
-  return { valid: true, expiresAt, expired: false };
+  return { valid: true, expiresAt, legacy: true, expired: false };
 }

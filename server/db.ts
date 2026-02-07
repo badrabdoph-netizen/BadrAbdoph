@@ -207,14 +207,10 @@ export async function createShareLinkRecord(data: InsertShareLink): Promise<Shar
   if (!db) {
     return await createLocalShareLink(data);
   }
+  const existing = await getShareLinkByCode(data.code);
+  if (existing) return null;
 
-  await db.insert(shareLinks).values(data).onDuplicateKeyUpdate({
-    set: {
-      note: data.note,
-      expiresAt: data.expiresAt,
-      revokedAt: data.revokedAt ?? null,
-    },
-  });
+  await db.insert(shareLinks).values(data);
 
   return await getShareLinkByCode(data.code);
 }

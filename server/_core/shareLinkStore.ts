@@ -86,16 +86,17 @@ function nextId() {
 
 export async function createLocalShareLink(
   data: InsertShareLink
-): Promise<LocalShareLink> {
+): Promise<LocalShareLink | null> {
   await ensureStoreLoaded();
-  const now = new Date();
   const existing = store?.get(data.code ?? "");
+  if (existing) return null;
+  const now = new Date();
   const record: LocalShareLink = {
-    id: existing?.id ?? nextId(),
+    id: nextId(),
     code: data.code,
     note: data.note ?? null,
     expiresAt: data.expiresAt,
-    createdAt: existing?.createdAt ?? data.createdAt ?? now,
+    createdAt: data.createdAt ?? now,
     updatedAt: now,
     revokedAt: data.revokedAt ?? null,
   };

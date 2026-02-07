@@ -115,22 +115,32 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         const expiresInMs = input.ttlHours * 60 * 60 * 1000;
-        const { code, expiresAt } = createShortShareCode(expiresInMs);
+        const note = input.note ?? null;
+        for (let attempt = 0; attempt < 8; attempt += 1) {
+          const { code, expiresAt } = createShortShareCode(expiresInMs);
+          const record = await db.createShareLinkRecord({
+            code,
+            note,
+            expiresAt,
+          });
+          if (!record) {
+            continue;
+          }
 
-        await db.createShareLinkRecord({
-          code,
-          note: input.note ?? null,
-          expiresAt,
+          return {
+            code: record.code,
+            expiresAt: record.expiresAt.toISOString(),
+            note: record.note ?? null,
+          };
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "تعذر إنشاء رابط جديد، حاول مرة أخرى.",
         });
-
-        return {
-          code,
-          expiresAt: expiresAt.toISOString(),
-          note: input.note ?? null,
-        };
       }),
     revoke: adminProcedure
-      .input(z.object({ code: z.string().min(8) }))
+      .input(z.object({ code: z.string().min(4) }))
       .mutation(async ({ input }) => {
         await db.revokeShareLink(input.code);
         return { success: true };
@@ -138,7 +148,7 @@ export const appRouter = router({
     extend: adminProcedure
       .input(
         z.object({
-          code: z.string().min(8),
+          code: z.string().min(4),
           hours: z.number().int().min(1).max(168),
         })
       )
@@ -171,7 +181,7 @@ export const appRouter = router({
         };
       }),
     validateShort: publicProcedure
-      .input(z.object({ code: z.string().min(8) }))
+      .input(z.object({ code: z.string().min(4).max(120) }))
       .query(async ({ input }) => {
         const result = verifyShortShareCode(input.code);
         if (!result.valid) {
@@ -184,7 +194,7 @@ export const appRouter = router({
         const record = await db.getShareLinkByCode(input.code);
         if (!record) {
           return {
-            valid: !result.expired,
+            valid: result.legacy ? !result.expired : false,
             expiresAt: result.expiresAt ? result.expiresAt.toISOString() : null,
           };
         }
