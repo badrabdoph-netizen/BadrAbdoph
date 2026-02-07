@@ -782,6 +782,7 @@ export default function Contact() {
                     placeholder="https://instagram.com/..."
                     ariaLabel="Instagram"
                     linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    allowEdit={false}
                   >
                     <Instagram size={22} />
                   </EditableLinkIcon>
@@ -792,6 +793,7 @@ export default function Contact() {
                     placeholder="https://facebook.com/..."
                     ariaLabel="Facebook"
                     linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    allowEdit={false}
                   >
                     <Facebook size={22} />
                   </EditableLinkIcon>
@@ -802,6 +804,7 @@ export default function Contact() {
                     placeholder="https://tiktok.com/..."
                     ariaLabel="TikTok"
                     linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    allowEdit={false}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
