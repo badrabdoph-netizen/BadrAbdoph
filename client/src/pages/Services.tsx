@@ -380,21 +380,21 @@ function PackageCard({
             </Button>
           </Link>
 
-          <a
-            href={waInquiryHref}
-            target="_blank"
-            rel="noreferrer"
-            className="w-full h-[56px] border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors inline-flex items-center justify-center gap-2 rounded-none cta-glow"
-          >
-            <EditableText
-              value={contentMap.services_secondary_cta}
-              fallback="اسأل عن التفاصيل"
-              fieldKey="services_secondary_cta"
-              category="services"
-              label="زر اسأل عن التفاصيل"
-            />
-            <ArrowLeft className="mr-2 w-4 h-4" />
-          </a>
+          <Link href="/package-details">
+            <Button
+              variant="outline"
+              className="w-full h-[56px] border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none cta-glow"
+            >
+              <EditableText
+                value={contentMap.services_secondary_cta}
+                fallback="اسأل عن التفاصيل"
+                fieldKey="services_secondary_cta"
+                category="services"
+                label="زر اسأل عن التفاصيل"
+              />
+              <ArrowLeft className="mr-2 w-4 h-4" />
+            </Button>
+          </Link>
         </div>
 
         {vip && (

@@ -13,6 +13,7 @@ import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import Share from "./pages/Share";
+import PackageDetails from "./pages/PackageDetails";
 
 function getNavOffsetPx() {
   const v = getComputedStyle(document.documentElement).getPropertyValue("--nav-offset").trim();
@@ -100,6 +101,7 @@ function Router() {
         <Route path="/about" component={About} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/services" component={Services} />
+        <Route path="/package-details" component={PackageDetails} />
         <Route path="/contact" component={Contact} />
         <Route path="/admin" component={Admin} />
         <Route component={NotFound} />

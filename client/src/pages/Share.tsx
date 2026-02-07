@@ -7,6 +7,7 @@ import Services from "@/pages/Services";
 import Contact from "@/pages/Contact";
 import Portfolio from "@/pages/Portfolio";
 import NotFound from "@/pages/NotFound";
+import PackageDetails from "@/pages/PackageDetails";
 
 type ShareProps = {
   token?: string;
@@ -20,6 +21,7 @@ function SiteRoutes() {
       <Route path="/about" component={About} />
       <Route path="/portfolio" component={Portfolio} />
       <Route path="/services" component={Services} />
+      <Route path="/package-details" component={PackageDetails} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>

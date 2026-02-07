@@ -1740,11 +1740,21 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
   const utils = trpc.useUtils();
   const [ttlHours, setTtlHours] = useState(24);
   const [note, setNote] = useState("");
+  const [latestLinkUrl, setLatestLinkUrl] = useState("");
   const { data: links = [], isLoading } = trpc.shareLinks.list.useQuery();
+
+  const buildShareUrl = (code: string) => {
+    if (typeof window === "undefined") return "";
+    return `${window.location.origin}/s/${code}`;
+  };
 
   const createMutation = trpc.shareLinks.create.useMutation({
     onSuccess: (data) => {
       setNote("");
+      if (data?.code) {
+        const url = buildShareUrl(data.code);
+        if (url) setLatestLinkUrl(url);
+      }
       toast.success("تم إنشاء الرابط المؤقت");
       utils.shareLinks.list.invalidate();
       onRefresh?.();
@@ -1856,6 +1866,24 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
             )}
             إنشاء الرابط
           </Button>
+
+          {latestLinkUrl && (
+            <div className="space-y-2">
+              <Label>آخر رابط تم إنشاؤه</Label>
+              <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                <Input value={latestLinkUrl} readOnly className="dir-ltr" />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleCopy(latestLinkUrl)}
+                >
+                  <Copy className="w-4 h-4 ml-2" />
+                  نسخ
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -1887,8 +1915,7 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
               ? false
               : expiresAtMs <= now;
             const isRevoked = Boolean(link.revokedAt);
-            const origin = typeof window !== "undefined" ? window.location.origin : "";
-            const url = `${origin}/s/${link.code}`;
+            const url = buildShareUrl(link.code);
 
             return (
               <div
