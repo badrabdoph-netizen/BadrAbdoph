@@ -470,7 +470,7 @@ export default function Home() {
       </header>
 
       {/* SERVICES PREVIEW */}
-      <section className="pt-12 pb-12 relative">
+      <section className="pt-16 pb-16 relative">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
@@ -674,7 +674,7 @@ export default function Home() {
       </section>
 
       {/* ABOUT PREVIEW */}
-      <section className="pt-16 pb-10 md:pt-20 md:pb-14 relative">
+      <section className="pt-16 pb-16 md:pt-20 md:pb-20 relative">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div className="relative order-2 md:order-1 group overflow-hidden">
@@ -737,7 +737,7 @@ export default function Home() {
       {/* ✅ Story Gallery */}
       <section
         ref={(el) => (portfolioRef.current = el)}
-        className="pt-2 pb-10 relative overflow-hidden"
+        className="pt-10 pb-14 md:pt-12 md:pb-16 relative overflow-hidden"
         onMouseMove={(e) => setSpot(e.clientX, e.clientY)}
         onTouchMove={(e) => {
           const t = e.touches[0];
@@ -802,7 +802,7 @@ export default function Home() {
       </section>
 
       {/* STATS */}
-      <section className="pt-4 pb-6">
+      <section className="py-10 md:py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-3 gap-3 max-w-4xl mx-auto">
             {aboutContent.stats.map((s, index) => (
@@ -835,7 +835,7 @@ export default function Home() {
       </section>
 
       {/* PORTFOLIO CTA */}
-      <section className="pt-6 pb-16 relative overflow-hidden">
+      <section className="pt-12 pb-16 md:pt-16 md:pb-20 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_35%_25%,rgba(255,200,80,0.12),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
@@ -937,7 +937,7 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="pt-12 pb-16 md:pt-16 md:pb-20 bg-card border-y border-white/5 relative overflow-hidden">
+      <section className="pt-16 pb-20 md:pt-20 md:pb-24 bg-card border-y border-white/5 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_20%_30%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
@@ -1116,34 +1116,6 @@ export default function Home() {
           }
         }
 
-        .cta-glow {
-          position: relative;
-          overflow: hidden;
-          isolation: isolate;
-          box-shadow: 0 0 0 1px rgba(255, 200, 80, 0.18) inset, 0 20px 60px rgba(255, 200, 80, 0.12);
-        }
-        .cta-glow::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          background: linear-gradient(135deg, rgba(255, 220, 150, 0.18), transparent 60%);
-          opacity: 0.8;
-          pointer-events: none;
-        }
-        .cta-glow::after {
-          content: "";
-          position: absolute;
-          inset: -120% -10%;
-          background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 45%, transparent 70%);
-          transform: translateX(-120%);
-          animation: cta-shine 3.6s ease-in-out infinite;
-          pointer-events: none;
-          opacity: 0.7;
-        }
-        .cta-glow:hover {
-          box-shadow: 0 0 0 1px rgba(255, 200, 80, 0.35) inset, 0 24px 80px rgba(255, 200, 80, 0.2);
-        }
         .cta-icon {
           margin-left: 8px;
           filter: drop-shadow(0 0 10px rgba(255,210,130,0.55));
@@ -1161,25 +1133,6 @@ export default function Home() {
           background-size: 160px 160px;
           mix-blend-mode: overlay;
         }
-
-        .premium-border { position: relative; }
-        .premium-border::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border: 1px solid rgba(255,255,255,0.06);
-          pointer-events: none;
-        }
-        .premium-border::after {
-          content: "";
-          position: absolute;
-          inset: -1px;
-          border: 1px solid rgba(255,200,80,0.10);
-          opacity: 0;
-          transition: opacity 250ms ease;
-          pointer-events: none;
-        }
-        .premium-border:hover::after { opacity: 1; }
 
         .package-card {
           background:
@@ -1563,11 +1516,6 @@ export default function Home() {
           100% { transform: translateX(120%); }
         }
 
-        @keyframes cta-shine {
-          0% { transform: translateX(-120%); }
-          60% { transform: translateX(120%); }
-          100% { transform: translateX(120%); }
-        }
         @keyframes cta-icon-pulse {
           0%, 100% { transform: translateY(0); opacity: 0.7; }
           50% { transform: translateY(2px); opacity: 1; }
@@ -1601,6 +1549,20 @@ export default function Home() {
           .testimonial-card { animation: float-soft 8s ease-in-out infinite; }
           .testimonial-card:nth-child(2) { animation-delay: -2s; }
           .testimonial-card:nth-child(3) { animation-delay: -4s; }
+        }
+        @media (max-width: 640px) {
+          .package-card {
+            padding: 24px;
+            box-shadow: 0 18px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,220,170,0.16) inset;
+          }
+          .testimonial-card {
+            box-shadow: 0 14px 45px rgba(0,0,0,0.45);
+          }
+          .card-title-chip {
+            font-size: 16px;
+            letter-spacing: 0.06em;
+            padding: 8px 14px;
+          }
         }
         @media (prefers-reduced-motion: reduce) {
           .package-card,

@@ -101,7 +101,7 @@ export default function About() {
         </div>
       </header>
 
-      <section className="py-12 md:py-16">
+      <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
             <div className="order-1 lg:order-2 relative overflow-hidden premium-border">
@@ -211,7 +211,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-14 md:py-20 bg-card border-y border-white/5 relative overflow-hidden">
+      <section className="py-16 md:py-20 bg-card border-y border-white/5 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
@@ -318,7 +318,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-14 md:py-20">
+      <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
             <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
@@ -381,7 +381,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-16 bg-primary/5 border-t border-white/5 text-center">
+      <section className="py-16 md:py-20 bg-primary/5 border-t border-white/5 text-center">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold mb-5">
             <EditableText
@@ -442,24 +442,6 @@ export default function About() {
           mix-blend-mode: overlay;
         }
 
-        .premium-border { position: relative; }
-        .premium-border::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border: 1px solid rgba(255,255,255,0.06);
-          pointer-events: none;
-        }
-        .premium-border::after {
-          content: "";
-          position: absolute;
-          inset: -1px;
-          border: 1px solid rgba(255,200,80,0.10);
-          opacity: 0;
-          transition: opacity 250ms ease;
-          pointer-events: none;
-        }
-        .premium-border:hover::after { opacity: 1; }
       `}</style>
 
       <Footer />

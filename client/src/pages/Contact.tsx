@@ -296,7 +296,7 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="py-14 pb-32">
+      <section className="py-16 pb-24 md:pb-28">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
             {/* Form FIRST on mobile */}
@@ -849,15 +849,6 @@ export default function Contact() {
       </a>
 
       <style>{`
-        .premium-border { position: relative; }
-        .premium-border::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border: 1px solid rgba(255,255,255,0.06);
-          pointer-events: none;
-          border-radius: inherit;
-        }
       `}</style>
 
       <Footer />

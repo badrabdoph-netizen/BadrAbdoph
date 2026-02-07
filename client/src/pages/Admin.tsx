@@ -2000,6 +2000,22 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
               type="button"
               variant="secondary"
               size="sm"
+              onClick={() => setTtlHours(3)}
+            >
+              3 ساعات
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setTtlHours(5)}
+            >
+              5 ساعات
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
               onClick={() => setTtlHours(24)}
             >
               24 ساعة
@@ -2172,6 +2188,22 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
                     disabled={isRevoked || extendMutation.isPending}
                   >
                     +1 ساعة
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => extendMutation.mutate({ code: link.code, hours: 3 })}
+                    disabled={isRevoked || extendMutation.isPending}
+                  >
+                    +3 ساعات
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => extendMutation.mutate({ code: link.code, hours: 5 })}
+                    disabled={isRevoked || extendMutation.isPending}
+                  >
+                    +5 ساعات
                   </Button>
                   <Button
                     size="sm"

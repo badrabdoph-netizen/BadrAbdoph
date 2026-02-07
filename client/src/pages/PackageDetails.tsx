@@ -136,7 +136,7 @@ export default function PackageDetails() {
         </div>
       </header>
 
-      <section className="py-12">
+      <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {options.map((option) => {
@@ -314,39 +314,9 @@ export default function PackageDetails() {
             border-radius: 16px;
           }
         }
-        .cta-glow {
-          position: relative;
-          overflow: hidden;
-          isolation: isolate;
-          box-shadow: 0 0 0 1px rgba(255, 200, 80, 0.18) inset, 0 18px 50px rgba(255, 200, 80, 0.12);
-        }
-        .cta-glow::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          background: linear-gradient(135deg, rgba(255, 220, 150, 0.18), transparent 60%);
-          opacity: 0.8;
-          pointer-events: none;
-        }
-        .cta-glow::after {
-          content: "";
-          position: absolute;
-          inset: -120% -10%;
-          background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 45%, transparent 70%);
-          transform: translateX(-120%);
-          animation: cta-shine 3.6s ease-in-out infinite;
-          pointer-events: none;
-          opacity: 0.6;
-        }
         @keyframes social-shine {
           0% { transform: translateX(-120%); }
           70% { transform: translateX(120%); }
-          100% { transform: translateX(120%); }
-        }
-        @keyframes cta-shine {
-          0% { transform: translateX(-120%); }
-          60% { transform: translateX(120%); }
           100% { transform: translateX(120%); }
         }
         @keyframes glow-pulse {

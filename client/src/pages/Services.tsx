@@ -665,7 +665,7 @@ export default function Services() {
         contentMap={contentMap}
       />
 
-      <section id="sessions" className="pt-3 pb-16" style={sectionStyle}>
+      <section id="sessions" className="pt-12 pb-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={
@@ -704,7 +704,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section id="prints" className="pt-3 pb-16" style={sectionStyle}>
+      <section id="prints" className="pt-12 pb-16" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={
@@ -742,7 +742,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section id="wedding" className="pt-3 pb-16 bg-card border-y border-white/5" style={sectionStyle}>
+      <section id="wedding" className="pt-12 pb-16 bg-card border-y border-white/5" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={
@@ -781,7 +781,7 @@ export default function Services() {
       </section>
 
       {/* ✅ addons gets extra bottom padding to guarantee activation near end */}
-      <section id="addons" className="pt-3 pb-24" style={sectionStyle}>
+      <section id="addons" className="pt-12 pb-24" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={
@@ -955,25 +955,6 @@ export default function Services() {
           background-size: 160px 160px;
           mix-blend-mode: overlay;
         }
-
-        .premium-border { position: relative; }
-        .premium-border::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border: 1px solid rgba(255,255,255,0.06);
-          pointer-events: none;
-        }
-        .premium-border::after {
-          content: "";
-          position: absolute;
-          inset: -1px;
-          border: 1px solid rgba(255,200,80,0.10);
-          opacity: 0;
-          transition: opacity 250ms ease;
-          pointer-events: none;
-        }
-        .premium-border:hover::after { opacity: 1; }
 
         .services-card::after {
           content: "";
@@ -1149,32 +1130,6 @@ export default function Services() {
           text-shadow: 0 0 10px rgba(255,210,130,0.35);
         }
 
-        .cta-glow {
-          position: relative;
-          overflow: hidden;
-          isolation: isolate;
-          box-shadow: 0 0 0 1px rgba(255, 200, 80, 0.18) inset, 0 18px 50px rgba(255, 200, 80, 0.12);
-        }
-        .cta-glow::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          background: linear-gradient(135deg, rgba(255, 220, 150, 0.18), transparent 60%);
-          opacity: 0.8;
-          pointer-events: none;
-        }
-        .cta-glow::after {
-          content: "";
-          position: absolute;
-          inset: -120% -10%;
-          background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.55) 45%, transparent 70%);
-          transform: translateX(-120%);
-          animation: cta-shine 3.6s ease-in-out infinite;
-          pointer-events: none;
-          opacity: 0.6;
-        }
-
         .custom-package {
           background:
             linear-gradient(145deg, rgba(18,18,24,0.9), rgba(8,8,12,0.98)),
@@ -1199,6 +1154,9 @@ export default function Services() {
             aspect-ratio: auto;
             border-radius: 28px;
             max-width: 100%;
+          }
+          .services-card {
+            padding: 24px;
           }
         }
         .custom-line {
@@ -1225,11 +1183,6 @@ export default function Services() {
         @keyframes services-shine {
           0% { transform: translateX(-120%); }
           65% { transform: translateX(120%); }
-          100% { transform: translateX(120%); }
-        }
-        @keyframes cta-shine {
-          0% { transform: translateX(-120%); }
-          60% { transform: translateX(120%); }
           100% { transform: translateX(120%); }
         }
 
