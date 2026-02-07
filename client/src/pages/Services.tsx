@@ -21,7 +21,7 @@ import {
   ctaTexts,
 } from "@/config/siteConfig";
 import { useContactData, usePackagesData, useContentData } from "@/hooks/useSiteData";
-import { EditableText } from "@/components/InlineEdit";
+import { EditableLinkIcon, EditableText } from "@/components/InlineEdit";
 
 type Pkg = {
   id: string;
@@ -72,6 +72,11 @@ function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
   if (!phone) return "";
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
+
+const formatWhatsAppHref = (value: string) => {
+  const phone = (value ?? "").replace(/[^\d]/g, "");
+  return phone ? `https://wa.me/${phone}` : "";
+};
 
 function getNavOffsetPx() {
   const v = getComputedStyle(document.documentElement).getPropertyValue("--nav-offset").trim();
@@ -379,21 +384,38 @@ function PackageCard({
             </Button>
           </Link>
 
-          <a
-            href={waInquiryHref}
-            target="_blank"
-            rel="noreferrer"
-            className="w-full h-[56px] border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors inline-flex items-center justify-center gap-2 rounded-none cta-glow"
-          >
-            <EditableText
-              value={contentMap.services_secondary_cta}
-              fallback="اسأل عن التفاصيل"
-              fieldKey="services_secondary_cta"
-              category="services"
-              label="زر اسأل عن التفاصيل"
-            />
-            <ArrowLeft className="mr-2 w-4 h-4" />
-          </a>
+          <div className="relative">
+            <a
+              href={waInquiryHref}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full h-[56px] border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors inline-flex items-center justify-center gap-2 rounded-none cta-glow"
+            >
+              <EditableText
+                value={contentMap.services_secondary_cta}
+                fallback="اسأل عن التفاصيل"
+                fieldKey="services_secondary_cta"
+                category="services"
+                label="زر اسأل عن التفاصيل"
+              />
+              <ArrowLeft className="mr-2 w-4 h-4" />
+            </a>
+            <EditableLinkIcon
+              value={whatsappNumber}
+              fieldKey="whatsapp"
+              label="رقم واتساب"
+              placeholder="2010xxxxxxx"
+              ariaLabel="Edit whatsapp"
+              formatHref={formatWhatsAppHref}
+              linkClassName="sr-only"
+              showEditButton
+              hideWhenDisabled
+              className="absolute left-2 top-2"
+              editButtonClassName="w-7 h-7 p-0"
+            >
+              <span className="sr-only">تعديل واتساب</span>
+            </EditableLinkIcon>
+          </div>
         </div>
 
         {vip && (

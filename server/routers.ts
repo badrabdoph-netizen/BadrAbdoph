@@ -12,9 +12,15 @@ import { TRPCError } from "@trpc/server";
 import {
   clearAdminSessionCookie,
   createAdminSession,
+  checkAdminLoginRateLimit,
+  clearAdminLoginFailures,
+  getAdminLoginBackoffMs,
+  isRequestSecure,
   matchesAdminCredentials,
+  recordAdminLoginFailure,
   setAdminSessionCookie,
 } from "./_core/adminAuth";
+import { ENV } from "./_core/env";
 
 export const appRouter = router({
   system: systemRouter,
@@ -45,12 +51,34 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
+        if (ENV.adminRequireHttps && !isRequestSecure(ctx.req)) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "لازم تستخدم HTTPS علشان تسجل دخول الأدمن.",
+          });
+        }
+
+        const rateStatus = checkAdminLoginRateLimit(ctx.req);
+        if (!rateStatus.allowed) {
+          const seconds = Math.max(1, Math.ceil(rateStatus.retryAfterMs / 1000));
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `محاولات كثيرة. جرّب بعد ${seconds} ثانية.`,
+          });
+        }
+
         const ok = matchesAdminCredentials(input.username, input.password);
         if (!ok) {
+          const entry = recordAdminLoginFailure(ctx.req);
+          const delayMs = getAdminLoginBackoffMs(entry.count);
+          if (delayMs > 0) {
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+          }
           throw new TRPCError({ code: "UNAUTHORIZED", message: "بيانات الدخول غير صحيحة" });
         }
 
         const { token, expiresAt } = await createAdminSession();
+        clearAdminLoginFailures(ctx.req);
         setAdminSessionCookie(ctx.req, ctx.res, token);
 
         return {

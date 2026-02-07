@@ -413,6 +413,9 @@ export default function Home() {
                 placeholder="https://instagram.com/..."
                 ariaLabel="Instagram"
                 linkClassName="hero-social-btn hero-social--ig"
+                className="gap-1"
+                showEditButton
+                editButtonClassName="w-7 h-7 p-0"
               >
                 <Instagram size={20} />
               </EditableLinkIcon>
@@ -423,6 +426,9 @@ export default function Home() {
                 placeholder="https://facebook.com/..."
                 ariaLabel="Facebook"
                 linkClassName="hero-social-btn hero-social--fb"
+                className="gap-1"
+                showEditButton
+                editButtonClassName="w-7 h-7 p-0"
               >
                 <Facebook size={20} />
               </EditableLinkIcon>
@@ -433,6 +439,9 @@ export default function Home() {
                 placeholder="https://tiktok.com/..."
                 ariaLabel="TikTok"
                 linkClassName="hero-social-btn hero-social--tt"
+                className="gap-1"
+                showEditButton
+                editButtonClassName="w-7 h-7 p-0"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -456,6 +465,9 @@ export default function Home() {
                 ariaLabel="WhatsApp"
                 formatHref={formatWhatsAppHref}
                 linkClassName="hero-social-btn hero-social--wa"
+                className="gap-1"
+                showEditButton
+                editButtonClassName="w-7 h-7 p-0"
               >
                 <WhatsAppIcon size={20} />
               </EditableLinkIcon>
@@ -878,6 +890,9 @@ export default function Home() {
               placeholder="https://instagram.com/..."
               ariaLabel="Instagram"
               linkClassName="portfolio-social portfolio-social--ig"
+              className="gap-1"
+              showEditButton
+              editButtonClassName="w-7 h-7 p-0"
             >
               <Instagram size={18} />
             </EditableLinkIcon>
@@ -888,6 +903,9 @@ export default function Home() {
               placeholder="https://facebook.com/..."
               ariaLabel="Facebook"
               linkClassName="portfolio-social portfolio-social--fb"
+              className="gap-1"
+              showEditButton
+              editButtonClassName="w-7 h-7 p-0"
             >
               <Facebook size={18} />
             </EditableLinkIcon>
@@ -898,6 +916,9 @@ export default function Home() {
               placeholder="https://tiktok.com/..."
               ariaLabel="TikTok"
               linkClassName="portfolio-social portfolio-social--tt"
+              className="gap-1"
+              showEditButton
+              editButtonClassName="w-7 h-7 p-0"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -921,6 +942,9 @@ export default function Home() {
               ariaLabel="WhatsApp"
               formatHref={formatWhatsAppHref}
               linkClassName="portfolio-social portfolio-social--wa"
+              className="gap-1"
+              showEditButton
+              editButtonClassName="w-7 h-7 p-0"
             >
               <WhatsAppIcon size={18} />
             </EditableLinkIcon>

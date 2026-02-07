@@ -183,6 +183,18 @@ export default function Contact() {
     () => `tel:${(contactInfo.phone ?? "").replace(/\s/g, "")}`,
     [contactInfo.phone]
   );
+  const formatWhatsAppHref = (value: string) => {
+    const phone = (value ?? "").replace(/[^\d]/g, "");
+    return phone ? `https://wa.me/${phone}` : "";
+  };
+  const formatTelHref = (value: string) => {
+    const phone = (value ?? "").replace(/\s/g, "");
+    return phone ? `tel:${phone}` : "";
+  };
+  const formatMailHref = (value: string) => {
+    const email = (value ?? "").trim();
+    return email ? `mailto:${email}` : "";
+  };
 
   const fieldClass =
     "h-12 bg-background/70 border-white/10 text-foreground placeholder:text-muted-foreground/70 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-colors";
@@ -257,41 +269,77 @@ export default function Contact() {
       <section className="border-y border-white/10 bg-background/70 backdrop-blur-md">
         <div className="container mx-auto px-4 py-4">
           <div className="grid grid-cols-2 gap-3">
-            <a
-              href={whatsappBookingHref}
-              target="_blank"
-              rel="noreferrer"
-              className="premium-border bg-card/40 border border-white/10 px-4 py-4 flex items-center justify-center gap-2 hover:border-primary/35 transition-colors"
-            >
-              <span className="text-primary">
-                <WhatsAppIcon />
-              </span>
-              <span className="text-sm font-semibold">
-                <EditableText
-                  value={contentMap.contact_quick_whatsapp}
-                  fallback="واتساب"
-                  fieldKey="contact_quick_whatsapp"
-                  category="contact"
-                  label="زر واتساب سريع"
-                />
-              </span>
-            </a>
+            <div className="relative">
+              <a
+                href={whatsappBookingHref}
+                target="_blank"
+                rel="noreferrer"
+                className="premium-border bg-card/40 border border-white/10 px-4 py-4 flex items-center justify-center gap-2 hover:border-primary/35 transition-colors w-full"
+              >
+                <span className="text-primary">
+                  <WhatsAppIcon />
+                </span>
+                <span className="text-sm font-semibold">
+                  <EditableText
+                    value={contentMap.contact_quick_whatsapp}
+                    fallback="واتساب"
+                    fieldKey="contact_quick_whatsapp"
+                    category="contact"
+                    label="زر واتساب سريع"
+                  />
+                </span>
+              </a>
+              <EditableLinkIcon
+                value={contactInfo.whatsappNumber}
+                fieldKey="whatsapp"
+                label="رقم واتساب"
+                placeholder="2010xxxxxxx"
+                ariaLabel="Edit WhatsApp"
+                formatHref={formatWhatsAppHref}
+                linkClassName="sr-only"
+                showEditButton
+                hideWhenDisabled
+                className="absolute left-2 top-2"
+                editButtonClassName="w-7 h-7 p-0"
+              >
+                <span className="sr-only">تعديل واتساب</span>
+              </EditableLinkIcon>
+            </div>
 
-            <a
-              href={telHref}
-              className="premium-border bg-card/40 border border-white/10 px-4 py-4 flex items-center justify-center gap-2 hover:border-primary/35 transition-colors"
-            >
-              <Phone className="w-5 h-5 text-primary" />
-              <span className="text-sm font-semibold">
-                <EditableText
-                  value={contentMap.contact_quick_call}
-                  fallback="مكالمة"
-                  fieldKey="contact_quick_call"
-                  category="contact"
-                  label="زر مكالمة سريع"
-                />
-              </span>
-            </a>
+            <div className="relative">
+              <a
+                href={telHref}
+                className="premium-border bg-card/40 border border-white/10 px-4 py-4 flex items-center justify-center gap-2 hover:border-primary/35 transition-colors w-full"
+              >
+                <Phone className="w-5 h-5 text-primary" />
+                <span className="text-sm font-semibold">
+                  <EditableText
+                    value={contentMap.contact_quick_call}
+                    fallback="مكالمة"
+                    fieldKey="contact_quick_call"
+                    category="contact"
+                    label="زر مكالمة سريع"
+                  />
+                </span>
+              </a>
+              <EditableLinkIcon
+                value={contactInfo.phone}
+                fieldKey="phone"
+                label="رقم الهاتف"
+                placeholder="01xxxxxxxxx"
+                ariaLabel="Edit phone"
+                formatHref={formatTelHref}
+                linkClassName="sr-only"
+                showEditButton
+                hideWhenDisabled
+                className="absolute left-2 top-2"
+                editButtonClassName="w-7 h-7 p-0"
+                target="_self"
+                rel="noreferrer"
+              >
+                <span className="sr-only">تعديل الهاتف</span>
+              </EditableLinkIcon>
+            </div>
           </div>
         </div>
       </section>
@@ -662,17 +710,36 @@ export default function Contact() {
                           label="عنوان الهاتف"
                         />
                       </h4>
-                      <a
-                        href={telHref}
-                        className="text-muted-foreground hover:text-primary transition-colors dir-ltr block"
-                      >
-                        <EditableContactText
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={telHref}
+                          className="text-muted-foreground hover:text-primary transition-colors dir-ltr block"
+                        >
+                          <EditableContactText
+                            value={contactInfo.phone}
+                            fallback={contactInfo.phone ?? ""}
+                            fieldKey="phone"
+                            label="رقم الهاتف"
+                          />
+                        </a>
+                        <EditableLinkIcon
                           value={contactInfo.phone}
-                          fallback={contactInfo.phone ?? ""}
                           fieldKey="phone"
                           label="رقم الهاتف"
-                        />
-                      </a>
+                          placeholder="01xxxxxxxxx"
+                          ariaLabel="Edit phone"
+                          formatHref={formatTelHref}
+                          linkClassName="sr-only"
+                          showEditButton
+                          hideWhenDisabled
+                          className="shrink-0"
+                          editButtonClassName="w-6 h-6 p-0"
+                          target="_self"
+                          rel="noreferrer"
+                        >
+                          <span className="sr-only">تعديل الهاتف</span>
+                        </EditableLinkIcon>
+                      </div>
                     </div>
                   </div>
 
@@ -692,19 +759,36 @@ export default function Contact() {
                           label="عنوان واتساب"
                         />
                       </h4>
-                      <a
-                        href={whatsappBookingHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-muted-foreground hover:text-primary transition-colors dir-ltr block"
-                      >
-                        <EditableContactText
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={whatsappBookingHref}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-muted-foreground hover:text-primary transition-colors dir-ltr block"
+                        >
+                          <EditableContactText
+                            value={contactInfo.whatsappNumber}
+                            fallback={contactInfo.whatsappNumber ?? ""}
+                            fieldKey="whatsapp"
+                            label="رقم واتساب"
+                          />
+                        </a>
+                        <EditableLinkIcon
                           value={contactInfo.whatsappNumber}
-                          fallback={contactInfo.whatsappNumber ?? ""}
                           fieldKey="whatsapp"
                           label="رقم واتساب"
-                        />
-                      </a>
+                          placeholder="2010xxxxxxx"
+                          ariaLabel="Edit whatsapp"
+                          formatHref={formatWhatsAppHref}
+                          linkClassName="sr-only"
+                          showEditButton
+                          hideWhenDisabled
+                          className="shrink-0"
+                          editButtonClassName="w-6 h-6 p-0"
+                        >
+                          <span className="sr-only">تعديل واتساب</span>
+                        </EditableLinkIcon>
+                      </div>
                     </div>
                   </div>
 
@@ -722,17 +806,36 @@ export default function Contact() {
                           label="عنوان البريد"
                         />
                       </h4>
-                      <a
-                        href={`mailto:${contactInfo.email}`}
-                        className="text-muted-foreground hover:text-primary transition-colors"
-                      >
-                        <EditableContactText
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`mailto:${contactInfo.email}`}
+                          className="text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <EditableContactText
+                            value={contactInfo.email}
+                            fallback={contactInfo.email ?? ""}
+                            fieldKey="email"
+                            label="البريد الإلكتروني"
+                          />
+                        </a>
+                        <EditableLinkIcon
                           value={contactInfo.email}
-                          fallback={contactInfo.email ?? ""}
                           fieldKey="email"
                           label="البريد الإلكتروني"
-                        />
-                      </a>
+                          placeholder="name@example.com"
+                          ariaLabel="Edit email"
+                          formatHref={formatMailHref}
+                          linkClassName="sr-only"
+                          showEditButton
+                          hideWhenDisabled
+                          className="shrink-0"
+                          editButtonClassName="w-6 h-6 p-0"
+                          target="_self"
+                          rel="noreferrer"
+                        >
+                          <span className="sr-only">تعديل البريد الإلكتروني</span>
+                        </EditableLinkIcon>
+                      </div>
                     </div>
                   </div>
 
@@ -782,6 +885,9 @@ export default function Contact() {
                     placeholder="https://instagram.com/..."
                     ariaLabel="Instagram"
                     linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    className="gap-1"
+                    showEditButton
+                    editButtonClassName="w-7 h-7 p-0"
                   >
                     <Instagram size={22} />
                   </EditableLinkIcon>
@@ -792,6 +898,9 @@ export default function Contact() {
                     placeholder="https://facebook.com/..."
                     ariaLabel="Facebook"
                     linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    className="gap-1"
+                    showEditButton
+                    editButtonClassName="w-7 h-7 p-0"
                   >
                     <Facebook size={22} />
                   </EditableLinkIcon>
@@ -802,6 +911,9 @@ export default function Contact() {
                     placeholder="https://tiktok.com/..."
                     ariaLabel="TikTok"
                     linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    className="gap-1"
+                    showEditButton
+                    editButtonClassName="w-7 h-7 p-0"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -825,25 +937,44 @@ export default function Contact() {
       </section>
 
       {/* WhatsApp Floating Button */}
-      <a
-        href={whatsappBookingHref}
-        target="_blank"
-        rel="noreferrer"
-        className="fixed z-50 premium-border bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg flex items-center gap-2 px-5 py-3 md:px-0 md:py-0 md:w-14 md:h-14 md:rounded-full rounded-full"
+      <div
+        className="fixed z-50"
         style={{ right: "1rem", bottom: "calc(1rem + env(safe-area-inset-bottom))" }}
-        title="تواصل عبر واتساب"
       >
-        <WhatsAppIcon />
-        <span className="text-sm font-semibold md:hidden">
-          <EditableText
-            value={contentMap.contact_floating_label}
-            fallback="واتساب"
-            fieldKey="contact_floating_label"
-            category="contact"
-            label="زر واتساب العائم"
-          />
-        </span>
-      </a>
+        <a
+          href={whatsappBookingHref}
+          target="_blank"
+          rel="noreferrer"
+          className="premium-border bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg flex items-center gap-2 px-5 py-3 md:px-0 md:py-0 md:w-14 md:h-14 md:rounded-full rounded-full"
+          title="تواصل عبر واتساب"
+        >
+          <WhatsAppIcon />
+          <span className="text-sm font-semibold md:hidden">
+            <EditableText
+              value={contentMap.contact_floating_label}
+              fallback="واتساب"
+              fieldKey="contact_floating_label"
+              category="contact"
+              label="زر واتساب العائم"
+            />
+          </span>
+        </a>
+        <EditableLinkIcon
+          value={contactInfo.whatsappNumber}
+          fieldKey="whatsapp"
+          label="رقم واتساب"
+          placeholder="2010xxxxxxx"
+          ariaLabel="Edit floating whatsapp"
+          formatHref={formatWhatsAppHref}
+          linkClassName="sr-only"
+          showEditButton
+          hideWhenDisabled
+          className="absolute -left-2 -top-2"
+          editButtonClassName="w-7 h-7 p-0"
+        >
+          <span className="sr-only">تعديل واتساب</span>
+        </EditableLinkIcon>
+      </div>
 
       <style>{`
         .premium-border { position: relative; }

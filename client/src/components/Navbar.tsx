@@ -202,6 +202,9 @@ export default function Navbar() {
               placeholder="https://instagram.com/..."
               ariaLabel="Instagram"
               linkClassName="social-orb tap-target"
+              className="gap-1"
+              showEditButton
+              editButtonClassName="w-7 h-7 p-0"
             >
               <Instagram size={18} />
             </EditableLinkIcon>
@@ -212,6 +215,9 @@ export default function Navbar() {
               placeholder="https://facebook.com/..."
               ariaLabel="Facebook"
               linkClassName="social-orb tap-target"
+              className="gap-1"
+              showEditButton
+              editButtonClassName="w-7 h-7 p-0"
             >
               <Facebook size={18} />
             </EditableLinkIcon>
@@ -242,6 +248,9 @@ export default function Navbar() {
               ariaLabel="Call"
               formatHref={formatTelHref}
               linkClassName="social-orb social-orb--phone tap-target"
+              className="gap-1"
+              showEditButton
+              editButtonClassName="w-7 h-7 p-0"
             >
               <Phone size={18} />
             </EditableLinkIcon>
@@ -254,6 +263,9 @@ export default function Navbar() {
               ariaLabel="WhatsApp"
               formatHref={formatWhatsAppHref}
               linkClassName="social-orb social-orb--wa tap-target"
+              className="gap-1"
+              showEditButton
+              editButtonClassName="w-7 h-7 p-0"
             >
               <WhatsAppIcon size={18} />
             </EditableLinkIcon>

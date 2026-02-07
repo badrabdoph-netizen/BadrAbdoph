@@ -8,6 +8,54 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
+const shouldAllowContextMenu = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) return false;
+  return Boolean(
+    target.closest("input, textarea, [contenteditable='true'], [data-allow-contextmenu]")
+  );
+};
+
+if (typeof window !== "undefined") {
+  document.addEventListener(
+    "contextmenu",
+    (event) => {
+      if (shouldAllowContextMenu(event.target)) return;
+      event.preventDefault();
+    },
+    { capture: true }
+  );
+
+  document.addEventListener(
+    "dragstart",
+    (event) => {
+      const target = event.target as HTMLElement | null;
+      if (target && target.tagName === "IMG") {
+        event.preventDefault();
+      }
+    },
+    { capture: true }
+  );
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "PrintScreen") {
+      event.preventDefault();
+      return;
+    }
+
+    const key = event.key.toLowerCase();
+    const meta = event.ctrlKey || event.metaKey;
+
+    if (meta && ["s", "p", "u"].includes(key)) {
+      event.preventDefault();
+      return;
+    }
+
+    if (meta && event.shiftKey && ["i", "j", "c"].includes(key)) {
+      event.preventDefault();
+    }
+  });
+}
+
 const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
