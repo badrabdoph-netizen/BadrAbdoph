@@ -288,6 +288,19 @@ function PortfolioManager({ onRefresh }: ManagerProps) {
   });
 
   const [newImage, setNewImage] = useState({ title: "", category: "wedding", file: null as File | null });
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [drafts, setDrafts] = useState<
+    Record<
+      number,
+      {
+        title: string;
+        category: string;
+        url: string;
+        visible: boolean;
+        sortOrder: number;
+      }
+    >
+  >({});
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -314,6 +327,40 @@ function PortfolioManager({ onRefresh }: ManagerProps) {
       setNewImage({ title: "", category: "wedding", file: null });
     };
     reader.readAsDataURL(newImage.file);
+  };
+
+  const openEdit = (image: any) => {
+    setEditingId(image.id);
+    setDrafts((prev) => ({
+      ...prev,
+      [image.id]: {
+        title: image.title ?? "",
+        category: image.category ?? "wedding",
+        url: image.url ?? "",
+        visible: image.visible !== false,
+        sortOrder: Number.isFinite(image.sortOrder) ? Number(image.sortOrder) : 0,
+      },
+    }));
+  };
+
+  const closeEdit = () => setEditingId(null);
+
+  const handleUpdate = async (id: number) => {
+    const draft = drafts[id];
+    if (!draft) return;
+    if (!draft.title || !draft.url) {
+      toast.error("يرجى إدخال العنوان والرابط");
+      return;
+    }
+    await updateMutation.mutateAsync({
+      id,
+      title: draft.title,
+      category: draft.category,
+      url: draft.url,
+      visible: draft.visible,
+      sortOrder: draft.sortOrder,
+    });
+    closeEdit();
   };
 
   if (isLoading) {
@@ -359,43 +406,361 @@ function PortfolioManager({ onRefresh }: ManagerProps) {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {images?.map((image) => (
-          <Card key={image.id} className="overflow-hidden">
-            <div className="aspect-square relative">
-              <img src={image.url} alt={image.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <Button
-                  size="icon"
-                  variant="secondary"
-                  onClick={() => updateMutation.mutate({ id: image.id, visible: !image.visible })}
-                >
-                  {image.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                </Button>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  onClick={() => deleteMutation.mutate({ id: image.id })}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Image className="w-5 h-5" />
+            قائمة الأعمال
+          </CardTitle>
+          <CardDescription>عدّل عنوان الصورة، التصنيف، الرابط، والترتيب بسهولة.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {images?.map((image) => {
+            const draft = drafts[image.id];
+            const isEditing = editingId === image.id;
+            return (
+              <div key={image.id} className="border border-white/10 rounded-lg p-4 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={image.url}
+                      alt={image.title}
+                      className="w-16 h-16 rounded-md object-cover border border-white/10"
+                    />
+                    <div>
+                      <div className="font-semibold">{image.title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {image.category} • ترتيب {image.sortOrder ?? 0}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant={image.visible ? "secondary" : "outline"}>
+                      {image.visible ? "ظاهر" : "مخفي"}
+                    </Badge>
+                    <Button size="sm" variant="outline" onClick={() => (isEditing ? closeEdit() : openEdit(image))}>
+                      {isEditing ? "إغلاق" : "تعديل"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => deleteMutation.mutate({ id: image.id })}
+                    >
+                      حذف
+                    </Button>
+                  </div>
+                </div>
+
+                {isEditing && draft ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>عنوان الصورة</Label>
+                      <Input
+                        value={draft.title}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [image.id]: { ...draft, title: e.target.value },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>تصنيف الصورة</Label>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        value={draft.category}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [image.id]: { ...draft, category: e.target.value },
+                          }))
+                        }
+                      >
+                        <option value="wedding">زفاف</option>
+                        <option value="engagement">خطوبة</option>
+                        <option value="outdoor">جلسات خارجية</option>
+                        <option value="portrait">بورتريه</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label>رابط الصورة</Label>
+                      <Input
+                        value={draft.url}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [image.id]: { ...draft, url: e.target.value },
+                          }))
+                        }
+                        dir="ltr"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>ترتيب الظهور</Label>
+                      <Input
+                        type="number"
+                        value={draft.sortOrder}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [image.id]: { ...draft, sortOrder: Number(e.target.value) || 0 },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between border rounded-md px-3 py-2">
+                      <span className="text-sm">إظهار الصورة</span>
+                      <Switch
+                        checked={draft.visible}
+                        onCheckedChange={(value) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [image.id]: { ...draft, visible: Boolean(value) },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="md:col-span-2 flex flex-wrap gap-2">
+                      <Button onClick={() => handleUpdate(image.id)} disabled={updateMutation.isPending}>
+                        {updateMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                        ) : (
+                          <Save className="w-4 h-4 ml-2" />
+                        )}
+                        حفظ التعديلات
+                      </Button>
+                      <Button variant="outline" onClick={closeEdit}>
+                        إلغاء
+                      </Button>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+
+          {(!images || images.length === 0) && (
+            <div className="text-center py-12 text-muted-foreground">
+              <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>لا توجد صور في المعرض بعد</p>
+              <p className="text-sm">قم بإضافة صور جديدة من الأعلى</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+    </div>
+  );
+}
+
+// ============================================
+// About Manager Component
+// ============================================
+function AboutManager({ onRefresh }: ManagerProps) {
+  const { data: content, refetch, isLoading } = trpc.siteContent.getAll.useQuery();
+  const { data: images, refetch: refetchImages } = trpc.siteImages.getAll.useQuery();
+  const upsertContentMutation = trpc.siteContent.upsert.useMutation({
+    onSuccess: () => {
+      toast.success("تم حفظ التعديلات");
+      refetch();
+      onRefresh?.();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+  const upsertImageMutation = trpc.siteImages.upsert.useMutation({
+    onSuccess: () => {
+      toast.success("تم حفظ الصورة");
+      refetchImages();
+      onRefresh?.();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const [editingContent, setEditingContent] = useState<Record<string, string>>({});
+  const [editingImages, setEditingImages] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (content) {
+      const map: Record<string, string> = {};
+      content.forEach((item) => {
+        map[item.key] = item.value;
+      });
+      setEditingContent(map);
+    }
+  }, [content]);
+
+  useEffect(() => {
+    if (images) {
+      const map: Record<string, string> = {};
+      images.forEach((item) => {
+        map[item.key] = item.url;
+      });
+      setEditingImages(map);
+    }
+  }, [images]);
+
+  const handleSave = async (key: string, label: string) => {
+    await upsertContentMutation.mutateAsync({
+      key,
+      value: editingContent[key] || "",
+      category: "about",
+      label,
+    });
+  };
+
+  const handleSaveImage = async (key: string, label: string) => {
+    await upsertImageMutation.mutateAsync({
+      key,
+      url: editingImages[key] || "",
+      alt: label,
+      category: "about",
+    });
+  };
+
+  const groups = [
+    {
+      title: "الهيدر",
+      items: [
+        { key: "about_kicker", label: "الشريط العلوي", multiline: false },
+        { key: "about_title", label: "العنوان الرئيسي", multiline: false },
+        { key: "about_description", label: "الوصف الرئيسي", multiline: true },
+        { key: "about_cta_primary", label: "زر احجز الآن", multiline: false },
+        { key: "about_cta_secondary", label: "زر الأسعار والباقات", multiline: false },
+      ],
+    },
+    {
+      title: "قسم القصة",
+      items: [
+        { key: "about_subtitle", label: "العنوان الفرعي", multiline: false },
+        { key: "about_story_title", label: "عنوان القصة", multiline: false },
+        { key: "about_story_description", label: "وصف القصة", multiline: true },
+      ],
+    },
+    {
+      title: "الإحصائيات",
+      items: [
+        { key: "about_stat_1_number", label: "رقم الإحصائية 1", multiline: false },
+        { key: "about_stat_1_label", label: "عنوان الإحصائية 1", multiline: false },
+        { key: "about_stat_2_number", label: "رقم الإحصائية 2", multiline: false },
+        { key: "about_stat_2_label", label: "عنوان الإحصائية 2", multiline: false },
+        { key: "about_stat_3_number", label: "رقم الإحصائية 3", multiline: false },
+        { key: "about_stat_3_label", label: "عنوان الإحصائية 3", multiline: false },
+      ],
+    },
+    {
+      title: "زر المعرض",
+      items: [{ key: "about_portfolio_link", label: "نص زر المعرض", multiline: false }],
+    },
+    {
+      title: "قسم المميزات",
+      items: [
+        { key: "about_features_kicker", label: "العنوان الصغير", multiline: false },
+        { key: "about_features_title", label: "العنوان الرئيسي", multiline: false },
+        { key: "about_features_desc", label: "الوصف", multiline: true },
+        { key: "about_feature_1_title", label: "ميزة 1 - عنوان", multiline: false },
+        { key: "about_feature_1_desc", label: "ميزة 1 - وصف", multiline: true },
+        { key: "about_feature_2_title", label: "ميزة 2 - عنوان", multiline: false },
+        { key: "about_feature_2_desc", label: "ميزة 2 - وصف", multiline: true },
+        { key: "about_feature_3_title", label: "ميزة 3 - عنوان", multiline: false },
+        { key: "about_feature_3_desc", label: "ميزة 3 - وصف", multiline: true },
+      ],
+    },
+    {
+      title: "آراء العملاء",
+      items: [
+        { key: "about_testimonials_kicker", label: "العنوان الصغير", multiline: false },
+        { key: "about_testimonials_title", label: "العنوان الرئيسي", multiline: false },
+        { key: "about_testimonial_1_quote", label: "رأي 1 - النص", multiline: true },
+        { key: "about_testimonial_1_name", label: "رأي 1 - الاسم", multiline: false },
+        { key: "about_testimonial_2_quote", label: "رأي 2 - النص", multiline: true },
+        { key: "about_testimonial_2_name", label: "رأي 2 - الاسم", multiline: false },
+      ],
+    },
+    {
+      title: "دعوة للتواصل",
+      items: [
+        { key: "about_cta_title", label: "العنوان", multiline: true },
+        { key: "about_cta_desc", label: "الوصف", multiline: true },
+        { key: "about_cta_primary_contact", label: "زر تواصل الآن", multiline: false },
+        { key: "about_cta_secondary_packages", label: "زر شوف الباقات", multiline: false },
+      ],
+    },
+  ];
+
+  if (isLoading) {
+    return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>صفحة من أنا</CardTitle>
+          <CardDescription>تعديل محتوى صفحة من أنا بالكامل من هنا.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label>صورة من أنا</Label>
+            <div className="flex gap-2">
+              <Input
+                value={editingImages.aboutImage || ""}
+                onChange={(e) => setEditingImages({ ...editingImages, aboutImage: e.target.value })}
+                placeholder="رابط الصورة"
+                dir="ltr"
+              />
+              <Button
+                size="icon"
+                onClick={() => handleSaveImage("aboutImage", "صورة من أنا")}
+                disabled={upsertImageMutation.isPending}
+              >
+                <Save className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          {groups.map((group, idx) => (
+            <div key={group.title} className="space-y-4">
+              <div className="flex items-center gap-2">
+                <h4 className="text-base font-semibold">{group.title}</h4>
+                {idx > 0 ? <Separator className="flex-1" /> : null}
+              </div>
+              <div className="space-y-4">
+                {group.items.map((item) => (
+                  <div key={item.key} className="space-y-2">
+                    <Label>{item.label}</Label>
+                    <div className="flex gap-2">
+                      {item.multiline ? (
+                        <Textarea
+                          value={editingContent[item.key] || ""}
+                          onChange={(e) =>
+                            setEditingContent({ ...editingContent, [item.key]: e.target.value })
+                          }
+                          rows={2}
+                        />
+                      ) : (
+                        <Input
+                          value={editingContent[item.key] || ""}
+                          onChange={(e) =>
+                            setEditingContent({ ...editingContent, [item.key]: e.target.value })
+                          }
+                        />
+                      )}
+                      <Button
+                        size="icon"
+                        onClick={() => handleSave(item.key, item.label)}
+                        disabled={upsertContentMutation.isPending}
+                      >
+                        <Save className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            <CardContent className="p-3">
-              <p className="text-sm font-medium truncate">{image.title}</p>
-              <p className="text-xs text-muted-foreground">{image.category}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {(!images || images.length === 0) && (
-        <div className="text-center py-12 text-muted-foreground">
-          <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>لا توجد صور في المعرض بعد</p>
-          <p className="text-sm">قم بإضافة صور جديدة من الأعلى</p>
-        </div>
-      )}
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -523,6 +888,22 @@ function PackagesManager({ onRefresh }: ManagerProps) {
     category: "session",
     features: "",
   });
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [drafts, setDrafts] = useState<
+    Record<
+      number,
+      {
+        name: string;
+        price: string;
+        description: string;
+        category: string;
+        features: string;
+        popular: boolean;
+        visible: boolean;
+        sortOrder: number;
+      }
+    >
+  >({});
 
   const handleCreate = async () => {
     if (!newPackage.name || !newPackage.price) {
@@ -538,9 +919,58 @@ function PackagesManager({ onRefresh }: ManagerProps) {
     });
   };
 
+  const openEdit = (pkg: any) => {
+    setEditingId(pkg.id);
+    setDrafts((prev) => ({
+      ...prev,
+      [pkg.id]: {
+        name: pkg.name ?? "",
+        price: pkg.price ?? "",
+        description: pkg.description ?? "",
+        category: pkg.category ?? "session",
+        features: Array.isArray(pkg.features) ? pkg.features.join("\n") : "",
+        popular: Boolean(pkg.popular),
+        visible: pkg.visible !== false,
+        sortOrder: Number.isFinite(pkg.sortOrder) ? Number(pkg.sortOrder) : 0,
+      },
+    }));
+  };
+
+  const closeEdit = () => {
+    setEditingId(null);
+  };
+
+  const handleUpdate = async (id: number) => {
+    const draft = drafts[id];
+    if (!draft) return;
+    if (!draft.name || !draft.price) {
+      toast.error("يرجى إدخال اسم الباقة والسعر");
+      return;
+    }
+    await updateMutation.mutateAsync({
+      id,
+      name: draft.name,
+      price: draft.price,
+      description: draft.description,
+      category: draft.category,
+      features: draft.features.split("\n").filter(Boolean),
+      popular: draft.popular,
+      visible: draft.visible,
+      sortOrder: draft.sortOrder,
+    });
+    closeEdit();
+  };
+
   if (isLoading) {
     return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin" /></div>;
   }
+
+  const categoryLabel: Record<string, string> = {
+    session: "جلسات التصوير",
+    prints: "جلسات + مطبوعات",
+    wedding: "Full Day",
+    addon: "إضافات",
+  };
 
   return (
     <div className="space-y-6">
@@ -597,59 +1027,204 @@ function PackagesManager({ onRefresh }: ManagerProps) {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {packages?.map((pkg) => (
-          <Card key={pkg.id}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg">{pkg.name}</CardTitle>
-                  <p className="text-2xl font-bold text-primary mt-2">{pkg.price}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    التصنيف: {pkg.category ?? "session"}
-                  </p>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="w-5 h-5" />
+            قائمة الباقات
+          </CardTitle>
+          <CardDescription>عدّل الباقات مباشرة، أو غيّر الترتيب والظهور.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {packages?.map((pkg) => {
+            const draft = drafts[pkg.id];
+            const isEditing = editingId === pkg.id;
+            return (
+              <div key={pkg.id} className="border border-white/10 rounded-lg p-4 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                  <div>
+                    <div className="text-lg font-bold">{pkg.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {pkg.price} • {categoryLabel[pkg.category ?? "session"]}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant={pkg.visible ? "secondary" : "outline"}>
+                      {pkg.visible ? "ظاهر" : "مخفي"}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => (isEditing ? closeEdit() : openEdit(pkg))}
+                    >
+                      {isEditing ? "إغلاق" : "تعديل"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => deleteMutation.mutate({ id: pkg.id })}
+                    >
+                      حذف
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => updateMutation.mutate({ id: pkg.id, visible: !pkg.visible })}
-                  >
-                    {pkg.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => deleteMutation.mutate({ id: pkg.id })}
-                  >
-                    <Trash2 className="w-4 h-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-3">{pkg.description}</p>
-              {pkg.features && (
-                <ul className="text-sm space-y-1">
-                  {(pkg.features as string[]).map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
 
-      {(!packages || packages.length === 0) && (
-        <div className="text-center py-12 text-muted-foreground">
-          <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>لا توجد باقات بعد</p>
-        </div>
-      )}
+                {isEditing && draft ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>اسم الباقة</Label>
+                      <Input
+                        value={draft.name}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [pkg.id]: { ...draft, name: e.target.value },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>السعر</Label>
+                      <Input
+                        value={draft.price}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [pkg.id]: { ...draft, price: e.target.value },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>التصنيف</Label>
+                      <select
+                        value={draft.category}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [pkg.id]: { ...draft, category: e.target.value },
+                          }))
+                        }
+                        className="w-full h-10 rounded-md border border-border bg-background px-3 text-sm"
+                      >
+                        <option value="session">جلسات التصوير</option>
+                        <option value="prints">جلسات + مطبوعات</option>
+                        <option value="wedding">Full Day</option>
+                        <option value="addon">إضافات</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>ترتيب الظهور</Label>
+                      <Input
+                        type="number"
+                        value={draft.sortOrder}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [pkg.id]: { ...draft, sortOrder: Number(e.target.value) || 0 },
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>الوصف</Label>
+                      <Textarea
+                        value={draft.description}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [pkg.id]: { ...draft, description: e.target.value },
+                          }))
+                        }
+                        rows={3}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>المميزات (كل ميزة في سطر)</Label>
+                      <Textarea
+                        value={draft.features}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [pkg.id]: { ...draft, features: e.target.value },
+                          }))
+                        }
+                        rows={3}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between border rounded-md px-3 py-2">
+                        <span className="text-sm">مميزة (Popular)</span>
+                        <Switch
+                          checked={draft.popular}
+                          onCheckedChange={(value) =>
+                            setDrafts((prev) => ({
+                              ...prev,
+                              [pkg.id]: { ...draft, popular: Boolean(value) },
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center justify-between border rounded-md px-3 py-2">
+                        <span className="text-sm">إظهار الباقة</span>
+                        <Switch
+                          checked={draft.visible}
+                          onCheckedChange={(value) =>
+                            setDrafts((prev) => ({
+                              ...prev,
+                              [pkg.id]: { ...draft, visible: Boolean(value) },
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="md:col-span-2 flex flex-wrap gap-2">
+                      <Button
+                        onClick={() => handleUpdate(pkg.id)}
+                        disabled={updateMutation.isPending}
+                      >
+                        {updateMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                        ) : (
+                          <Save className="w-4 h-4 ml-2" />
+                        )}
+                        حفظ التعديلات
+                      </Button>
+                      <Button variant="outline" onClick={closeEdit}>
+                        إلغاء
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {pkg.description ? (
+                      <p className="text-sm text-muted-foreground">{pkg.description}</p>
+                    ) : null}
+                    {pkg.features && (
+                      <ul className="text-sm space-y-1 mt-2">
+                        {(pkg.features as string[]).map((feature, i) => (
+                          <li key={i} className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
+
+          {(!packages || packages.length === 0) && (
+            <div className="text-center py-12 text-muted-foreground">
+              <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>لا توجد باقات بعد</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
     </div>
   );
 }
@@ -756,7 +1331,8 @@ function TestimonialsManager({ onRefresh }: ManagerProps) {
 // ============================================
 function ContactManager({ onRefresh }: ManagerProps) {
   const { data: contactInfo, refetch, isLoading } = trpc.contactInfo.getAll.useQuery();
-  const upsertMutation = trpc.contactInfo.upsert.useMutation({
+  const { data: content, refetch: refetchContent } = trpc.siteContent.getAll.useQuery();
+  const upsertContactMutation = trpc.contactInfo.upsert.useMutation({
     onSuccess: () => {
       toast.success("تم حفظ التغييرات");
       refetch();
@@ -764,8 +1340,17 @@ function ContactManager({ onRefresh }: ManagerProps) {
     },
     onError: (error) => toast.error(error.message),
   });
+  const upsertContentMutation = trpc.siteContent.upsert.useMutation({
+    onSuccess: () => {
+      toast.success("تم حفظ النصوص");
+      refetchContent();
+      onRefresh?.();
+    },
+    onError: (error) => toast.error(error.message),
+  });
 
   const [editingContact, setEditingContact] = useState<Record<string, string>>({});
+  const [editingContent, setEditingContent] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (contactInfo) {
@@ -777,10 +1362,29 @@ function ContactManager({ onRefresh }: ManagerProps) {
     }
   }, [contactInfo]);
 
-  const handleSave = async (key: string, label: string) => {
-    await upsertMutation.mutateAsync({
+  useEffect(() => {
+    if (content) {
+      const contentMap: Record<string, string> = {};
+      content.forEach((item) => {
+        contentMap[item.key] = item.value;
+      });
+      setEditingContent(contentMap);
+    }
+  }, [content]);
+
+  const handleSaveContact = async (key: string, label: string) => {
+    await upsertContactMutation.mutateAsync({
       key,
       value: editingContact[key] || "",
+      label,
+    });
+  };
+
+  const handleSaveContent = async (key: string, label: string) => {
+    await upsertContentMutation.mutateAsync({
+      key,
+      value: editingContent[key] || "",
+      category: "contact",
       label,
     });
   };
@@ -793,6 +1397,77 @@ function ContactManager({ onRefresh }: ManagerProps) {
     { key: "instagram", label: "رابط إنستجرام" },
     { key: "facebook", label: "رابط فيسبوك" },
     { key: "tiktok", label: "رابط تيك توك" },
+  ];
+
+  const textGroups = [
+    {
+      title: "الهيدر",
+      items: [
+        { key: "contact_kicker", label: "الشريط العلوي", multiline: false },
+        { key: "contact_title", label: "العنوان الرئيسي", multiline: false },
+        { key: "contact_subtitle", label: "الوصف", multiline: true },
+      ],
+    },
+    {
+      title: "الأزرار السريعة",
+      items: [
+        { key: "contact_quick_whatsapp", label: "زر واتساب سريع", multiline: false },
+        { key: "contact_quick_call", label: "زر مكالمة سريع", multiline: false },
+      ],
+    },
+    {
+      title: "نموذج التواصل",
+      items: [
+        { key: "contact_form_title", label: "عنوان النموذج", multiline: false },
+        { key: "contact_label_name", label: "تسمية الاسم", multiline: false },
+        { key: "contact_placeholder_name", label: "Placeholder الاسم", multiline: false },
+        { key: "contact_label_date", label: "تسمية التاريخ", multiline: false },
+        { key: "contact_label_package", label: "تسمية الباقة", multiline: false },
+        { key: "contact_placeholder_package", label: "Placeholder الباقة", multiline: false },
+        { key: "contact_label_phone", label: "تسمية الهاتف", multiline: false },
+        { key: "contact_placeholder_phone", label: "Placeholder الهاتف", multiline: false },
+        { key: "contact_label_price", label: "تسمية السعر", multiline: false },
+        { key: "contact_placeholder_price", label: "Placeholder السعر", multiline: false },
+        { key: "contact_label_addons", label: "تسمية الإضافات", multiline: false },
+        { key: "contact_addons_placeholder", label: "Placeholder الإضافات", multiline: false },
+        { key: "contact_addons_empty", label: "نص الإضافات الفارغ", multiline: false },
+      ],
+    },
+    {
+      title: "الإيصال",
+      items: [
+        { key: "contact_receipt_title", label: "عنوان الإيصال", multiline: false },
+        { key: "contact_receipt_heading", label: "عنوان قسم الإيصال", multiline: false },
+        { key: "contact_receipt_copy", label: "زر نسخ الإيصال", multiline: false },
+        { key: "contact_receipt_label_name", label: "حقل الاسم", multiline: false },
+        { key: "contact_receipt_label_phone", label: "حقل الهاتف", multiline: false },
+        { key: "contact_receipt_label_date", label: "حقل التاريخ", multiline: false },
+        { key: "contact_receipt_label_package", label: "حقل الباقة", multiline: false },
+        { key: "contact_receipt_label_addons", label: "حقل الإضافات", multiline: false },
+        { key: "contact_receipt_label_price", label: "حقل السعر", multiline: false },
+        { key: "contact_receipt_empty", label: "قيمة فارغة", multiline: false },
+        { key: "contact_submit_button", label: "زر إرسال الإيصال", multiline: false },
+        { key: "contact_submit_helper", label: "تنبيه الإرسال", multiline: true },
+      ],
+    },
+    {
+      title: "معلومات التواصل",
+      items: [
+        { key: "contact_info_title", label: "عنوان معلومات التواصل", multiline: false },
+        { key: "contact_info_desc", label: "وصف معلومات التواصل", multiline: true },
+        { key: "contact_info_phone_label", label: "عنوان الهاتف", multiline: false },
+        { key: "contact_info_whatsapp_label", label: "عنوان واتساب", multiline: false },
+        { key: "contact_info_email_label", label: "عنوان البريد", multiline: false },
+        { key: "contact_info_location_label", label: "عنوان الموقع", multiline: false },
+      ],
+    },
+    {
+      title: "السوشيال",
+      items: [
+        { key: "contact_follow_title", label: "عنوان تابعنا", multiline: false },
+        { key: "contact_floating_label", label: "زر واتساب العائم", multiline: false },
+      ],
+    },
   ];
 
   if (isLoading) {
@@ -818,11 +1493,60 @@ function ContactManager({ onRefresh }: ManagerProps) {
               />
               <Button
                 size="icon"
-                onClick={() => handleSave(field.key, field.label)}
-                disabled={upsertMutation.isPending}
+                onClick={() => handleSaveContact(field.key, field.label)}
+                disabled={upsertContactMutation.isPending}
               >
                 <Save className="w-4 h-4" />
               </Button>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>نصوص صفحة تواصل معي</CardTitle>
+          <CardDescription>تعديل جميع النصوص والعناوين داخل صفحة التواصل.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {textGroups.map((group, idx) => (
+            <div key={group.title} className="space-y-4">
+              <div className="flex items-center gap-2">
+                <h4 className="text-base font-semibold">{group.title}</h4>
+                {idx > 0 ? <Separator className="flex-1" /> : null}
+              </div>
+              <div className="space-y-4">
+                {group.items.map((item) => (
+                  <div key={item.key} className="space-y-2">
+                    <Label>{item.label}</Label>
+                    <div className="flex gap-2">
+                      {item.multiline ? (
+                        <Textarea
+                          value={editingContent[item.key] || ""}
+                          onChange={(e) =>
+                            setEditingContent({ ...editingContent, [item.key]: e.target.value })
+                          }
+                          rows={2}
+                        />
+                      ) : (
+                        <Input
+                          value={editingContent[item.key] || ""}
+                          onChange={(e) =>
+                            setEditingContent({ ...editingContent, [item.key]: e.target.value })
+                          }
+                        />
+                      )}
+                      <Button
+                        size="icon"
+                        onClick={() => handleSaveContent(item.key, item.label)}
+                        disabled={upsertContentMutation.isPending}
+                      >
+                        <Save className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </CardContent>
@@ -1371,6 +2095,7 @@ function LiveEditor() {
               >
                 <TabsList className="grid w-full h-auto grid-cols-2 md:grid-cols-3 gap-2">
                   <TabsTrigger value="content">النصوص</TabsTrigger>
+                  <TabsTrigger value="about">من أنا</TabsTrigger>
                   <TabsTrigger value="portfolio">المعرض</TabsTrigger>
                   <TabsTrigger value="packages">الباقات</TabsTrigger>
                   <TabsTrigger value="testimonials">الآراء</TabsTrigger>
@@ -1381,6 +2106,9 @@ function LiveEditor() {
 
                 <TabsContent value="content">
                   <ContentManager onRefresh={refreshPreview} />
+                </TabsContent>
+                <TabsContent value="about">
+                  <AboutManager onRefresh={refreshPreview} />
                 </TabsContent>
                 <TabsContent value="portfolio">
                   <PortfolioManager onRefresh={refreshPreview} />

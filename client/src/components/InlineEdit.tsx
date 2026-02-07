@@ -391,6 +391,11 @@ type EditableLinkIconProps = {
   linkClassName?: string;
   editorClassName?: string;
   formatHref?: (value: string) => string;
+  target?: string;
+  rel?: string;
+  showEditButton?: boolean;
+  editButtonClassName?: string;
+  hideWhenDisabled?: boolean;
   children: ReactNode;
 };
 
@@ -405,6 +410,11 @@ export function EditableLinkIcon({
   linkClassName,
   editorClassName,
   formatHref,
+  target,
+  rel,
+  showEditButton = false,
+  editButtonClassName,
+  hideWhenDisabled = false,
   children,
 }: EditableLinkIconProps) {
   const { enabled } = useInlineEditMode();
@@ -474,16 +484,18 @@ export function EditableLinkIcon({
     }
   };
 
-  if (!enabled && !displayValue) return null;
+  if ((!enabled && hideWhenDisabled) || (!enabled && !displayValue)) return null;
 
   const hrefValue = displayValue ? (formatHref ? formatHref(displayValue) : displayValue) : "#";
+  const linkTarget = target ?? "_blank";
+  const linkRel = rel ?? (linkTarget === "_blank" ? "noreferrer" : undefined);
 
   return (
-    <div className={cn("relative inline-flex group", className)}>
+    <div className={cn("relative inline-flex items-center gap-2 group", className)}>
       <a
         href={hrefValue}
-        target="_blank"
-        rel="noreferrer"
+        target={linkTarget}
+        rel={linkRel}
         aria-label={ariaLabel}
         className={linkClassName}
         onClick={(event) => {
@@ -496,11 +508,29 @@ export function EditableLinkIcon({
       >
         {children}
       </a>
-      {enabled && (
+      {enabled && !showEditButton && (
         <span className="absolute -top-2 -right-2 flex items-center gap-1 rounded-full border border-white/20 bg-black/60 px-2 py-0.5 text-[10px] text-white opacity-0 transition group-hover:opacity-100">
           <Pencil className="w-3 h-3" />
           تعديل
         </span>
+      )}
+      {enabled && showEditButton && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setIsEditing(true);
+            setDraft(displayValue);
+          }}
+          className={cn(
+            "inline-flex items-center justify-center rounded-full border border-white/20 bg-black/60 text-white text-[11px] px-2 py-1 hover:bg-black/70 transition",
+            editButtonClassName
+          )}
+          aria-label={`تعديل ${label}`}
+        >
+          <Pencil className="w-3 h-3" />
+        </button>
       )}
 
       {enabled && isEditing && (
