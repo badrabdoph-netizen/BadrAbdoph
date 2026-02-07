@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Check, Loader2, Pencil, X, Image as ImageIcon, Upload } from "lucide-react";
+import { pushEdit } from "@/lib/editHistory";
 
 type EditableTextProps = {
   value?: string | null;
@@ -71,7 +72,23 @@ export function EditableText({
   }, [normalizedValue, isEditing]);
 
   const upsertMutation = trpc.siteContent.upsert.useMutation({
-    onSuccess: () => {
+    onMutate: (input) => {
+      const prev = normalizedValue ?? "";
+      return {
+        action: {
+          kind: "siteContent" as const,
+          key: input.key,
+          prev,
+          next: input.value,
+          category: input.category,
+          label: input.label,
+        },
+      };
+    },
+    onSuccess: (_data, _input, ctx) => {
+      if (ctx?.action && ctx.action.prev !== ctx.action.next) {
+        pushEdit(ctx.action);
+      }
       toast.success("تم حفظ النص");
       utils.siteContent.getAll.invalidate();
       setIsEditing(false);
@@ -87,6 +104,10 @@ export function EditableText({
 
   const handleSave = () => {
     if (!enabled || upsertMutation.isPending) return;
+    if (draft === normalizedValue) {
+      setIsEditing(false);
+      return;
+    }
     upsertMutation.mutate({
       key: fieldKey,
       value: draft,
@@ -235,7 +256,22 @@ export function EditableContactText({
   }, [normalizedValue, isEditing]);
 
   const upsertMutation = trpc.contactInfo.upsert.useMutation({
-    onSuccess: () => {
+    onMutate: (input) => {
+      const prev = normalizedValue ?? "";
+      return {
+        action: {
+          kind: "contactInfo" as const,
+          key: input.key,
+          prev,
+          next: input.value,
+          label: input.label ?? label,
+        },
+      };
+    },
+    onSuccess: (_data, _input, ctx) => {
+      if (ctx?.action && ctx.action.prev !== ctx.action.next) {
+        pushEdit(ctx.action);
+      }
       toast.success("تم حفظ البيانات");
       utils.contactInfo.getAll.invalidate();
       setIsEditing(false);
@@ -245,6 +281,10 @@ export function EditableContactText({
 
   const handleSave = () => {
     if (!enabled || upsertMutation.isPending) return;
+    if (draft === normalizedValue) {
+      setIsEditing(false);
+      return;
+    }
     upsertMutation.mutate({
       key: fieldKey,
       value: draft,
@@ -372,7 +412,21 @@ export function EditableImage({
   }, [src, isEditing]);
 
   const upsertMutation = trpc.siteImages.upsert.useMutation({
-    onSuccess: () => {
+    onMutate: (input) => ({
+      action: {
+        kind: "siteImage" as const,
+        key: input.key,
+        prevUrl: src,
+        nextUrl: input.url,
+        alt: input.alt,
+        category: input.category,
+        label,
+      },
+    }),
+    onSuccess: (_data, _input, ctx) => {
+      if (ctx?.action && ctx.action.prevUrl !== ctx.action.nextUrl) {
+        pushEdit(ctx.action);
+      }
       toast.success("تم تحديث الصورة");
       utils.siteImages.getAll.invalidate();
       setIsEditing(false);
@@ -381,7 +435,19 @@ export function EditableImage({
   });
 
   const uploadMutation = trpc.siteImages.upload.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const nextUrl = data?.url ?? src;
+      if (nextUrl && nextUrl !== src) {
+        pushEdit({
+          kind: "siteImage",
+          key: fieldKey,
+          prevUrl: src,
+          nextUrl,
+          alt,
+          category,
+          label,
+        });
+      }
       toast.success("تم رفع الصورة");
       utils.siteImages.getAll.invalidate();
       setIsEditing(false);
@@ -391,6 +457,10 @@ export function EditableImage({
 
   const handleSaveUrl = () => {
     if (!enabled || upsertMutation.isPending) return;
+    if (draftUrl === src) {
+      setIsEditing(false);
+      return;
+    }
     upsertMutation.mutate({
       key: fieldKey,
       url: draftUrl,

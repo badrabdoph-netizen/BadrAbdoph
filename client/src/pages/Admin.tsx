@@ -32,8 +32,11 @@ import {
   ShieldCheck,
   Sparkles,
   KeyRound,
+  Undo2,
+  Redo2,
 } from "lucide-react";
 import { Link } from "wouter";
+import { useEditHistory, type EditAction } from "@/lib/editHistory";
 
 export default function Admin() {
   const utils = trpc.useUtils();
@@ -1178,9 +1181,94 @@ function LiveEditor() {
   const [panelOpen, setPanelOpen] = useState(true);
   const [activePanelTab, setActivePanelTab] = useState("content");
   const [previewKey, setPreviewKey] = useState(0);
+  const [historyBusy, setHistoryBusy] = useState(false);
+  const utils = trpc.useUtils();
+  const {
+    canUndo,
+    canRedo,
+    takeUndo,
+    takeRedo,
+    restoreUndo,
+    restoreRedo,
+  } = useEditHistory();
+
+  const contentMutation = trpc.siteContent.upsert.useMutation({
+    onSuccess: () => utils.siteContent.getAll.invalidate(),
+  });
+  const contactMutation = trpc.contactInfo.upsert.useMutation({
+    onSuccess: () => utils.contactInfo.getAll.invalidate(),
+  });
+  const imageMutation = trpc.siteImages.upsert.useMutation({
+    onSuccess: () => utils.siteImages.getAll.invalidate(),
+  });
 
   const refreshPreview = () => {
     setPreviewKey((prev) => prev + 1);
+  };
+
+  const applyAction = async (action: EditAction, direction: "undo" | "redo") => {
+    if (action.kind === "siteContent") {
+      const value = direction === "undo" ? action.prev : action.next;
+      await contentMutation.mutateAsync({
+        key: action.key,
+        value,
+        category: action.category,
+        label: action.label,
+      });
+      return;
+    }
+    if (action.kind === "contactInfo") {
+      const value = direction === "undo" ? action.prev : action.next;
+      await contactMutation.mutateAsync({
+        key: action.key,
+        value,
+        label: action.label,
+      });
+      return;
+    }
+    if (action.kind === "siteImage") {
+      const url = direction === "undo" ? action.prevUrl : action.nextUrl;
+      await imageMutation.mutateAsync({
+        key: action.key,
+        url,
+        alt: action.alt,
+        category: action.category,
+      });
+    }
+  };
+
+  const handleUndo = async () => {
+    if (historyBusy) return;
+    const action = takeUndo();
+    if (!action) return;
+    setHistoryBusy(true);
+    try {
+      await applyAction(action, "undo");
+      refreshPreview();
+      toast.success("تم الرجوع عن آخر تعديل");
+    } catch (error: any) {
+      restoreUndo(action);
+      toast.error(error?.message ?? "تعذر الرجوع عن التعديل");
+    } finally {
+      setHistoryBusy(false);
+    }
+  };
+
+  const handleRedo = async () => {
+    if (historyBusy) return;
+    const action = takeRedo();
+    if (!action) return;
+    setHistoryBusy(true);
+    try {
+      await applyAction(action, "redo");
+      refreshPreview();
+      toast.success("تم التقدم في التعديل");
+    } catch (error: any) {
+      restoreRedo(action);
+      toast.error(error?.message ?? "تعذر التقدم في التعديل");
+    } finally {
+      setHistoryBusy(false);
+    }
   };
 
   return (
@@ -1193,6 +1281,24 @@ function LiveEditor() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleUndo}
+            disabled={!canUndo || historyBusy}
+          >
+            <Undo2 className="w-4 h-4 ml-2" />
+            رجوع
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRedo}
+            disabled={!canRedo || historyBusy}
+          >
+            <Redo2 className="w-4 h-4 ml-2" />
+            تقدم
+          </Button>
           <Button
             variant="outline"
             size="sm"
