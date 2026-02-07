@@ -34,14 +34,6 @@ export default function Footer() {
   const phoneClean = (contactInfo.phone ?? "").replace(/\s/g, "");
   const telHref = phoneClean ? `tel:${phoneClean}` : "";
   const mailHref = contactInfo.email ? `mailto:${contactInfo.email}` : "";
-  const formatTelHref = (value: string) => {
-    const phone = (value ?? "").replace(/\s/g, "");
-    return phone ? `tel:${phone}` : "";
-  };
-  const formatMailHref = (value: string) => {
-    const email = (value ?? "").trim();
-    return email ? `mailto:${email}` : "";
-  };
 
   const waInquiryHref = buildWhatsAppHref("حابب استفسر ❤️", contactInfo.whatsappNumber);
   const formatWhatsAppHref = (value: string) => {
@@ -148,9 +140,6 @@ export default function Footer() {
                 placeholder="https://instagram.com/..."
                 ariaLabel="Instagram"
                 linkClassName="social-orb"
-                className="gap-1"
-                showEditButton
-                editButtonClassName="w-7 h-7 p-0"
               >
                 <Instagram size={18} />
               </EditableLinkIcon>
@@ -162,9 +151,6 @@ export default function Footer() {
                 placeholder="https://facebook.com/..."
                 ariaLabel="Facebook"
                 linkClassName="social-orb"
-                className="gap-1"
-                showEditButton
-                editButtonClassName="w-7 h-7 p-0"
               >
                 <Facebook size={18} />
               </EditableLinkIcon>
@@ -177,9 +163,6 @@ export default function Footer() {
                 ariaLabel="WhatsApp"
                 formatHref={formatWhatsAppHref}
                 linkClassName="social-orb social-orb--wa"
-                className="gap-1"
-                showEditButton
-                editButtonClassName="w-7 h-7 p-0"
               >
                 <WhatsAppIcon size={18} />
               </EditableLinkIcon>
@@ -262,159 +245,104 @@ export default function Footer() {
 
             <div className="space-y-3">
               {telHref ? (
-                <div className="relative">
-                  <a
-                    href={telHref}
-                    className="premium-border w-full px-4 py-4 border border-white/10 bg-black/10 hover:border-primary/35 transition-colors flex items-center justify-between tap-target"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 border border-white/10 bg-black/15 flex items-center justify-center text-primary">
-                        <Phone size={20} />
+                <a
+                  href={telHref}
+                  className="premium-border w-full px-4 py-4 border border-white/10 bg-black/10 hover:border-primary/35 transition-colors flex items-center justify-between tap-target"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 border border-white/10 bg-black/15 flex items-center justify-center text-primary">
+                      <Phone size={20} />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold">
+                        <EditableText
+                          value={contentMap.footer_contact_call_label}
+                          fallback="مكالمة"
+                          fieldKey="footer_contact_call_label"
+                          category="footer"
+                          label="عنوان المكالمة"
+                        />
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold">
-                          <EditableText
-                            value={contentMap.footer_contact_call_label}
-                            fallback="مكالمة"
-                            fieldKey="footer_contact_call_label"
-                            category="footer"
-                            label="عنوان المكالمة"
-                          />
-                        </div>
-                        <div className="text-xs text-muted-foreground dir-ltr">
-                          <EditableContactText
-                            value={contactInfo.phone}
-                            fallback=""
-                            fieldKey="phone"
-                            label="رقم الهاتف"
-                          />
-                        </div>
+                      <div className="text-xs text-muted-foreground dir-ltr">
+                        <EditableContactText
+                          value={contactInfo.phone}
+                          fallback=""
+                          fieldKey="phone"
+                          label="رقم الهاتف"
+                        />
                       </div>
                     </div>
-                    <ArrowLeft className="w-4 h-4 text-foreground/50" />
-                  </a>
-                  <EditableLinkIcon
-                    value={contactInfo.phone}
-                    fieldKey="phone"
-                    label="رقم الهاتف"
-                    placeholder="01xxxxxxxxx"
-                    ariaLabel="Edit phone"
-                    formatHref={formatTelHref}
-                    linkClassName="sr-only"
-                    showEditButton
-                    hideWhenDisabled
-                    className="absolute left-3 top-3"
-                    editButtonClassName="w-7 h-7 p-0"
-                    target="_self"
-                    rel="noreferrer"
-                  >
-                    <span className="sr-only">تعديل رقم الهاتف</span>
-                  </EditableLinkIcon>
-                </div>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-foreground/50" />
+                </a>
               ) : null}
 
               {waInquiryHref ? (
-                <div className="relative">
-                  <a
-                    href={waInquiryHref}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="premium-border w-full px-4 py-4 border border-white/10 bg-black/10 hover:border-primary/35 transition-colors flex items-center justify-between tap-target"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 border border-white/10 bg-black/15 flex items-center justify-center text-primary">
-                        <WhatsAppIcon size={20} />
+                <a
+                  href={waInquiryHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="premium-border w-full px-4 py-4 border border-white/10 bg-black/10 hover:border-primary/35 transition-colors flex items-center justify-between tap-target"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 border border-white/10 bg-black/15 flex items-center justify-center text-primary">
+                      <WhatsAppIcon size={20} />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold">
+                        <EditableText
+                          value={contentMap.footer_contact_whatsapp_label}
+                          fallback="واتساب"
+                          fieldKey="footer_contact_whatsapp_label"
+                          category="footer"
+                          label="عنوان الواتساب"
+                        />
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold">
-                          <EditableText
-                            value={contentMap.footer_contact_whatsapp_label}
-                            fallback="واتساب"
-                            fieldKey="footer_contact_whatsapp_label"
-                            category="footer"
-                            label="عنوان الواتساب"
-                          />
-                        </div>
-                        <div className="text-xs text-muted-foreground dir-ltr">
-                          <EditableContactText
-                            value={contactInfo.whatsappNumber ?? contactInfo.phone}
-                            fallback=""
-                            fieldKey="whatsapp"
-                            label="رقم الواتساب"
-                          />
-                        </div>
+                      <div className="text-xs text-muted-foreground dir-ltr">
+                        <EditableContactText
+                          value={contactInfo.whatsappNumber ?? contactInfo.phone}
+                          fallback=""
+                          fieldKey="whatsapp"
+                          label="رقم الواتساب"
+                        />
                       </div>
                     </div>
-                    <ArrowLeft className="w-4 h-4 text-foreground/50" />
-                  </a>
-                  <EditableLinkIcon
-                    value={contactInfo.whatsappNumber ?? contactInfo.phone}
-                    fieldKey="whatsapp"
-                    label="رقم الواتساب"
-                    placeholder="2010xxxxxxx"
-                    ariaLabel="Edit whatsapp"
-                    formatHref={formatWhatsAppHref}
-                    linkClassName="sr-only"
-                    showEditButton
-                    hideWhenDisabled
-                    className="absolute left-3 top-3"
-                    editButtonClassName="w-7 h-7 p-0"
-                  >
-                    <span className="sr-only">تعديل رقم الواتساب</span>
-                  </EditableLinkIcon>
-                </div>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-foreground/50" />
+                </a>
               ) : null}
 
               {mailHref ? (
-                <div className="relative">
-                  <a
-                    href={mailHref}
-                    className="premium-border w-full px-4 py-4 border border-white/10 bg-black/10 hover:border-primary/35 transition-colors flex items-center justify-between tap-target"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 border border-white/10 bg-black/15 flex items-center justify-center text-primary">
-                        <Mail size={20} />
+                <a
+                  href={mailHref}
+                  className="premium-border w-full px-4 py-4 border border-white/10 bg-black/10 hover:border-primary/35 transition-colors flex items-center justify-between tap-target"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 border border-white/10 bg-black/15 flex items-center justify-center text-primary">
+                      <Mail size={20} />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold">
+                        <EditableText
+                          value={contentMap.footer_contact_email_label}
+                          fallback="إيميل"
+                          fieldKey="footer_contact_email_label"
+                          category="footer"
+                          label="عنوان الإيميل"
+                        />
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold">
-                          <EditableText
-                            value={contentMap.footer_contact_email_label}
-                            fallback="إيميل"
-                            fieldKey="footer_contact_email_label"
-                            category="footer"
-                            label="عنوان الإيميل"
-                          />
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          <EditableContactText
-                            value={contactInfo.email}
-                            fallback=""
-                            fieldKey="email"
-                            label="البريد الإلكتروني"
-                          />
-                        </div>
+                      <div className="text-xs text-muted-foreground">
+                        <EditableContactText
+                          value={contactInfo.email}
+                          fallback=""
+                          fieldKey="email"
+                          label="البريد الإلكتروني"
+                        />
                       </div>
                     </div>
-                    <ArrowLeft className="w-4 h-4 text-foreground/50" />
-                  </a>
-                  <EditableLinkIcon
-                    value={contactInfo.email}
-                    fieldKey="email"
-                    label="البريد الإلكتروني"
-                    placeholder="name@example.com"
-                    ariaLabel="Edit email"
-                    formatHref={formatMailHref}
-                    linkClassName="sr-only"
-                    showEditButton
-                    hideWhenDisabled
-                    className="absolute left-3 top-3"
-                    editButtonClassName="w-7 h-7 p-0"
-                    target="_self"
-                    rel="noreferrer"
-                  >
-                    <span className="sr-only">تعديل البريد الإلكتروني</span>
-                  </EditableLinkIcon>
-                </div>
+                  </div>
+                  <ArrowLeft className="w-4 h-4 text-foreground/50" />
+                </a>
               ) : null}
 
               {contactInfo.location ? (

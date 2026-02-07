@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +34,7 @@ import {
   KeyRound,
   Undo2,
   Redo2,
+  Pencil,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useEditHistory, type EditAction } from "@/lib/editHistory";
@@ -1332,6 +1333,7 @@ function TestimonialsManager({ onRefresh }: ManagerProps) {
 function ContactManager({ onRefresh }: ManagerProps) {
   const { data: contactInfo, refetch, isLoading } = trpc.contactInfo.getAll.useQuery();
   const { data: content, refetch: refetchContent } = trpc.siteContent.getAll.useQuery();
+  const contactInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const upsertContactMutation = trpc.contactInfo.upsert.useMutation({
     onSuccess: () => {
       toast.success("تم حفظ التغييرات");
@@ -1387,6 +1389,13 @@ function ContactManager({ onRefresh }: ManagerProps) {
       category: "contact",
       label,
     });
+  };
+
+  const focusContactField = (key: string) => {
+    const el = contactInputRefs.current[key];
+    if (!el) return;
+    el.focus();
+    el.select();
   };
 
   const contactFields = [
@@ -1490,7 +1499,18 @@ function ContactManager({ onRefresh }: ManagerProps) {
                 onChange={(e) => setEditingContact({ ...editingContact, [field.key]: e.target.value })}
                 placeholder={field.label}
                 dir="ltr"
+                ref={(el) => {
+                  contactInputRefs.current[field.key] = el;
+                }}
               />
+              <Button
+                size="icon"
+                variant="secondary"
+                onClick={() => focusContactField(field.key)}
+                aria-label={`تعديل ${field.label}`}
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
               <Button
                 size="icon"
                 onClick={() => handleSaveContact(field.key, field.label)}

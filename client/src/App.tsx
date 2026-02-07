@@ -6,7 +6,6 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { useContactData } from "@/hooks/useSiteData";
-import { EditableLinkIcon } from "@/components/InlineEdit";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Portfolio from "./pages/Portfolio";
@@ -57,11 +56,6 @@ function buildWhatsAppHref(text: string, whatsappNumber: string | undefined) {
   return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
 }
 
-const formatWhatsAppHref = (value: string) => {
-  const phone = (value ?? "").replace(/[^\d]/g, "");
-  return phone ? `https://wa.me/${phone}` : "";
-};
-
 function WhatsAppIcon({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -79,26 +73,9 @@ function FloatingWhatsApp() {
   if (!href) return null;
 
   return (
-    <div className="wa-float-wrap">
-      <a href={href} className="wa-float" target="_blank" rel="noreferrer" aria-label="WhatsApp">
-        <WhatsAppIcon size={18} />
-      </a>
-      <EditableLinkIcon
-        value={contactInfo.whatsappNumber}
-        fieldKey="whatsapp"
-        label="رقم واتساب"
-        placeholder="2010xxxxxxx"
-        ariaLabel="Edit WhatsApp"
-        formatHref={formatWhatsAppHref}
-        linkClassName="sr-only"
-        showEditButton
-        hideWhenDisabled
-        className="absolute -left-2 -top-2"
-        editButtonClassName="w-7 h-7 p-0"
-      >
-        <span className="sr-only">تعديل واتساب</span>
-      </EditableLinkIcon>
-    </div>
+    <a href={href} className="wa-float" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+      <WhatsAppIcon size={18} />
+    </a>
   );
 }
 
