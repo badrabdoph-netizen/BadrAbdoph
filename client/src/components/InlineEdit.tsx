@@ -396,6 +396,7 @@ type EditableLinkIconProps = {
   showEditButton?: boolean;
   editButtonClassName?: string;
   hideWhenDisabled?: boolean;
+  allowEdit?: boolean;
   children: ReactNode;
 };
 
@@ -415,6 +416,7 @@ export function EditableLinkIcon({
   showEditButton = false,
   editButtonClassName,
   hideWhenDisabled = false,
+  allowEdit = true,
   children,
 }: EditableLinkIconProps) {
   const { enabled } = useInlineEditMode();
@@ -484,6 +486,8 @@ export function EditableLinkIcon({
     }
   };
 
+  const canEdit = enabled && allowEdit;
+
   if ((!enabled && hideWhenDisabled) || (!enabled && !displayValue)) return null;
 
   const hrefValue = displayValue ? (formatHref ? formatHref(displayValue) : displayValue) : "#";
@@ -499,7 +503,7 @@ export function EditableLinkIcon({
         aria-label={ariaLabel}
         className={linkClassName}
         onClick={(event) => {
-          if (!enabled) return;
+          if (!canEdit) return;
           event.preventDefault();
           event.stopPropagation();
           setIsEditing(true);
@@ -508,13 +512,13 @@ export function EditableLinkIcon({
       >
         {children}
       </a>
-      {enabled && !showEditButton && (
+      {canEdit && !showEditButton && (
         <span className="absolute -top-2 -right-2 flex items-center gap-1 rounded-full border border-white/20 bg-black/60 px-2 py-0.5 text-[10px] text-white opacity-0 transition group-hover:opacity-100">
           <Pencil className="w-3 h-3" />
           تعديل
         </span>
       )}
-      {enabled && showEditButton && (
+      {canEdit && showEditButton && (
         <button
           type="button"
           onClick={(event) => {
@@ -533,7 +537,7 @@ export function EditableLinkIcon({
         </button>
       )}
 
-      {enabled && isEditing && (
+      {canEdit && isEditing && (
         <div className="absolute top-full right-0 mt-2 z-30 w-64 rounded-xl border border-white/15 bg-background p-3 text-right shadow-xl">
           <div className="text-xs font-semibold mb-2">{label}</div>
           <Input
