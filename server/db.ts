@@ -22,6 +22,12 @@ import {
   InsertShareLink,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import {
+  createLocalShareLink,
+  getLocalShareLinkByCode,
+  listLocalShareLinks,
+  revokeLocalShareLink,
+} from "./_core/shareLinkStore";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 let _pool: mysql.Pool | null = null;
@@ -187,9 +193,19 @@ export async function deleteSiteImage(key: string) {
 // Share Links Functions
 // ============================================
 
-export async function createShareLinkRecord(data: InsertShareLink) {
+type ShareLinkRecord = {
+  code: string;
+  note: string | null;
+  expiresAt: Date;
+  createdAt: Date;
+  revokedAt: Date | null;
+};
+
+export async function createShareLinkRecord(data: InsertShareLink): Promise<ShareLinkRecord | null> {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) {
+    return await createLocalShareLink(data);
+  }
 
   await db.insert(shareLinks).values(data).onDuplicateKeyUpdate({
     set: {
@@ -202,22 +218,28 @@ export async function createShareLinkRecord(data: InsertShareLink) {
   return await getShareLinkByCode(data.code);
 }
 
-export async function getShareLinkByCode(code: string) {
+export async function getShareLinkByCode(code: string): Promise<ShareLinkRecord | null> {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) {
+    return await getLocalShareLinkByCode(code);
+  }
   const result = await db.select().from(shareLinks).where(eq(shareLinks.code, code)).limit(1);
   return result.length > 0 ? result[0] : null;
 }
 
-export async function listShareLinks() {
+export async function listShareLinks(): Promise<ShareLinkRecord[]> {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    return await listLocalShareLinks();
+  }
   return await db.select().from(shareLinks).orderBy(desc(shareLinks.createdAt));
 }
 
 export async function revokeShareLink(code: string) {
   const db = await getDb();
-  if (!db) return false;
+  if (!db) {
+    return await revokeLocalShareLink(code);
+  }
   const now = new Date();
   await db.update(shareLinks).set({ revokedAt: now }).where(eq(shareLinks.code, code));
   return true;

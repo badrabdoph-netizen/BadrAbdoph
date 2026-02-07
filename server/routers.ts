@@ -156,14 +156,6 @@ export const appRouter = router({
           };
         }
 
-        const dbConn = await db.getDb();
-        if (!dbConn) {
-          return {
-            valid: result.valid,
-            expiresAt: result.expiresAt ? result.expiresAt.toISOString() : null,
-          };
-        }
-
         const record = await db.getShareLinkByCode(input.code);
         if (!record) {
           return {

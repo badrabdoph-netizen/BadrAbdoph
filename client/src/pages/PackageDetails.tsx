@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Facebook, Instagram, MessageCircle, Phone, Sparkles } from "lucide-react";
+import { Facebook, Instagram, MessageCircle, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { EditableText } from "@/components/InlineEdit";
@@ -40,48 +40,29 @@ export default function PackageDetails() {
   const content = useContentData();
   const contentMap = content.contentMap ?? {};
 
-  const phone = (contactInfo.phone ?? "").replace(/\s/g, "");
   const whatsapp = (contactInfo.whatsappNumber ?? "").replace(/[^\d]/g, "");
   const whatsappHref = whatsapp ? `https://wa.me/${whatsapp}` : "";
-  const telHref = phone ? `tel:${phone}` : "";
 
   const options = [
     {
+      fallback: "احجز ازاي",
       key: "package_help_option_1",
-      fallback: "عايز استفسر عن حاجه كمان",
-      href: "/contact",
+      icon: Sparkles,
+    },
+    {
+      fallback: "عايز استفسر عن حاجه كمان 💁‍♂️",
+      key: "package_help_option_2",
       icon: MessageCircle,
     },
     {
-      key: "package_help_option_2",
-      fallback: "احجز ازاي",
-      href: "/contact",
-      icon: Sparkles,
-    },
-    {
+      fallback: "هل اليوم بتاعي هيكون متاح ؟ 🙏",
       key: "package_help_option_3",
-      fallback: "بنفع احجز دلوقتي لمده طويله قدام",
-      href: "/contact",
       icon: Sparkles,
     },
     {
+      fallback: "عايز اشوف شكل الالبومات ❤️",
       key: "package_help_option_4",
-      fallback: "عايز اتواصل معاك بشكل مباشر",
-      href: telHref || "/contact",
-      icon: Phone,
-      external: Boolean(telHref),
-    },
-    {
-      key: "package_help_option_5",
-      fallback: "واتسابك",
-      href: whatsappHref || "/contact",
-      icon: WhatsAppIcon,
-      external: Boolean(whatsappHref),
-    },
-    {
-      key: "package_help_option_6",
-      fallback: "عايز اشوف شكل الالبومات وغيره",
-      href: "/portfolio",
+      href: "/contact",
       icon: Sparkles,
     },
   ];
@@ -159,7 +140,12 @@ export default function PackageDetails() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {options.map((option) => {
               const Icon = option.icon as any;
-              const isExternal = option.external || option.href?.startsWith("http");
+              const optionText = contentMap[option.key] || option.fallback;
+              const message = encodeURIComponent(optionText);
+              const optionHref = whatsappHref
+                ? `${whatsappHref}?text=${message}`
+                : "/contact";
+              const isExternal = whatsappHref.length > 0;
               const contentNode = (
                 <>
                   <div className="w-12 h-12 rounded-full border border-white/10 bg-black/20 flex items-center justify-center text-primary">
@@ -180,9 +166,9 @@ export default function PackageDetails() {
                 </>
               );
 
-              if (option.href?.startsWith("/") && !isExternal) {
+              if (optionHref.startsWith("/") && !isExternal) {
                 return (
-                  <Link key={option.key} href={option.href}>
+                  <Link key={option.key} href={optionHref}>
                     <a className="premium-border border border-white/10 bg-card/50 p-5 flex items-center justify-between gap-4 hover:border-primary/40 hover:bg-primary/5 transition-colors">
                       {contentNode}
                     </a>
@@ -193,7 +179,7 @@ export default function PackageDetails() {
               return (
                 <a
                   key={option.key}
-                  href={option.href}
+                  href={optionHref}
                   target={isExternal ? "_blank" : undefined}
                   rel={isExternal ? "noreferrer" : undefined}
                   className="premium-border border border-white/10 bg-card/50 p-5 flex items-center justify-between gap-4 hover:border-primary/40 hover:bg-primary/5 transition-colors"
@@ -206,7 +192,7 @@ export default function PackageDetails() {
 
           {socials.length > 0 && (
             <div className="mt-10">
-              <div className="text-center mb-6 text-sm text-muted-foreground">
+              <div className="text-center mb-6 text-sm text-muted-foreground hero-follow-title">
                 <EditableText
                   value={contentMap.package_help_socials_title}
                   fallback="تواصل معنا عبر السوشيال"
@@ -215,9 +201,17 @@ export default function PackageDetails() {
                   label="عنوان السوشيال في صفحة تفاصيل الباقات"
                 />
               </div>
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="hero-follow-icons">
                 {socials.map((social) => {
                   const Icon = social.icon as any;
+                  const className =
+                    social.key === "instagram"
+                      ? "hero-social-btn hero-social--ig"
+                      : social.key === "facebook"
+                        ? "hero-social-btn hero-social--fb"
+                        : social.key === "tiktok"
+                          ? "hero-social-btn hero-social--tt"
+                          : "hero-social-btn hero-social--wa";
                   return (
                     <a
                       key={social.key}
@@ -225,17 +219,112 @@ export default function PackageDetails() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={social.label}
-                      className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-white/15 bg-black/20 flex items-center justify-center text-foreground hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all shadow-[0_16px_36px_rgba(0,0,0,0.35)]"
+                      className={className}
                     >
                       <Icon size={26} />
                     </a>
                   );
                 })}
               </div>
+              <div className="hero-follow-glow" aria-hidden="true" />
             </div>
           )}
         </div>
       </section>
+
+      <style>{`
+        .hero-follow-title::after {
+          content: "";
+          width: 54px;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(255,200,80,0.8), transparent);
+          display: block;
+          margin: 10px auto 0;
+          box-shadow: 0 0 12px rgba(255,200,80,0.35);
+        }
+        .hero-follow-icons {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 14px;
+          flex-wrap: wrap;
+        }
+        .hero-follow-glow {
+          width: min(220px, 60vw);
+          height: 18px;
+          margin: 14px auto 0;
+          background: radial-gradient(circle, rgba(255,210,130,0.45), transparent 70%);
+          filter: blur(8px);
+          opacity: 0.75;
+          animation: glow-pulse 4.2s ease-in-out infinite;
+        }
+        .hero-social-btn {
+          width: 58px;
+          height: 58px;
+          border-radius: 18px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(255,255,255,0.16);
+          background: rgba(9,9,12,0.55);
+          color: #f6ddb0;
+          box-shadow: 0 18px 45px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.05);
+          transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .hero-social-btn::before {
+          content: "";
+          position: absolute;
+          inset: -35% -25%;
+          background: radial-gradient(circle, rgba(255,220,160,0.35), transparent 65%);
+          opacity: 0.35;
+          pointer-events: none;
+        }
+        .hero-social-btn::after {
+          content: "";
+          position: absolute;
+          inset: -40% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 48%, transparent 70%);
+          transform: translateX(-120%);
+          animation: social-shine 4.8s ease-in-out infinite;
+          opacity: 0.35;
+          pointer-events: none;
+        }
+        .hero-social-btn:hover {
+          transform: translateY(-3px) scale(1.03);
+          border-color: rgba(255,200,80,0.45);
+          box-shadow: 0 22px 60px rgba(0,0,0,0.6), 0 0 22px rgba(255,200,80,0.22);
+        }
+        .hero-social--ig,
+        .hero-social--fb,
+        .hero-social--tt,
+        .hero-social--wa {
+          background: radial-gradient(circle at 30% 20%, rgba(255,210,120,0.18), rgba(10,10,14,0.9));
+          color: #f7e4bf;
+          border-color: rgba(255,210,120,0.35);
+        }
+        @media (max-width: 640px) {
+          .hero-social-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+          }
+        }
+        @keyframes social-shine {
+          0% { transform: translateX(-120%); }
+          70% { transform: translateX(120%); }
+          100% { transform: translateX(120%); }
+        }
+        @keyframes glow-pulse {
+          0%, 100% { opacity: 0.55; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.15); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-follow-glow,
+          .hero-social-btn::after { animation: none !important; }
+        }
+      `}</style>
 
       <Footer />
     </div>

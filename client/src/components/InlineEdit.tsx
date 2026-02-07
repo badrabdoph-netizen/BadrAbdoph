@@ -3,15 +3,94 @@ import { trpc } from "@/lib/trpc";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Check, Loader2, Pencil, X, Image as ImageIcon, Upload } from "lucide-react";
 import { pushEdit } from "@/lib/editHistory";
 
-const confirmInlineSave = (message = "هل تريد حفظ التعديل؟") => {
-  if (typeof window === "undefined") return true;
-  return window.confirm(message);
+type ConfirmState = {
+  open: boolean;
+  title: string;
+  description?: string;
+  confirmLabel: string;
+  cancelLabel: string;
+  onConfirm?: () => void;
 };
+
+function useInlineConfirm() {
+  const [state, setState] = useState<ConfirmState>({
+    open: false,
+    title: "تأكيد الحفظ",
+    description: "هل تريد حفظ التعديل الآن؟",
+    confirmLabel: "حفظ",
+    cancelLabel: "إلغاء",
+  });
+
+  const requestConfirm = (options: {
+    title?: string;
+    description?: string;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    onConfirm: () => void;
+  }) => {
+    setState({
+      open: true,
+      title: options.title ?? "تأكيد الحفظ",
+      description: options.description ?? "هل تريد حفظ التعديل الآن؟",
+      confirmLabel: options.confirmLabel ?? "حفظ",
+      cancelLabel: options.cancelLabel ?? "إلغاء",
+      onConfirm: options.onConfirm,
+    });
+  };
+
+  const closeDialog = () => {
+    setState((prev) => ({ ...prev, open: false, onConfirm: undefined }));
+  };
+
+  const ConfirmDialog = () => (
+    <AlertDialog
+      open={state.open}
+      onOpenChange={(open) => {
+        if (!open) {
+          closeDialog();
+        }
+      }}
+    >
+      <AlertDialogContent dir="rtl" className="text-right">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{state.title}</AlertDialogTitle>
+          {state.description ? (
+            <AlertDialogDescription>{state.description}</AlertDialogDescription>
+          ) : null}
+        </AlertDialogHeader>
+        <AlertDialogFooter className="sm:justify-start">
+          <AlertDialogCancel>{state.cancelLabel}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              const action = state.onConfirm;
+              closeDialog();
+              action?.();
+            }}
+          >
+            {state.confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+
+  return { requestConfirm, ConfirmDialog };
+}
 
 type EditableTextProps = {
   value?: string | null;
