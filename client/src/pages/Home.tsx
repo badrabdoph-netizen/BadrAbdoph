@@ -79,7 +79,7 @@ function CoupleIcon({ className }: { className?: string }) {
 
 function StarsRow() {
   return (
-    <div className="flex items-center gap-1 text-primary">
+    <div className="flex items-center gap-1 text-primary testimonial-stars">
       <Star className="w-4 h-4" />
       <Star className="w-4 h-4" />
       <Star className="w-4 h-4" />
@@ -1383,6 +1383,10 @@ export default function Home() {
         .testimonials-glow {
           color: rgba(255,255,255,0.85);
           text-shadow: 0 0 14px rgba(255,210,130,0.45), 0 0 30px rgba(255,210,130,0.25);
+        }
+        .testimonial-stars {
+          text-shadow: 0 0 12px rgba(255,210,130,0.65), 0 0 24px rgba(255,210,130,0.35);
+          filter: drop-shadow(0 8px 16px rgba(255,200,80,0.35));
         }
         .testimonial-card {
           position: relative;
