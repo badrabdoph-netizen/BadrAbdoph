@@ -506,7 +506,7 @@ export default function Home() {
               <Link href="/services">
                 <Button
                   variant="outline"
-                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none px-12 py-5 text-lg cta-glow"
+                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-none cta-glow cta-size"
                 >
                   <EditableText
                     value={getValue("home_services_button")}
@@ -649,7 +649,7 @@ export default function Home() {
                         <Button
                           variant={featured ? "default" : "outline"}
                           className={[
-                            "rounded-none px-7 cta-glow",
+                            "rounded-none cta-glow",
                             featured
                               ? "bg-primary text-primary-foreground hover:bg-primary/90"
                               : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
@@ -860,7 +860,7 @@ export default function Home() {
 
           <a
             href={externalPortfolioUrl}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none px-10 py-4 inline-flex items-center gap-2 cta-glow"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none inline-flex items-center gap-2 cta-glow cta-size"
             target="_blank"
             rel="noreferrer"
           >
