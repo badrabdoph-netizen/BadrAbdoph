@@ -41,6 +41,8 @@ export const appRouter = router({
       return {
         authenticated: ctx.adminAccess,
         expiresAt: ctx.adminExpiresAt ? ctx.adminExpiresAt.toISOString() : null,
+        loginDisabled: ENV.adminLoginDisabled,
+        envIssues: ENV.adminEnvIssues,
       };
     }),
     login: publicProcedure
@@ -51,12 +53,6 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ENV.adminLoginDisabled) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "تسجيل دخول الأدمن متوقف مؤقتًا. اضبط ADMIN_USER/ADMIN_PASS/JWT_SECRET.",
-          });
-        }
         if (ENV.adminRequireHttps && !isRequestSecure(ctx.req)) {
           throw new TRPCError({
             code: "FORBIDDEN",

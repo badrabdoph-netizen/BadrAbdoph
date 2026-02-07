@@ -69,6 +69,8 @@ export default function Admin() {
     return (
       <AdminLogin
         isLoading={loginMutation.isPending}
+        loginDisabled={statusQuery.data?.loginDisabled}
+        envIssues={statusQuery.data?.envIssues}
         onSubmit={(username, password) => {
           loginMutation.mutate({ username, password });
         }}
@@ -135,13 +137,19 @@ function AdminDashboard({
 function AdminLogin({
   onSubmit,
   isLoading,
+  loginDisabled,
+  envIssues,
 }: {
   onSubmit: (username: string, password: string) => void;
   isLoading: boolean;
+  loginDisabled?: boolean;
+  envIssues?: string[];
 }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showEnvDetails, setShowEnvDetails] = useState(false);
   const canSubmit = username.trim().length > 0 && password.length > 0;
+  const showLockNotice = Boolean(loginDisabled);
 
   return (
     <div
@@ -204,6 +212,48 @@ function AdminLogin({
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {showLockNotice && (
+                <div className="mb-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-semibold text-destructive">
+                      تسجيل الأدمن متوقف مؤقتًا
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => setShowEnvDetails((prev) => !prev)}
+                    >
+                      {showEnvDetails ? "إخفاء التفاصيل" : "عرض التفاصيل"}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                    لازم تضبط متغيرات البيئة في السيرفر علشان صفحة الأدمن تفتح.
+                  </p>
+                  {showEnvDetails && (
+                    <div className="mt-3 space-y-2 text-xs text-muted-foreground">
+                      <div className="font-semibold text-foreground/80">النواقص الحالية:</div>
+                      <ul className="list-disc pr-4 space-y-1">
+                        {(envIssues?.length ? envIssues : ["ADMIN_USER/ADMIN_PASS", "JWT_SECRET"]).map((issue) => (
+                          <li key={issue}>{issue}</li>
+                        ))}
+                      </ul>
+                      <div className="font-semibold text-foreground/80">المطلوب ضبطه:</div>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="rounded-md border border-border/60 bg-background/60 px-2 py-1">
+                          ADMIN_USER
+                        </span>
+                        <span className="rounded-md border border-border/60 bg-background/60 px-2 py-1">
+                          ADMIN_PASS
+                        </span>
+                        <span className="rounded-md border border-border/60 bg-background/60 px-2 py-1">
+                          JWT_SECRET
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               <form
                 className="space-y-4"
                 onSubmit={(event) => {
@@ -236,7 +286,7 @@ function AdminLogin({
                 <Button
                   className="w-full"
                   type="submit"
-                  disabled={!canSubmit || isLoading}
+                  disabled={!canSubmit || isLoading || showLockNotice}
                 >
                   {isLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin ml-2" />

@@ -31,10 +31,10 @@ if (isProduction) {
   }
 }
 
-const adminLoginDisabled = adminEnvIssues.length > 0;
-if (adminLoginDisabled) {
+const adminLoginDisabled = false;
+if (adminEnvIssues.length > 0) {
   console.warn(
-    `[Admin] تم تعطيل تسجيل دخول الأدمن لعدم اكتمال الإعدادات: ${adminEnvIssues.join(", ")}`
+    `[Admin] تحذير إعدادات: ${adminEnvIssues.join(", ")}`
   );
 }
 
