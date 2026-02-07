@@ -1671,43 +1671,11 @@ function SectionsManager({ onRefresh }: ManagerProps) {
 // ============================================
 type ShareLinkItem = {
   code: string;
-  url: string;
   expiresAt: string;
   createdAt: string;
   note?: string | null;
+  revokedAt?: string | null;
 };
-
-const SHARE_LINKS_STORAGE_KEY = "badr_share_links_cache";
-
-function loadCachedShareLinks(): ShareLinkItem[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(SHARE_LINKS_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as Array<ShareLinkItem & { token?: string }>;
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .map((item) => ({
-        code: item.code ?? item.token ?? "",
-        url: item.url,
-        expiresAt: item.expiresAt,
-        createdAt: item.createdAt,
-        note: item.note ?? null,
-      }))
-      .filter((item) => item.code && item.url);
-  } catch {
-    return [];
-  }
-}
-
-function persistShareLinks(links: ShareLinkItem[]) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(SHARE_LINKS_STORAGE_KEY, JSON.stringify(links));
-  } catch {
-    // ignore storage errors
-  }
-}
 
 function formatShareDate(value: string) {
   const date = new Date(value);
@@ -1719,29 +1687,25 @@ function formatShareDate(value: string) {
 }
 
 function ShareLinksManager({ onRefresh }: ManagerProps) {
+  const utils = trpc.useUtils();
   const [ttlHours, setTtlHours] = useState(24);
   const [note, setNote] = useState("");
-  const [links, setLinks] = useState<ShareLinkItem[]>(() => loadCachedShareLinks());
-
-  useEffect(() => {
-    persistShareLinks(links);
-  }, [links]);
+  const { data: links = [], isLoading } = trpc.shareLinks.list.useQuery();
 
   const createMutation = trpc.shareLinks.create.useMutation({
     onSuccess: (data) => {
-      const origin = window.location.origin;
-      const url = `${origin}/s/${data.code}`;
-      const item: ShareLinkItem = {
-        code: data.code,
-        url,
-        expiresAt: data.expiresAt,
-        createdAt: new Date().toISOString(),
-        note: data.note ?? (note.trim() || null),
-      };
-
-      setLinks(prev => [item, ...prev].slice(0, 12));
       setNote("");
       toast.success("تم إنشاء الرابط المؤقت");
+      utils.shareLinks.list.invalidate();
+      onRefresh?.();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const revokeMutation = trpc.shareLinks.revoke.useMutation({
+    onSuccess: () => {
+      toast.success("تم تعطيل الرابط");
+      utils.shareLinks.list.invalidate();
       onRefresh?.();
     },
     onError: (error) => toast.error(error.message),
@@ -1765,7 +1729,7 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
   };
 
   const handleRemove = (code: string) => {
-    setLinks(prev => prev.filter(link => link.code !== code));
+    revokeMutation.mutate({ code });
   };
 
   const now = Date.now();
@@ -1852,10 +1816,15 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
             الروابط التي أنشأتها
           </CardTitle>
           <CardDescription>
-            هذه القائمة محفوظة على المتصفح الحالي فقط.
+            هذه القائمة محفوظة على السيرفر ويمكن التحكم بها من أي جهاز.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          {isLoading && (
+            <div className="flex justify-center py-6">
+              <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+          )}
           {sortedLinks.length === 0 && (
             <div className="text-sm text-muted-foreground">
               لم يتم إنشاء أي روابط بعد.
@@ -1867,6 +1836,9 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
             const isExpired = Number.isNaN(expiresAtMs)
               ? false
               : expiresAtMs <= now;
+            const isRevoked = Boolean(link.revokedAt);
+            const origin = typeof window !== "undefined" ? window.location.origin : "";
+            const url = `${origin}/s/${link.code}`;
 
             return (
               <div
@@ -1875,8 +1847,8 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
               >
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant={isExpired ? "destructive" : "secondary"}>
-                      {isExpired ? "منتهي" : "ساري"}
+                    <Badge variant={isRevoked || isExpired ? "destructive" : "secondary"}>
+                      {isRevoked ? "ملغي" : isExpired ? "منتهي" : "ساري"}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       ينتهي في {formatShareDate(link.expiresAt)}
@@ -1888,14 +1860,15 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
                     </div>
                   )}
                   <div className="text-xs text-muted-foreground dir-ltr break-all">
-                    {link.url}
+                    {url}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
                     variant="secondary"
-                    onClick={() => handleCopy(link.url)}
+                    onClick={() => handleCopy(url)}
+                    disabled={isRevoked}
                   >
                     <Copy className="w-4 h-4 ml-2" />
                     نسخ
@@ -1904,9 +1877,10 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
                     size="sm"
                     variant="outline"
                     onClick={() => handleRemove(link.code)}
+                    disabled={revokeMutation.isPending || isRevoked}
                   >
                     <Trash2 className="w-4 h-4 ml-2" />
-                    حذف
+                    تعطيل
                   </Button>
                 </div>
               </div>

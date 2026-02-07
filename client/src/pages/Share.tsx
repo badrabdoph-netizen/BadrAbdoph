@@ -29,11 +29,11 @@ function SiteRoutes() {
 export default function Share({ token, code }: ShareProps) {
   const shortQuery = trpc.shareLinks.validateShort.useQuery(
     { code: code ?? "" },
-    { enabled: Boolean(code), staleTime: 60_000, refetchOnWindowFocus: false }
+    { enabled: Boolean(code), staleTime: 0, refetchOnWindowFocus: true }
   );
   const tokenQuery = trpc.shareLinks.validate.useQuery(
     { token: token ?? "" },
-    { enabled: !code && Boolean(token), staleTime: 60_000, refetchOnWindowFocus: false }
+    { enabled: !code && Boolean(token), staleTime: 0, refetchOnWindowFocus: true }
   );
 
   const data = code ? shortQuery.data : tokenQuery.data;

@@ -142,3 +142,19 @@ export const contactInfo = mysqlTable("contact_info", {
 
 export type ContactInfo = typeof contactInfo.$inferSelect;
 export type InsertContactInfo = typeof contactInfo.$inferInsert;
+
+/**
+ * Share links table - stores temporary share links for admin
+ */
+export const shareLinks = mysqlTable("share_links", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 120 }).notNull().unique(),
+  note: text("note"),
+  expiresAt: timestamp("expiresAt").notNull(),
+  revokedAt: timestamp("revokedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ShareLink = typeof shareLinks.$inferSelect;
+export type InsertShareLink = typeof shareLinks.$inferInsert;

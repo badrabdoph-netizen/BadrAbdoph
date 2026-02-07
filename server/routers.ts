@@ -94,6 +94,16 @@ export const appRouter = router({
 
   // Temporary Share Links
   shareLinks: router({
+    list: adminProcedure.query(async () => {
+      const links = await db.listShareLinks();
+      return links.map((link) => ({
+        code: link.code,
+        note: link.note ?? null,
+        expiresAt: link.expiresAt.toISOString(),
+        createdAt: link.createdAt.toISOString(),
+        revokedAt: link.revokedAt ? link.revokedAt.toISOString() : null,
+      }));
+    }),
     create: adminProcedure
       .input(
         z.object({
@@ -105,11 +115,23 @@ export const appRouter = router({
         const expiresInMs = input.ttlHours * 60 * 60 * 1000;
         const { code, expiresAt } = createShortShareCode(expiresInMs);
 
+        await db.createShareLinkRecord({
+          code,
+          note: input.note ?? null,
+          expiresAt,
+        });
+
         return {
           code,
           expiresAt: expiresAt.toISOString(),
           note: input.note ?? null,
         };
+      }),
+    revoke: adminProcedure
+      .input(z.object({ code: z.string().min(8) }))
+      .mutation(async ({ input }) => {
+        await db.revokeShareLink(input.code);
+        return { success: true };
       }),
     validate: publicProcedure
       .input(z.object({ token: z.string().min(10) }))
@@ -125,10 +147,46 @@ export const appRouter = router({
       .input(z.object({ code: z.string().min(8) }))
       .query(async ({ input }) => {
         const result = verifyShortShareCode(input.code);
+        if (!result.valid) {
+          return {
+            valid: false,
+            expiresAt: result.expiresAt ? result.expiresAt.toISOString() : null,
+          };
+        }
+
+        const dbConn = await db.getDb();
+        if (!dbConn) {
+          return {
+            valid: result.valid,
+            expiresAt: result.expiresAt ? result.expiresAt.toISOString() : null,
+          };
+        }
+
+        const record = await db.getShareLinkByCode(input.code);
+        if (!record) {
+          return {
+            valid: false,
+            expiresAt: result.expiresAt ? result.expiresAt.toISOString() : null,
+          };
+        }
+
+        if (record.revokedAt) {
+          return {
+            valid: false,
+            expiresAt: record.expiresAt?.toISOString() ?? null,
+          };
+        }
+
+        if (record.expiresAt && record.expiresAt.getTime() <= Date.now()) {
+          return {
+            valid: false,
+            expiresAt: record.expiresAt.toISOString(),
+          };
+        }
 
         return {
-          valid: result.valid,
-          expiresAt: result.expiresAt ? result.expiresAt.toISOString() : null,
+          valid: true,
+          expiresAt: record.expiresAt?.toISOString() ?? result.expiresAt?.toISOString() ?? null,
         };
       }),
   }),

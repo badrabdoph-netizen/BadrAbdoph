@@ -1,4 +1,4 @@
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -10,6 +10,7 @@ import {
   packages, 
   testimonials, 
   contactInfo,
+  shareLinks,
   InsertSiteContent,
   InsertSiteImage,
   InsertPortfolioImage,
@@ -17,6 +18,7 @@ import {
   InsertPackage,
   InsertTestimonial,
   InsertContactInfo,
+  InsertShareLink,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -173,6 +175,46 @@ export async function deleteSiteImage(key: string) {
   const db = await getDb();
   if (!db) return false;
   await db.delete(siteImages).where(eq(siteImages.key, key));
+  return true;
+}
+
+// ============================================
+// Share Links Functions
+// ============================================
+
+export async function createShareLinkRecord(data: InsertShareLink) {
+  const db = await getDb();
+  if (!db) return null;
+
+  await db.insert(shareLinks).values(data).onDuplicateKeyUpdate({
+    set: {
+      note: data.note,
+      expiresAt: data.expiresAt,
+      revokedAt: data.revokedAt ?? null,
+    },
+  });
+
+  return await getShareLinkByCode(data.code);
+}
+
+export async function getShareLinkByCode(code: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(shareLinks).where(eq(shareLinks.code, code)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function listShareLinks() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(shareLinks).orderBy(desc(shareLinks.createdAt));
+}
+
+export async function revokeShareLink(code: string) {
+  const db = await getDb();
+  if (!db) return false;
+  const now = new Date();
+  await db.update(shareLinks).set({ revokedAt: now }).where(eq(shareLinks.code, code));
   return true;
 }
 
