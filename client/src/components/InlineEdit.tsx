@@ -24,12 +24,30 @@ type EditableTextProps = {
 };
 
 export function useInlineEditMode() {
-  const [isPreview, setIsPreview] = useState(false);
+  const [isPreview, setIsPreview] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const params = new URLSearchParams(window.location.search);
+    const hasPreviewParam = params.get("adminPreview") === "1";
+    const storageKey = "adminPreviewMode";
+    if (hasPreviewParam) {
+      window.sessionStorage.setItem(storageKey, "1");
+      return true;
+    }
+    return window.sessionStorage.getItem(storageKey) === "1";
+  });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const storageKey = "adminPreviewMode";
     const params = new URLSearchParams(window.location.search);
-    setIsPreview(params.get("adminPreview") === "1");
+    const hasPreviewParam = params.get("adminPreview") === "1";
+    if (hasPreviewParam) {
+      window.sessionStorage.setItem(storageKey, "1");
+      setIsPreview(true);
+      return;
+    }
+    const stored = window.sessionStorage.getItem(storageKey) === "1";
+    setIsPreview(stored);
   }, []);
 
   const statusQuery = trpc.adminAccess.status.useQuery(undefined, {
