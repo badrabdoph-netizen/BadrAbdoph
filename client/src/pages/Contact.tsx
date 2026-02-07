@@ -296,7 +296,7 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="py-16 pb-24 md:pb-28">
+      <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
             {/* Form FIRST on mobile */}
@@ -774,14 +774,14 @@ export default function Contact() {
                     label="عنوان تابعنا"
                   />
                 </h2>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <EditableLinkIcon
                     value={socialLinks.instagram}
                     fieldKey="instagram"
                     label="رابط إنستجرام"
                     placeholder="https://instagram.com/..."
                     ariaLabel="Instagram"
-                    linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    linkClassName="hero-social-btn hero-social--ig"
                     allowEdit={false}
                   >
                     <Instagram size={22} />
@@ -792,7 +792,7 @@ export default function Contact() {
                     label="رابط فيسبوك"
                     placeholder="https://facebook.com/..."
                     ariaLabel="Facebook"
-                    linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    linkClassName="hero-social-btn hero-social--fb"
                     allowEdit={false}
                   >
                     <Facebook size={22} />
@@ -803,7 +803,7 @@ export default function Contact() {
                     label="رابط تيك توك"
                     placeholder="https://tiktok.com/..."
                     ariaLabel="TikTok"
-                    linkClassName="w-14 h-14 bg-black/15 border border-white/10 flex items-center justify-center text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all duration-300"
+                    linkClassName="hero-social-btn hero-social--tt"
                     allowEdit={false}
                   >
                     <svg
@@ -849,6 +849,67 @@ export default function Contact() {
       </a>
 
       <style>{`
+        .hero-social-btn {
+          width: 58px;
+          height: 58px;
+          border-radius: 18px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(255,255,255,0.16);
+          background: rgba(9,9,12,0.55);
+          color: #f6ddb0;
+          box-shadow: 0 18px 45px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.05);
+          transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .hero-social-btn::before {
+          content: "";
+          position: absolute;
+          inset: -35% -25%;
+          background: radial-gradient(circle, rgba(255,220,160,0.35), transparent 65%);
+          opacity: 0.35;
+          pointer-events: none;
+        }
+        .hero-social-btn::after {
+          content: "";
+          position: absolute;
+          inset: -40% -10%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 48%, transparent 70%);
+          transform: translateX(-120%);
+          animation: social-shine 4.8s ease-in-out infinite;
+          opacity: 0.35;
+          pointer-events: none;
+        }
+        .hero-social-btn:hover {
+          transform: translateY(-3px) scale(1.03);
+          border-color: rgba(255,200,80,0.45);
+          box-shadow: 0 22px 60px rgba(0,0,0,0.6), 0 0 22px rgba(255,200,80,0.22);
+        }
+        .hero-social--ig,
+        .hero-social--fb,
+        .hero-social--tt,
+        .hero-social--wa {
+          background: radial-gradient(circle at 30% 20%, rgba(255,210,120,0.18), rgba(10,10,14,0.9));
+          color: #f7e4bf;
+          border-color: rgba(255,210,120,0.35);
+        }
+        @media (max-width: 640px) {
+          .hero-social-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+          }
+        }
+        @keyframes social-shine {
+          0% { transform: translateX(-120%); }
+          70% { transform: translateX(120%); }
+          100% { transform: translateX(120%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-social-btn::after { animation: none !important; }
+        }
       `}</style>
 
       <Footer />

@@ -665,7 +665,7 @@ export default function Services() {
         contentMap={contentMap}
       />
 
-      <section id="sessions" className="pt-12 pb-16" style={sectionStyle}>
+      <section id="sessions" className="py-16 md:py-20" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={
@@ -704,7 +704,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section id="prints" className="pt-12 pb-16" style={sectionStyle}>
+      <section id="prints" className="py-16 md:py-20" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={
@@ -742,7 +742,7 @@ export default function Services() {
         </div>
       </section>
 
-      <section id="wedding" className="pt-12 pb-16 bg-card border-y border-white/5" style={sectionStyle}>
+      <section id="wedding" className="py-16 md:py-20 bg-card border-y border-white/5" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={
@@ -781,7 +781,7 @@ export default function Services() {
       </section>
 
       {/* ✅ addons gets extra bottom padding to guarantee activation near end */}
-      <section id="addons" className="pt-12 pb-24" style={sectionStyle}>
+      <section id="addons" className="py-16 md:py-20" style={sectionStyle}>
         <div className="container mx-auto px-4">
           <SectionHeader
             title={

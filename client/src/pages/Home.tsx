@@ -470,7 +470,7 @@ export default function Home() {
       </header>
 
       {/* SERVICES PREVIEW */}
-      <section className="pt-16 pb-16 relative">
+      <section className="py-16 md:py-20 relative">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_15%_25%,rgba(255,200,80,0.10),transparent_55%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
@@ -674,7 +674,7 @@ export default function Home() {
       </section>
 
       {/* ABOUT PREVIEW */}
-      <section className="pt-16 pb-16 md:pt-20 md:pb-20 relative">
+      <section className="py-16 md:py-20 relative">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div className="relative order-2 md:order-1 group overflow-hidden">
@@ -737,7 +737,7 @@ export default function Home() {
       {/* ✅ Story Gallery */}
       <section
         ref={(el) => (portfolioRef.current = el)}
-        className="pt-10 pb-14 md:pt-12 md:pb-16 relative overflow-hidden"
+        className="py-16 md:py-20 relative overflow-hidden"
         onMouseMove={(e) => setSpot(e.clientX, e.clientY)}
         onTouchMove={(e) => {
           const t = e.touches[0];
@@ -802,7 +802,7 @@ export default function Home() {
       </section>
 
       {/* STATS */}
-      <section className="py-10 md:py-12">
+      <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-3 gap-3 max-w-4xl mx-auto">
             {aboutContent.stats.map((s, index) => (
@@ -835,7 +835,7 @@ export default function Home() {
       </section>
 
       {/* PORTFOLIO CTA */}
-      <section className="pt-12 pb-16 md:pt-16 md:pb-20 relative overflow-hidden">
+      <section className="py-16 md:py-20 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_35%_25%,rgba(255,200,80,0.12),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h3 className="text-primary text-sm tracking-widest uppercase mb-2 font-bold">
@@ -937,7 +937,7 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="pt-16 pb-20 md:pt-20 md:pb-24 bg-card border-y border-white/5 relative overflow-hidden">
+      <section className="py-16 md:py-20 bg-card border-y border-white/5 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-40 [background:radial-gradient(circle_at_20%_30%,rgba(255,200,80,0.10),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
