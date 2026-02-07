@@ -4,6 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -1740,6 +1750,18 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
   const [note, setNote] = useState("");
   const [latestLinkUrl, setLatestLinkUrl] = useState("");
   const { data: links = [], isLoading } = trpc.shareLinks.list.useQuery();
+  const [confirmState, setConfirmState] = useState<{
+    open: boolean;
+    title: string;
+    description?: string;
+    confirmLabel: string;
+    onConfirm?: () => void;
+  }>({
+    open: false,
+    title: "",
+    description: "",
+    confirmLabel: "تأكيد",
+  });
 
   const buildShareUrl = (code: string) => {
     if (typeof window === "undefined") return "";
@@ -1774,7 +1796,17 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
       toast.error("يرجى إدخال مدة صحيحة بالساعات");
       return;
     }
-    createMutation.mutate({ ttlHours, note: note.trim() || undefined });
+    const hoursLabel = ttlHours === 1 ? "ساعة واحدة" : `${ttlHours} ساعة`;
+    const payloadNote = note.trim() || undefined;
+    setConfirmState({
+      open: true,
+      title: "تأكيد إنشاء الرابط",
+      description: `هل تريد إنشاء رابط مؤقت لمدة ${hoursLabel}؟`,
+      confirmLabel: "إنشاء",
+      onConfirm: () => {
+        createMutation.mutate({ ttlHours, note: payloadNote });
+      },
+    });
   };
 
   const handleCopy = async (url: string) => {
@@ -1787,7 +1819,15 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
   };
 
   const handleRemove = (code: string) => {
-    revokeMutation.mutate({ code });
+    setConfirmState({
+      open: true,
+      title: "تعطيل الرابط",
+      description: "هل تريد تعطيل هذا الرابط المؤقت؟",
+      confirmLabel: "تعطيل",
+      onConfirm: () => {
+        revokeMutation.mutate({ code });
+      },
+    });
   };
 
   const now = Date.now();
@@ -1797,6 +1837,36 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
 
   return (
     <div className="space-y-6">
+      <AlertDialog
+        open={confirmState.open}
+        onOpenChange={(open) => {
+          if (!open) {
+            setConfirmState((prev) => ({ ...prev, open: false, onConfirm: undefined }));
+          }
+        }}
+      >
+        <AlertDialogContent dir="rtl" className="text-right">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmState.title}</AlertDialogTitle>
+            {confirmState.description ? (
+              <AlertDialogDescription>{confirmState.description}</AlertDialogDescription>
+            ) : null}
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-start">
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                const action = confirmState.onConfirm;
+                setConfirmState((prev) => ({ ...prev, open: false, onConfirm: undefined }));
+                action?.();
+              }}
+            >
+              {confirmState.confirmLabel}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -1808,7 +1878,7 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="share-ttl">المدة (بالساعات)</Label>
               <Input
@@ -1820,7 +1890,7 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
                 onChange={(e) => setTtlHours(Number(e.target.value))}
               />
             </div>
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2">
               <Label htmlFor="share-note">ملاحظة (اختياري)</Label>
               <Input
                 id="share-note"
@@ -1866,10 +1936,14 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
           </Button>
 
           {latestLinkUrl && (
-            <div className="space-y-2">
+            <div className="rounded-lg border border-border bg-card/50 p-3 space-y-2">
               <Label>آخر رابط تم إنشاؤه</Label>
               <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                <Input value={latestLinkUrl} readOnly className="dir-ltr" />
+                <Input
+                  value={latestLinkUrl}
+                  readOnly
+                  className="dir-ltr text-xs sm:text-sm w-full"
+                />
                 <Button
                   type="button"
                   variant="secondary"
@@ -1895,7 +1969,7 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
             هذه القائمة محفوظة على السيرفر ويمكن التحكم بها من أي جهاز.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           {isLoading && (
             <div className="flex justify-center py-6">
               <Loader2 className="w-6 h-6 animate-spin" />
@@ -1917,10 +1991,10 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
 
             return (
               <div
-              key={link.code}
-                className="flex flex-col gap-3 rounded-lg border border-border p-4 md:flex-row md:items-center md:justify-between"
+                key={link.code}
+                className="rounded-xl border border-border bg-card/40 p-4 space-y-3"
               >
-                <div className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={isRevoked || isExpired ? "destructive" : "secondary"}>
                       {isRevoked ? "ملغي" : isExpired ? "منتهي" : "ساري"}
@@ -1929,34 +2003,44 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
                       ينتهي في {formatShareDate(link.expiresAt)}
                     </span>
                   </div>
-                  {link.note && (
-                    <div className="text-sm text-muted-foreground">
-                      {link.note}
-                    </div>
-                  )}
-                  <div className="text-xs text-muted-foreground dir-ltr break-all">
-                    {url}
+                  <div className="text-xs text-muted-foreground">
+                    {formatShareDate(link.createdAt)}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => handleCopy(url)}
-                    disabled={isRevoked}
-                  >
-                    <Copy className="w-4 h-4 ml-2" />
-                    نسخ
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleRemove(link.code)}
-                    disabled={revokeMutation.isPending || isRevoked}
-                  >
-                    <Trash2 className="w-4 h-4 ml-2" />
-                    تعطيل
-                  </Button>
+
+                {link.note && (
+                  <div className="text-sm text-muted-foreground">{link.note}</div>
+                )}
+
+                <div className="space-y-2">
+                  <Label className="text-xs">الرابط</Label>
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                    <Input
+                      value={url}
+                      readOnly
+                      className="dir-ltr text-xs sm:text-sm w-full"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleCopy(url)}
+                        disabled={isRevoked}
+                      >
+                        <Copy className="w-4 h-4 ml-2" />
+                        نسخ
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleRemove(link.code)}
+                        disabled={revokeMutation.isPending || isRevoked}
+                      >
+                        <Trash2 className="w-4 h-4 ml-2" />
+                        تعطيل
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -2110,12 +2194,24 @@ function LiveEditor() {
         </div>
       </div>
 
-      <div
-        className={[
-          "grid gap-6",
-          panelOpen ? "lg:grid-cols-[1.35fr_0.85fr]" : "",
-        ].join(" ")}
-      >
+      <div className="space-y-6">
+        {panelOpen && (
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Link2 className="w-5 h-5" />
+                روابط مؤقتة
+              </CardTitle>
+              <CardDescription>
+                أنشئ وادِر روابط المعاينة المؤقتة من هنا.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-2">
+              <ShareLinksManager onRefresh={refreshPreview} />
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="overflow-hidden">
           <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
@@ -2143,23 +2239,6 @@ function LiveEditor() {
             </div>
           </CardContent>
         </Card>
-
-        {panelOpen && (
-          <Card className="overflow-hidden">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Link2 className="w-5 h-5" />
-                روابط مؤقتة
-              </CardTitle>
-              <CardDescription>
-                أنشئ وادِر روابط المعاينة المؤقتة من هنا.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-2 max-h-[78vh] overflow-y-auto">
-              <ShareLinksManager onRefresh={refreshPreview} />
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );

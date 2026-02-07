@@ -163,6 +163,7 @@ export function EditableText({
   const utils = trpc.useUtils();
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState("");
+  const { requestConfirm, ConfirmDialog } = useInlineConfirm();
 
   const normalizedValue = value ?? "";
   const displayValue = normalizedValue || fallback || "";
@@ -210,12 +211,15 @@ export function EditableText({
       setIsEditing(false);
       return;
     }
-    if (!confirmInlineSave()) return;
-    upsertMutation.mutate({
-      key: fieldKey,
-      value: draft,
-      category,
-      label,
+    requestConfirm({
+      onConfirm: () => {
+        upsertMutation.mutate({
+          key: fieldKey,
+          value: draft,
+          category,
+          label,
+        });
+      },
     });
   };
 
@@ -319,6 +323,7 @@ export function EditableText({
           )}
         </span>
       )}
+      <ConfirmDialog />
     </Tag>
   );
 }
@@ -348,6 +353,7 @@ export function EditableContactText({
   const utils = trpc.useUtils();
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState("");
+  const { requestConfirm, ConfirmDialog } = useInlineConfirm();
 
   const normalizedValue = value ?? "";
   const displayValue = normalizedValue || fallback || "";
@@ -388,11 +394,14 @@ export function EditableContactText({
       setIsEditing(false);
       return;
     }
-    if (!confirmInlineSave()) return;
-    upsertMutation.mutate({
-      key: fieldKey,
-      value: draft,
-      label,
+    requestConfirm({
+      onConfirm: () => {
+        upsertMutation.mutate({
+          key: fieldKey,
+          value: draft,
+          label,
+        });
+      },
     });
   };
 
@@ -480,6 +489,7 @@ export function EditableContactText({
           )}
         </span>
       )}
+      <ConfirmDialog />
     </span>
   );
 }
@@ -527,6 +537,7 @@ export function EditableLinkIcon({
   const utils = trpc.useUtils();
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState("");
+  const { requestConfirm, ConfirmDialog } = useInlineConfirm();
 
   const normalizedValue = value ?? "";
   const displayValue = normalizedValue || fallback || "";
@@ -566,11 +577,14 @@ export function EditableLinkIcon({
       setIsEditing(false);
       return;
     }
-    if (!confirmInlineSave()) return;
-    upsertMutation.mutate({
-      key: fieldKey,
-      value: draft,
-      label,
+    requestConfirm({
+      onConfirm: () => {
+        upsertMutation.mutate({
+          key: fieldKey,
+          value: draft,
+          label,
+        });
+      },
     });
   };
 
@@ -669,6 +683,7 @@ export function EditableLinkIcon({
           </div>
         </div>
       )}
+      <ConfirmDialog />
     </div>
   );
 }
@@ -698,6 +713,7 @@ export function EditableImage({
   const utils = trpc.useUtils();
   const [isEditing, setIsEditing] = useState(false);
   const [draftUrl, setDraftUrl] = useState(src);
+  const { requestConfirm, ConfirmDialog } = useInlineConfirm();
 
   useEffect(() => {
     if (isEditing) return;
@@ -754,34 +770,43 @@ export function EditableImage({
       setIsEditing(false);
       return;
     }
-    if (!confirmInlineSave()) return;
-    upsertMutation.mutate({
-      key: fieldKey,
-      url: draftUrl,
-      alt,
-      category,
+    requestConfirm({
+      onConfirm: () => {
+        upsertMutation.mutate({
+          key: fieldKey,
+          url: draftUrl,
+          alt,
+          category,
+        });
+      },
     });
   };
 
   const handleFileChange = (file: File | undefined) => {
     if (!file) return;
-    if (!confirmInlineSave("هل تريد رفع الصورة وحفظ التعديل؟")) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64 = (reader.result as string).split(",")[1] ?? "";
-      if (!base64) {
-        toast.error("تعذر قراءة الصورة");
-        return;
-      }
-      uploadMutation.mutate({
-        key: fieldKey,
-        base64,
-        mimeType: file.type,
-        alt,
-        category,
-      });
-    };
-    reader.readAsDataURL(file);
+    requestConfirm({
+      title: "تأكيد رفع الصورة",
+      description: "هل تريد رفع الصورة وحفظ التعديل الآن؟",
+      confirmLabel: "رفع وحفظ",
+      onConfirm: () => {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const base64 = (reader.result as string).split(",")[1] ?? "";
+          if (!base64) {
+            toast.error("تعذر قراءة الصورة");
+            return;
+          }
+          uploadMutation.mutate({
+            key: fieldKey,
+            base64,
+            mimeType: file.type,
+            alt,
+            category,
+          });
+        };
+        reader.readAsDataURL(file);
+      },
+    });
   };
 
   return (
@@ -852,6 +877,7 @@ export function EditableImage({
           </div>
         </div>
       )}
+      <ConfirmDialog />
     </div>
   );
 }
