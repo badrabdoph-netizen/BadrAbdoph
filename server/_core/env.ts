@@ -15,19 +15,27 @@ const adminLoginMaxAttempts = Number.parseInt(process.env.ADMIN_LOGIN_MAX_ATTEMP
 const adminLoginBlockMs = Number.parseInt(process.env.ADMIN_LOGIN_BLOCK_MS ?? "1800000", 10);
 const adminRequireHttps = (process.env.ADMIN_REQUIRE_HTTPS ?? "true") === "true";
 
+const adminEnvIssues: string[] = [];
 if (isProduction) {
   if (!process.env.ADMIN_USER || !process.env.ADMIN_PASS) {
-    throw new Error("ADMIN_USER و ADMIN_PASS لازم يتحددوا في الإنتاج.");
+    adminEnvIssues.push("ADMIN_USER/ADMIN_PASS غير محددين");
   }
   if (adminUser === DEFAULT_ADMIN_USER || adminPass === DEFAULT_ADMIN_PASS) {
-    throw new Error("ممنوع استخدام بيانات الأدمن الافتراضية في الإنتاج.");
+    adminEnvIssues.push("بيانات الأدمن الافتراضية غير مسموحة");
   }
   if (!process.env.JWT_SECRET || cookieSecret === DEFAULT_COOKIE_SECRET) {
-    throw new Error("JWT_SECRET لازم يتحدد بقيمة قوية في الإنتاج.");
+    adminEnvIssues.push("JWT_SECRET غير محدد بقيمة قوية");
   }
   if (adminBypass) {
-    throw new Error("ADMIN_BYPASS ممنوع يكون مفعّل في الإنتاج.");
+    adminEnvIssues.push("ADMIN_BYPASS مفعّل");
   }
+}
+
+const adminLoginDisabled = adminEnvIssues.length > 0;
+if (adminLoginDisabled) {
+  console.warn(
+    `[Admin] تم تعطيل تسجيل دخول الأدمن لعدم اكتمال الإعدادات: ${adminEnvIssues.join(", ")}`
+  );
 }
 
 export const ENV = {
@@ -55,4 +63,6 @@ export const ENV = {
     ? adminLoginBlockMs
     : 1800000,
   adminRequireHttps,
+  adminLoginDisabled,
+  adminEnvIssues,
 };
