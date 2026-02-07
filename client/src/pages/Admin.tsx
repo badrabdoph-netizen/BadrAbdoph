@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { 
   Image, 
-  Settings, 
   Package, 
   MessageSquare, 
   Upload,
@@ -1974,7 +1972,6 @@ function ShareLinksManager({ onRefresh }: ManagerProps) {
 // ============================================
 function LiveEditor() {
   const [panelOpen, setPanelOpen] = useState(true);
-  const [activePanelTab, setActivePanelTab] = useState("content");
   const [previewKey, setPreviewKey] = useState(0);
   const [historyBusy, setHistoryBusy] = useState(false);
   const utils = trpc.useUtils();
@@ -2072,7 +2069,7 @@ function LiveEditor() {
         <div>
           <h2 className="text-2xl font-semibold">المعاينة المباشرة</h2>
           <p className="text-sm text-muted-foreground">
-            عدّل أي جزء من الأدوات وشاهد النتيجة فوراً داخل المعاينة.
+            عدّل من داخل المعاينة مباشرة، وروابط المعاينة المؤقتة موجودة في اللوحة الجانبية.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -2099,7 +2096,7 @@ function LiveEditor() {
             size="sm"
             onClick={() => setPanelOpen((open) => !open)}
           >
-            {panelOpen ? "إخفاء الأدوات" : "إظهار الأدوات"}
+            {panelOpen ? "إخفاء الروابط المؤقتة" : "إظهار الروابط المؤقتة"}
           </Button>
           <Button variant="secondary" size="sm" onClick={refreshPreview}>
             <Monitor className="w-4 h-4 ml-2" />
@@ -2151,55 +2148,15 @@ function LiveEditor() {
           <Card className="overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                أدوات التعديل
+                <Link2 className="w-5 h-5" />
+                روابط مؤقتة
               </CardTitle>
               <CardDescription>
-                كل أدوات التعديل مجمعة هنا، والتحديث يظهر مباشرة في المعاينة.
+                أنشئ وادِر روابط المعاينة المؤقتة من هنا.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-2 max-h-[78vh] overflow-y-auto">
-              <Tabs
-                value={activePanelTab}
-                onValueChange={setActivePanelTab}
-                className="space-y-4"
-              >
-                <TabsList className="grid w-full h-auto grid-cols-2 md:grid-cols-3 gap-2">
-                  <TabsTrigger value="content">النصوص</TabsTrigger>
-                  <TabsTrigger value="about">من أنا</TabsTrigger>
-                  <TabsTrigger value="portfolio">المعرض</TabsTrigger>
-                  <TabsTrigger value="packages">الباقات</TabsTrigger>
-                  <TabsTrigger value="testimonials">الآراء</TabsTrigger>
-                  <TabsTrigger value="contact">التواصل</TabsTrigger>
-                  <TabsTrigger value="sections">الأقسام</TabsTrigger>
-                  <TabsTrigger value="share">روابط مؤقتة</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="content">
-                  <ContentManager onRefresh={refreshPreview} />
-                </TabsContent>
-                <TabsContent value="about">
-                  <AboutManager onRefresh={refreshPreview} />
-                </TabsContent>
-                <TabsContent value="portfolio">
-                  <PortfolioManager onRefresh={refreshPreview} />
-                </TabsContent>
-                <TabsContent value="packages">
-                  <PackagesManager onRefresh={refreshPreview} />
-                </TabsContent>
-                <TabsContent value="testimonials">
-                  <TestimonialsManager onRefresh={refreshPreview} />
-                </TabsContent>
-                <TabsContent value="contact">
-                  <ContactManager onRefresh={refreshPreview} />
-                </TabsContent>
-                <TabsContent value="sections">
-                  <SectionsManager onRefresh={refreshPreview} />
-                </TabsContent>
-                <TabsContent value="share">
-                  <ShareLinksManager onRefresh={refreshPreview} />
-                </TabsContent>
-              </Tabs>
+              <ShareLinksManager onRefresh={refreshPreview} />
             </CardContent>
           </Card>
         )}

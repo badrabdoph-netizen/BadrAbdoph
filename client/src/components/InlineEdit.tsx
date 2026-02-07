@@ -8,6 +8,11 @@ import { toast } from "sonner";
 import { Check, Loader2, Pencil, X, Image as ImageIcon, Upload } from "lucide-react";
 import { pushEdit } from "@/lib/editHistory";
 
+const confirmInlineSave = (message = "هل تريد حفظ التعديل؟") => {
+  if (typeof window === "undefined") return true;
+  return window.confirm(message);
+};
+
 type EditableTextProps = {
   value?: string | null;
   fallback?: string;
@@ -126,6 +131,7 @@ export function EditableText({
       setIsEditing(false);
       return;
     }
+    if (!confirmInlineSave()) return;
     upsertMutation.mutate({
       key: fieldKey,
       value: draft,
@@ -303,6 +309,7 @@ export function EditableContactText({
       setIsEditing(false);
       return;
     }
+    if (!confirmInlineSave()) return;
     upsertMutation.mutate({
       key: fieldKey,
       value: draft,
@@ -480,6 +487,7 @@ export function EditableLinkIcon({
       setIsEditing(false);
       return;
     }
+    if (!confirmInlineSave()) return;
     upsertMutation.mutate({
       key: fieldKey,
       value: draft,
@@ -667,6 +675,7 @@ export function EditableImage({
       setIsEditing(false);
       return;
     }
+    if (!confirmInlineSave()) return;
     upsertMutation.mutate({
       key: fieldKey,
       url: draftUrl,
@@ -677,6 +686,7 @@ export function EditableImage({
 
   const handleFileChange = (file: File | undefined) => {
     if (!file) return;
+    if (!confirmInlineSave("هل تريد رفع الصورة وحفظ التعديل؟")) return;
     const reader = new FileReader();
     reader.onload = async () => {
       const base64 = (reader.result as string).split(",")[1] ?? "";
