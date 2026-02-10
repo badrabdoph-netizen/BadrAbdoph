@@ -743,6 +743,7 @@ export default function Home() {
                       multiline
                     />
                   </p>
+                  <span className="about-more">عرض المزيد</span>
                 </div>
               </Link>
             </div>
@@ -1169,10 +1170,31 @@ export default function Home() {
           left: 0;
           right: 0;
           bottom: 0;
-          height: 56px;
-          background: linear-gradient(180deg, rgba(11,11,15,0), rgba(11,11,15,0.92));
-          backdrop-filter: blur(4px);
+          height: 64px;
+          background: linear-gradient(
+            180deg,
+            rgba(11,11,15,0) 0%,
+            rgba(11,11,15,0.15) 45%,
+            rgba(11,11,15,0.35) 70%,
+            rgba(11,11,15,0.55) 100%
+          );
+          opacity: 0.9;
           pointer-events: none;
+        }
+        .about-more {
+          position: absolute;
+          bottom: 8px;
+          right: 0;
+          z-index: 1;
+          font-size: 12px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: rgba(255,220,150,0.95);
+          background: rgba(11,11,15,0.55);
+          border: 1px solid rgba(255,210,120,0.35);
+          padding: 6px 12px;
+          border-radius: 999px;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.35);
         }
         .about-text {
           color: rgba(255,255,255,0.72);

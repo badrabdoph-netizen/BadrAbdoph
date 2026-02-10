@@ -144,6 +144,46 @@ function PackageCard({
   const baseKey = `package_${pkg.id}`;
   const getValue = (key: string, fallback = "") => (contentMap[key] as string | undefined) ?? fallback;
   const customDescription = getValue(`${baseKey}_description`, pkg.description ?? "").trim();
+  const proNoteText = isPro
+    ? getValue("services_pro_note_text", "MEDIA COVERAGE REELS & TIKTOK").trim()
+    : "";
+
+  const featureItems = pkg.features.map((feature, index) => {
+    const fieldKey = `${baseKey}_feature_${index + 1}`;
+    const value = contentMap[fieldKey] ?? feature;
+    return { index, feature, fieldKey, value, isSynthetic: false };
+  });
+
+  const orderedFeatures = (() => {
+    if (!isPro) return featureItems;
+    const items = [...featureItems];
+    const isMediaLine = (text: string) =>
+      /media/i.test(text) || text.includes("ريلز") || text.includes("تيك");
+
+    const moveItem = (predicate: (text: string) => boolean, toIndex: number) => {
+      const fromIndex = items.findIndex((item) => predicate(item.value));
+      if (fromIndex === -1) return;
+      const [item] = items.splice(fromIndex, 1);
+      items.splice(Math.min(toIndex, items.length), 0, item);
+    };
+
+    moveItem((text) => text.includes("عدد غير محدود"), 0);
+
+    const mediaIndex = items.findIndex((item) => isMediaLine(item.value));
+    if (mediaIndex !== -1) {
+      moveItem((text) => isMediaLine(text), 1);
+    } else if (proNoteText) {
+      items.splice(Math.min(1, items.length), 0, {
+        index: -1,
+        feature: proNoteText,
+        fieldKey: "services_pro_note_text",
+        value: proNoteText,
+        isSynthetic: true,
+      });
+    }
+
+    return items;
+  })();
 
   const Icon =
     kind === "wedding" || kind === "prints" ? (
@@ -297,37 +337,25 @@ function PackageCard({
           </div>
         </div>
 
-        {isPro ? (
-          <div className="pro-note">
-            <Check size={14} className="text-primary ml-2 flex-shrink-0" />
-            <span className="pro-note-text">
-              <EditableText
-                value={contentMap.services_pro_note_text}
-                fallback="MEDIA COVERAGE REELS & TIKTOK"
-                fieldKey="services_pro_note_text"
-                category="services"
-                label="ملاحظة برو"
-              />
-            </span>
-          </div>
-        ) : null}
-
-        {pkg.features.length && !isCustom ? (
+        {orderedFeatures.length && !isCustom ? (
           <ul className="space-y-3 mb-6 md:mb-7">
-            {pkg.features.map((feature, i) => {
-              const featureValue = contentMap[`${baseKey}_feature_${i + 1}`] ?? feature;
+            {orderedFeatures.map((item, i) => {
+              const featureValue = item.value;
               const showProTag = isPro && featureValue.includes("تنظيم ريلز");
               const showMediaTag = featureValue.includes("MEDIA COVERAGE REELS");
+              const label = item.isSynthetic
+                ? "ملاحظة برو"
+                : `ميزة ${item.index + 1} - ${pkg.name}`;
               return (
-                <li key={i} className="flex items-start text-sm">
+                <li key={item.fieldKey ?? i} className="flex items-start text-sm">
                   <Check size={16} className="text-primary ml-2 mt-1 flex-shrink-0" />
                   <span className="text-gray-300 leading-relaxed">
                     <EditableText
-                      value={contentMap[`${baseKey}_feature_${i + 1}`]}
-                      fallback={feature}
-                      fieldKey={`${baseKey}_feature_${i + 1}`}
+                      value={contentMap[item.fieldKey]}
+                      fallback={item.feature}
+                      fieldKey={item.fieldKey}
                       category="services"
-                      label={`ميزة ${i + 1} - ${pkg.name}`}
+                      label={label}
                       multiline
                     />
                     {showProTag ? (
@@ -814,8 +842,8 @@ export default function Services() {
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-[radial-gradient(circle_at_30%_20%,rgba(255,200,80,0.12),transparent_60%)]" />
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-bold">
-                      {service.emoji}{" "}
+                    <h3 className="text-xl font-bold flex flex-wrap items-center gap-2">
+                      {service.emoji ? <span className="text-base">{service.emoji}</span> : null}
                       <EditableText
                         value={contentMap[`package_${service.id}_name`]}
                         fallback={service.name}
@@ -823,6 +851,9 @@ export default function Services() {
                         category="services"
                         label={`اسم الإضافة ${service.name}`}
                       />
+                      {["wedding-party", "media-coverage", "promo-video"].includes(service.id) ? (
+                        <span className="addon-special-tag">مصور خاص</span>
+                      ) : null}
                     </h3>
                     <span className="text-primary font-bold">
                       <EditableText
@@ -1128,6 +1159,36 @@ export default function Services() {
           text-transform: uppercase;
           color: rgba(255,235,200,0.85);
           text-shadow: 0 0 10px rgba(255,210,130,0.35);
+        }
+        .addon-special-tag {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 3px 9px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,210,120,0.55);
+          background:
+            linear-gradient(130deg, rgba(255,210,120,0.35), rgba(255,255,255,0.08)),
+            radial-gradient(circle at 20% 20%, rgba(255,245,210,0.35), transparent 60%);
+          color: rgba(255,245,220,0.98);
+          font-size: 10px;
+          font-weight: 700;
+          text-shadow: 0 0 10px rgba(255,210,130,0.7);
+          box-shadow:
+            0 6px 18px rgba(0,0,0,0.35),
+            0 0 16px rgba(255,210,130,0.35);
+          position: relative;
+          overflow: hidden;
+        }
+        .addon-special-tag::after {
+          content: "";
+          position: absolute;
+          inset: -120% -20%;
+          background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.7) 46%, transparent 70%);
+          transform: translateX(-120%);
+          animation: services-shine 5.8s ease-in-out infinite;
+          opacity: 0.45;
+          pointer-events: none;
         }
 
         .custom-package {
