@@ -341,7 +341,7 @@ function PackageCard({
           <ul className="space-y-3 mb-6 md:mb-7">
             {orderedFeatures.map((item, i) => {
               const featureValue = item.value;
-              const showProTag = isPro && featureValue.includes("تنظيم ريلز");
+              const showProTag = false;
               const showMediaTag = featureValue.includes("MEDIA COVERAGE REELS");
               const label = item.isSynthetic
                 ? "ملاحظة برو"

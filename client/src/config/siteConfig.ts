@@ -201,6 +201,7 @@ export const sessionPackages = [
     badge: "PRO",
     features: [
       "عدد غير محدود من الصور",
+      "MEDIA COVERAGE REELS",
       "تنظيم ريلز واستوريهات السوشيال ميديا",
       "أولوية تسليم سريع",
       "وقت مفتوح",
