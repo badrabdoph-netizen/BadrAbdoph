@@ -204,6 +204,18 @@ export default function Contact() {
     const totalText = formatPriceNumber(total);
     return unit ? `${totalText}${unit}` : totalText;
   }, [selectedPackage, selectedAddons]);
+
+  const priceBreakdown = useMemo(() => {
+    const emptyValue = getValue("contact_receipt_empty", "—");
+    if (!selectedPackage?.price) return "";
+    const lines = [`• ${selectedPackage.label}: ${selectedPackage.price}`];
+    selectedAddons.forEach((addon) => {
+      lines.push(`• ${addon.label}: ${addon.price}`);
+    });
+    lines.push(`الإجمالي: ${priceValue || emptyValue}`);
+    return lines.join("\n");
+  }, [selectedPackage, selectedAddons, priceValue, contentMap]);
+
   const receiptText = useMemo(() => {
     const emptyValue = getValue("contact_receipt_empty", "—");
     const lines = [
@@ -213,10 +225,12 @@ export default function Contact() {
       `${getValue("contact_receipt_label_date", "التاريخ")}: ${watchedDate || emptyValue}`,
       `${getValue("contact_receipt_label_package", "الباقة")}: ${selectedPackage?.label || emptyValue}`,
       `${getValue("contact_receipt_label_addons", "الإضافات")}: ${addonsText}`,
-      `${getValue("contact_receipt_label_price", "السعر")}: ${priceValue || emptyValue}`,
+      priceBreakdown
+        ? `${getValue("contact_receipt_label_price", "السعر")}:\n${priceBreakdown}`
+        : `${getValue("contact_receipt_label_price", "السعر")}: ${emptyValue}`,
     ];
     return lines.join("\n");
-  }, [watchedName, watchedPhone, watchedDate, selectedPackage, addonsText, priceValue, contentMap]);
+  }, [watchedName, watchedPhone, watchedDate, selectedPackage, addonsText, priceValue, priceBreakdown, contentMap]);
 
   const whatsappReceiptHref = useMemo(
     () => buildWhatsAppHref(receiptText, contactInfo.whatsappNumber),
@@ -476,54 +490,6 @@ export default function Contact() {
 
                   <FormField
                     control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          <EditableText
-                            value={contentMap.contact_label_phone}
-                            fallback="رقم الهاتف"
-                            fieldKey="contact_label_phone"
-                            category="contact"
-                            label="حقل الهاتف"
-                          />
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder={getValue("contact_placeholder_phone", "01xxxxxxxxx")}
-                            value={field.value}
-                            onChange={(e) => field.onChange(normalizePhone(e.target.value))}
-                            className={`${fieldClass} text-right`}
-                            dir="ltr"
-                            inputMode="tel"
-                            autoComplete="tel"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid gap-2">
-                    <Label>
-                      <EditableText
-                        value={contentMap.contact_label_price}
-                        fallback="السعر المختار"
-                        fieldKey="contact_label_price"
-                        category="contact"
-                        label="عنوان السعر"
-                      />
-                    </Label>
-                    <Input
-                      value={priceValue}
-                      readOnly
-                      placeholder={getValue("contact_placeholder_price", "سيظهر السعر تلقائياً")}
-                      className={`${fieldClass} text-right font-semibold text-primary/90`}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
                     name="addonIds"
                     render={({ field }) => (
                       <FormItem>
@@ -549,10 +515,10 @@ export default function Contact() {
                                 <ChevronDown className="w-4 h-4 text-muted-foreground" />
                               </button>
                             </PopoverTrigger>
-                          <PopoverContent
-                            align="start"
-                            className="w-[min(92vw,360px)] border border-white/10 bg-background/95 backdrop-blur-md p-3"
-                          >
+                            <PopoverContent
+                              align="start"
+                              className="w-[min(92vw,360px)] border border-white/10 bg-background/95 backdrop-blur-md p-3"
+                            >
                               <div className="space-y-3">
                                 {addonOptions.length ? (
                                   addonOptions.map((opt) => {
@@ -600,6 +566,54 @@ export default function Contact() {
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          <EditableText
+                            value={contentMap.contact_label_phone}
+                            fallback="رقم الهاتف"
+                            fieldKey="contact_label_phone"
+                            category="contact"
+                            label="حقل الهاتف"
+                          />
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={getValue("contact_placeholder_phone", "01xxxxxxxxx")}
+                            value={field.value}
+                            onChange={(e) => field.onChange(normalizePhone(e.target.value))}
+                            className={`${fieldClass} text-right`}
+                            dir="ltr"
+                            inputMode="tel"
+                            autoComplete="tel"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid gap-2">
+                    <Label>
+                      <EditableText
+                        value={contentMap.contact_label_price}
+                        fallback="السعر المختار"
+                        fieldKey="contact_label_price"
+                        category="contact"
+                        label="عنوان السعر"
+                      />
+                    </Label>
+                    <Input
+                      value={priceValue}
+                      readOnly
+                      placeholder={getValue("contact_placeholder_price", "سيظهر السعر تلقائياً")}
+                      className={`${fieldClass} text-right font-semibold text-primary/90`}
+                    />
+                  </div>
 
                   <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-black/35 via-background/80 to-black/40 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
                     <div className="absolute inset-0 pointer-events-none opacity-50 [background:radial-gradient(circle_at_20%_0%,rgba(255,200,80,0.18),transparent_55%)]" />
