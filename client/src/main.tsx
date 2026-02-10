@@ -16,6 +16,17 @@ const shouldAllowContextMenu = (target: EventTarget | null) => {
 };
 
 if (typeof window !== "undefined") {
+  const root = document.documentElement;
+  root.lang = "ar";
+  root.dir = "rtl";
+  root.setAttribute("translate", "no");
+  root.classList.add("notranslate");
+  if (document.body) {
+    document.body.setAttribute("translate", "no");
+    document.body.setAttribute("dir", "rtl");
+    document.body.classList.add("notranslate");
+  }
+
   document.addEventListener(
     "contextmenu",
     (event) => {

@@ -189,6 +189,7 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const portfolioRef = useRef<HTMLElement | null>(null);
   const { contactInfo, socialLinks } = useContactData();
+  const { enabled: inlineEditEnabled } = useInlineEditMode();
   const content = useContentData();
   const contentMap = content.contentMap ?? {};
   const testimonials = useTestimonialsData();
@@ -201,6 +202,12 @@ export default function Home() {
   const aboutImage = imageMap.aboutImage?.url ?? siteImages.aboutImage;
   const getValue = (key: string, fallback: string = "") =>
     (contentMap[key] as string | undefined) ?? fallback;
+  const handleAboutStoryClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (inlineEditEnabled) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  };
 
   const formatWhatsAppHref = (value: string) => {
     const phone = (value ?? "").replace(/[^\d]/g, "");
@@ -719,16 +726,25 @@ export default function Home() {
                   multiline
                 />
               </h2>
-              <p className="about-text">
-                <EditableText
-                  value={content.aboutDescription}
-                  fallback={aboutContent.description ?? ""}
-                  fieldKey="about_description"
-                  category="about"
-                  label="وصف صفحة من أنا"
-                  multiline
-                />
-              </p>
+              <Link
+                href="/about"
+                className="about-story-link"
+                onClick={handleAboutStoryClick}
+                aria-label="افتح قسم من أنا"
+              >
+                <div className="about-story">
+                  <p className="about-text">
+                    <EditableText
+                      value={content.aboutDescription}
+                      fallback={aboutContent.description ?? ""}
+                      fieldKey="about_description"
+                      category="about"
+                      label="وصف صفحة من أنا"
+                      multiline
+                    />
+                  </p>
+                </div>
+              </Link>
             </div>
           </div>
         </div>
@@ -1131,11 +1147,32 @@ export default function Home() {
           font-weight: 700;
           margin-bottom: 14px;
           font-family: "Playfair Display", serif;
-          background: linear-gradient(120deg, #fff, #f7e0b5, #fff);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-          text-shadow: 0 10px 30px rgba(255,210,120,0.12);
+          color: rgba(255,245,225,0.98);
+          text-shadow:
+            0 8px 24px rgba(0,0,0,0.35),
+            0 0 18px rgba(255,210,120,0.25);
+        }
+        .about-story-link {
+          display: block;
+          color: inherit;
+          text-decoration: none;
+        }
+        .about-story {
+          position: relative;
+          max-height: 170px;
+          overflow: hidden;
+          cursor: pointer;
+        }
+        .about-story::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 56px;
+          background: linear-gradient(180deg, rgba(11,11,15,0), rgba(11,11,15,0.92));
+          backdrop-filter: blur(4px);
+          pointer-events: none;
         }
         .about-text {
           color: rgba(255,255,255,0.72);

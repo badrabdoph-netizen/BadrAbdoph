@@ -10,6 +10,11 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  app.use((_req, res, next) => {
+    res.setHeader("Content-Language", "ar");
+    next();
+  });
+
   // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"
