@@ -144,6 +144,11 @@ function PackageCard({
   const baseKey = `package_${pkg.id}`;
   const getValue = (key: string, fallback = "") => (contentMap[key] as string | undefined) ?? fallback;
   const customDescription = getValue(`${baseKey}_description`, pkg.description ?? "").trim();
+  const customWhatsAppMessage =
+    "ظبطلي باكدج مناسبه مع ميزانيتي مختلفه عن ال موجود عندك❤️";
+  const customWhatsAppHref = isCustom
+    ? buildWhatsAppHref(customWhatsAppMessage, whatsappNumber)
+    : "";
   const proNoteText = isPro
     ? getValue("services_pro_note_text", "MEDIA COVERAGE REELS & TIKTOK").trim()
     : "";
@@ -387,43 +392,69 @@ function PackageCard({
           </ul>
         ) : null}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Link href="/contact">
-            <Button
-              variant={weddingTone ? "default" : "outline"}
-                          className={[
-                            "w-full rounded-none cta-glow cta-size",
-                weddingTone
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
-              ].join(" ")}
+        {isCustom ? (
+          <div className="custom-cta">
+            <a
+              href={customWhatsAppHref || undefined}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full"
             >
-              <EditableText
-                value={contentMap.services_primary_cta}
-                fallback={ctaTexts.bookNow ?? "احجز الآن"}
-                fieldKey="services_primary_cta"
-                category="services"
-                label="زر احجز الآن (الباقات)"
-              />
-            </Button>
-          </Link>
+              <Button
+                variant="outline"
+                className="custom-cta-btn border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none cta-glow cta-size w-full"
+                disabled={!customWhatsAppHref}
+              >
+                <EditableText
+                  value={contentMap.services_secondary_cta}
+                  fallback="تفاصيل"
+                  fieldKey="services_secondary_cta"
+                  category="services"
+                  label="زر تفاصيل (خصص باقتك)"
+                />
+                <ArrowLeft className="mr-2 w-4 h-4" />
+              </Button>
+            </a>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link href="/contact">
+              <Button
+                variant={weddingTone ? "default" : "outline"}
+                            className={[
+                              "w-full rounded-none cta-glow cta-size",
+                  weddingTone
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "border-primary text-primary hover:bg-primary hover:text-primary-foreground",
+                ].join(" ")}
+              >
+                <EditableText
+                  value={contentMap.services_primary_cta}
+                  fallback={ctaTexts.bookNow ?? "احجز الآن"}
+                  fieldKey="services_primary_cta"
+                  category="services"
+                  label="زر احجز الآن (الباقات)"
+                />
+              </Button>
+            </Link>
 
-          <Link href="/package-details">
-            <Button
-              variant="outline"
-              className="w-full border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none cta-glow cta-size"
-            >
-              <EditableText
-                value={contentMap.services_secondary_cta}
-                fallback="اسأل عن التفاصيل"
-                fieldKey="services_secondary_cta"
-                category="services"
-                label="زر اسأل عن التفاصيل"
-              />
-              <ArrowLeft className="mr-2 w-4 h-4" />
-            </Button>
-          </Link>
-        </div>
+            <Link href="/package-details">
+              <Button
+                variant="outline"
+                className="w-full border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors rounded-none cta-glow cta-size"
+              >
+                <EditableText
+                  value={contentMap.services_secondary_cta}
+                  fallback="اسأل عن التفاصيل"
+                  fieldKey="services_secondary_cta"
+                  category="services"
+                  label="زر اسأل عن التفاصيل"
+                />
+                <ArrowLeft className="mr-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+        )}
 
         {vip && (
           <div className="mt-5 text-xs vip-note">
@@ -1198,9 +1229,10 @@ export default function Services() {
           border-style: dashed;
           border-color: rgba(255,210,120,0.45);
           box-shadow: 0 22px 70px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,210,120,0.25);
-          border-radius: 999px;
-          aspect-ratio: 1 / 1;
-          max-width: 380px;
+          border-radius: 28px;
+          aspect-ratio: auto;
+          max-width: 520px;
+          min-height: 320px;
           margin: 0 auto;
           display: flex;
           align-items: center;
@@ -1210,11 +1242,19 @@ export default function Services() {
           text-align: center;
           align-items: center;
         }
+        .custom-cta {
+          margin-top: 18px;
+          display: flex;
+          justify-content: center;
+        }
+        .custom-cta-btn {
+          max-width: 320px;
+        }
         @media (max-width: 640px) {
           .custom-package {
-            aspect-ratio: auto;
-            border-radius: 28px;
+            border-radius: 22px;
             max-width: 100%;
+            min-height: 0;
           }
           .services-card {
             padding: 24px;

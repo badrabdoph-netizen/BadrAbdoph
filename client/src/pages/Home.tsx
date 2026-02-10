@@ -341,6 +341,7 @@ export default function Home() {
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/10 via-background/25 to-background" />
         <div className="absolute inset-0 z-10 pointer-events-none [background:radial-gradient(circle_at_50%_35%,rgba(255,200,80,0.10),transparent_55%)]" />
         <div className="absolute inset-0 z-10 pointer-events-none hero-grain opacity-[0.12]" />
+        <div className="absolute inset-x-0 bottom-0 h-28 md:h-40 z-10 pointer-events-none hero-bottom-fade" />
 
         <div className="absolute top-6 right-6 z-30 flex flex-col gap-2">
           <EditableImage
@@ -389,18 +390,6 @@ export default function Home() {
               displayClassName="whitespace-pre-line"
             />
           </h1>
-
-          <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mb-6 font-light leading-relaxed">
-            <EditableText
-              value={content.heroDescription}
-              fallback={homeHero?.subTextAr || photographerInfo.descriptionAr || ""}
-              fieldKey="hero_description"
-              category="home"
-              label="وصف القسم الرئيسي"
-              multiline
-              className="block"
-            />
-          </p>
 
           <div className="mt-8 flex flex-col items-center gap-4">
             <div className="hero-follow-title">
@@ -509,7 +498,18 @@ export default function Home() {
                 multiline
               />
             </p>
-            <div className="mt-6 flex justify-center">
+            <p className="text-muted-foreground mt-5 mb-3 max-w-2xl mx-auto leading-relaxed">
+              <EditableText
+                value={content.heroDescription}
+                fallback={homeHero?.subTextAr || photographerInfo.descriptionAr || ""}
+                fieldKey="hero_description"
+                category="home"
+                label="وصف القسم الرئيسي"
+                multiline
+                className="block"
+              />
+            </p>
+            <div className="mt-2 flex justify-center">
               <Link href="/services">
                 <Button
                   variant="outline"
@@ -733,16 +733,18 @@ export default function Home() {
                 aria-label="افتح قسم من أنا"
               >
                 <div className="about-story">
-                  <p className="about-text">
-                    <EditableText
-                      value={content.aboutDescription}
-                      fallback={aboutContent.description ?? ""}
-                      fieldKey="about_description"
-                      category="about"
-                      label="وصف صفحة من أنا"
-                      multiline
-                    />
-                  </p>
+                  <div className="about-story-mask">
+                    <p className="about-text">
+                      <EditableText
+                        value={content.aboutDescription}
+                        fallback={aboutContent.description ?? ""}
+                        fieldKey="about_description"
+                        category="about"
+                        label="وصف صفحة من أنا"
+                        multiline
+                      />
+                    </p>
+                  </div>
                   <span className="about-more">عرض المزيد</span>
                 </div>
               </Link>
@@ -1056,6 +1058,15 @@ export default function Home() {
           background-size: 160px 160px;
           mix-blend-mode: overlay;
         }
+        .hero-bottom-fade {
+          background: linear-gradient(
+            180deg,
+            rgba(0,0,0,0) 0%,
+            hsl(var(--background)) 85%
+          );
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+        }
 
         .package-card {
           background:
@@ -1160,26 +1171,13 @@ export default function Home() {
         }
         .about-story {
           position: relative;
-          max-height: 170px;
-          overflow: hidden;
           cursor: pointer;
         }
-        .about-story::after {
-          content: "";
-          position: absolute;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          height: 64px;
-          background: linear-gradient(
-            180deg,
-            rgba(11,11,15,0) 0%,
-            rgba(11,11,15,0.15) 45%,
-            rgba(11,11,15,0.35) 70%,
-            rgba(11,11,15,0.55) 100%
-          );
-          opacity: 0.9;
-          pointer-events: none;
+        .about-story-mask {
+          max-height: 170px;
+          overflow: hidden;
+          mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0));
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0));
         }
         .about-more {
           position: absolute;
