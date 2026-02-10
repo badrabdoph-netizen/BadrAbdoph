@@ -60,6 +60,42 @@ function normalizePhone(raw: string) {
   return v;
 }
 
+function parsePriceValue(raw?: string) {
+  if (!raw) return null;
+  let v = toEnglishDigits(raw);
+  v = v.replace(/٬/g, "").replace(/٫/g, ".");
+  const cleaned = v.replace(/[^0-9.,-]/g, "");
+  if (!cleaned) return null;
+  let normalized = cleaned;
+  const hasDot = normalized.includes(".");
+  const hasComma = normalized.includes(",");
+  if (hasDot && hasComma) {
+    normalized = normalized.replace(/,/g, "");
+  } else if (!hasDot && hasComma) {
+    if (/\d+,\d{3}/.test(normalized)) {
+      normalized = normalized.replace(/,/g, "");
+    } else {
+      normalized = normalized.replace(/,/g, ".");
+    }
+  }
+  const match = normalized.match(/-?\d+(\.\d+)?/);
+  if (!match) return null;
+  const num = Number(match[0]);
+  return Number.isFinite(num) ? num : null;
+}
+
+function extractPriceUnit(raw?: string) {
+  if (!raw) return "";
+  const unit = toEnglishDigits(raw).replace(/[0-9.,٬٫\s]/g, "").trim();
+  return unit ? ` ${unit}` : "";
+}
+
+function formatPriceNumber(value: number) {
+  if (!Number.isFinite(value)) return "";
+  const rounded = Math.round(value * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+}
+
 function WhatsAppIcon({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -155,7 +191,19 @@ export default function Contact() {
     ? selectedAddons.map((a) => a.label).join("، ")
     : getValue("contact_addons_placeholder", "اختر الإضافات");
 
-  const priceValue = selectedPackage?.price ?? "";
+  const priceValue = useMemo(() => {
+    if (!selectedPackage?.price) return "";
+    const packageNumber = parsePriceValue(selectedPackage.price);
+    if (packageNumber === null) return selectedPackage.price;
+    const addonsTotal = selectedAddons.reduce((sum, addon) => {
+      const addonNumber = parsePriceValue(addon.price);
+      return addonNumber === null ? sum : sum + addonNumber;
+    }, 0);
+    const total = packageNumber + addonsTotal;
+    const unit = extractPriceUnit(selectedPackage.price);
+    const totalText = formatPriceNumber(total);
+    return unit ? `${totalText}${unit}` : totalText;
+  }, [selectedPackage, selectedAddons]);
   const receiptText = useMemo(() => {
     const emptyValue = getValue("contact_receipt_empty", "—");
     const lines = [
